@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Search, Filter, MapPin } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import RestaurantCard from './RestaurantCard';
+import RestaurantMapModal from './RestaurantMapModal';
 import { getAllRestaurants, type Restaurant } from '@/utils/restaurantData';
 import { getLocalizedValue } from '@/utils/localization';
 import { useDistanceCalculation, type RestaurantWithDistance } from '@/hooks/useDistanceCalculation';
@@ -24,9 +25,10 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
   const [sortBy, setSortBy] = useState('name');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showMapModal, setShowMapModal] = useState(false);
 
   // Use distance calculation hook
-  const { restaurantsWithDistance, hasLocation } = useDistanceCalculation(restaurants);
+  const { restaurantsWithDistance, hasLocation, userLocation } = useDistanceCalculation(restaurants);
 
   useEffect(() => {
     try {
@@ -227,10 +229,13 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <button
+          onClick={() => setShowMapModal(true)}
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-navikko-primary transition-colors cursor-pointer"
+        >
           <MapPin className="h-4 w-4" />
           <span>{t('search.nearby')}</span>
-        </div>
+        </button>
       </div>
 
       {/* Restaurant Grid */}
@@ -257,6 +262,14 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
           </div>
         </Card>
       )}
+
+      {/* Restaurant Map Modal */}
+      <RestaurantMapModal
+        isOpen={showMapModal}
+        onClose={() => setShowMapModal(false)}
+        restaurants={filteredRestaurants}
+        userLocation={userLocation}
+      />
     </div>
   );
 };
