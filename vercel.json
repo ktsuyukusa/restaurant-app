@@ -1,7 +1,19 @@
 {
+  "redirects": [
+    {
+      "source": "/privacy-policy",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/terms-of-service",
+      "destination": "/", 
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/((?!_next/static|_next/image|favicon.ico|api/).*)",
       "destination": "/index.html"
     }
   ]
