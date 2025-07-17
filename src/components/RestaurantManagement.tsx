@@ -7,9 +7,11 @@ import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { toast } from '@/components/ui/use-toast';
+import { getSupabaseClient } from '@/lib/supabase';
 
 interface Restaurant {
   id: string;
@@ -29,51 +31,72 @@ const RestaurantManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Restaurant>>({});
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const restaurantTypes = ['Japanese', 'Italian', 'Chinese', 'Korean', 'French', 'Thai', 'Indian', 'American', 'Cafe', 'Izakaya'];
 
   useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+          .from('restaurants')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching restaurants:', error);
+        } else {
+          setRestaurants(data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching restaurants:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchRestaurants();
   }, []);
 
-  const fetchRestaurants = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('restaurants')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
-      setRestaurants(data || []);
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to fetch restaurants', variant: 'destructive' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
     try {
+      const supabase = getSupabaseClient();
+      
       if (editingId) {
         const { error } = await supabase
           .from('restaurants')
           .update(formData)
           .eq('id', editingId);
+
         if (error) throw error;
-        toast({ title: 'Success', description: 'Restaurant updated successfully' });
       } else {
         const { error } = await supabase
           .from('restaurants')
           .insert([formData]);
+
         if (error) throw error;
-        toast({ title: 'Success', description: 'Restaurant created successfully' });
       }
+
+      // Refresh the list
+      const { data, error } = await supabase
+        .from('restaurants')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setRestaurants(data || []);
+      
       setFormData({});
       setEditingId(null);
-      fetchRestaurants();
     } catch (error) {
-      toast({ title: 'Error', description: 'Failed to save restaurant', variant: 'destructive' });
+      console.error('Error saving restaurant:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -83,17 +106,27 @@ const RestaurantManagement: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this restaurant?')) return;
-    try {
-      const { error } = await supabase
-        .from('restaurants')
-        .delete()
-        .eq('id', id);
-      if (error) throw error;
-      toast({ title: 'Success', description: 'Restaurant deleted successfully' });
-      fetchRestaurants();
-    } catch (error) {
-      toast({ title: 'Error', description: 'Failed to delete restaurant', variant: 'destructive' });
+    if (confirm(t('confirm.delete'))) {
+      try {
+        const supabase = getSupabaseClient();
+        const { error } = await supabase
+          .from('restaurants')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+
+        // Refresh the list
+        const { data, error: fetchError } = await supabase
+          .from('restaurants')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (fetchError) throw fetchError;
+        setRestaurants(data || []);
+      } catch (error) {
+        console.error('Error deleting restaurant:', error);
+      }
     }
   };
 

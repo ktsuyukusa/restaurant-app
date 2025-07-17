@@ -6,7 +6,7 @@ import { ShoppingCart } from 'lucide-react';
 import { useAppContext } from '@/contexts/AppContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from 'react-i18next';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 
 interface MenuItem {
   id: string;
@@ -34,28 +34,34 @@ const MenuDisplay: React.FC<MenuDisplayProps> = ({ restaurantId }) => {
   const { addToCart } = useAppContext();
   const { i18n } = useTranslation();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [filteredItems, setFilteredItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchMenuItems = async () => {
+      try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+          .from('menus')
+          .select('*')
+          .eq('restaurant_id', restaurantId)
+          .eq('is_available', true);
+
+        if (error) {
+          console.error('Error fetching menu items:', error);
+        } else {
+          setMenuItems(data || []);
+          setFilteredItems(data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching menu items:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchMenuItems();
   }, [restaurantId]);
-
-  const fetchMenuItems = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('menus')
-        .select('*')
-        .eq('restaurant_id', restaurantId);
-      
-      if (error) throw error;
-      setMenuItems(data || []);
-    } catch (err) {
-      console.error('Error fetching menu items:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const getItemName = (item: MenuItem) => {
     const currentLang = i18n.language;

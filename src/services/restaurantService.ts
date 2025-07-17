@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 
 export interface Restaurant {
   id: string;
@@ -42,7 +42,7 @@ class RestaurantService {
   // Get all active restaurants
   async getRestaurants(): Promise<Restaurant[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseClient()
         .from('restaurants')
         .select('*')
         .eq('is_active', true)
@@ -63,7 +63,7 @@ class RestaurantService {
   // Get restaurant by ID
   async getRestaurantById(id: string): Promise<Restaurant | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseClient()
         .from('restaurants')
         .select('*')
         .eq('id', id)
@@ -85,7 +85,7 @@ class RestaurantService {
   // Get menu items for a restaurant
   async getMenuItems(restaurantId: string): Promise<MenuItem[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseClient()
         .from('menus')
         .select('*')
         .eq('restaurant_id', restaurantId)
@@ -107,7 +107,7 @@ class RestaurantService {
   // Get menu item by ID
   async getMenuItemById(id: string): Promise<MenuItem | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseClient()
         .from('menus')
         .select('*')
         .eq('id', id)
@@ -129,7 +129,7 @@ class RestaurantService {
   // Search restaurants by name or cuisine
   async searchRestaurants(query: string): Promise<Restaurant[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseClient()
         .from('restaurants')
         .select('*')
         .eq('is_active', true)
@@ -151,7 +151,7 @@ class RestaurantService {
   // Get restaurants by cuisine
   async getRestaurantsByCuisine(cuisine: string): Promise<Restaurant[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseClient()
         .from('restaurants')
         .select('*')
         .eq('is_active', true)
@@ -173,7 +173,7 @@ class RestaurantService {
   // Get restaurants near a location (simple distance calculation)
   async getRestaurantsNearLocation(lat: number, lng: number, radiusKm: number = 10): Promise<Restaurant[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseClient()
         .from('restaurants')
         .select('*')
         .eq('is_active', true);
@@ -226,7 +226,7 @@ class RestaurantService {
   // Get all available cuisines
   async getCuisines(): Promise<string[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseClient()
         .from('restaurants')
         .select('cuisine')
         .eq('is_active', true)
@@ -248,7 +248,7 @@ class RestaurantService {
   // Get menu categories for a restaurant
   async getMenuCategories(restaurantId: string): Promise<string[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getSupabaseClient()
         .from('menus')
         .select('category')
         .eq('restaurant_id', restaurantId)

@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Loader2, AlertCircle } from 'lucide-react';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { supabase } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 import { getLocalizedValue } from '@/utils/localization';
 
 interface NearbyRestaurant {
@@ -25,48 +25,42 @@ const NearbyPrompt: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (coords) {
-      fetchNearbyRestaurants();
-    }
+    const fetchNearbyRestaurants = async () => {
+      if (!coords) return;
+
+      try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+          .from('restaurants')
+          .select('*')
+          .eq('is_active', true);
+
+        if (error) {
+          console.error('Error fetching restaurants:', error);
+        } else {
+          // Filter restaurants within 5km radius
+          const nearby = (data || []).filter(restaurant => {
+            if (!restaurant.latitude || !restaurant.longitude) return false;
+            
+            const distance = calculateDistance(
+              coords.latitude,
+              coords.longitude,
+              restaurant.latitude,
+              restaurant.longitude
+            );
+            
+            return distance <= 5; // 5km radius
+          });
+
+          setNearbyRestaurants(nearby);
+        }
+      } catch (error) {
+        console.error('Error fetching nearby restaurants:', error);
+      }
+    };
+
+    fetchNearbyRestaurants();
   }, [coords]);
-
-  const fetchNearbyRestaurants = async () => {
-    if (!coords) return;
-
-    setLoading(true);
-    try {
-      // Fetch all restaurants first (you might want to add a radius filter in your database)
-      const { data: restaurants, error } = await supabase
-        .from('restaurants')
-        .select('*');
-
-      if (error) throw error;
-
-      // Calculate distances and filter nearby restaurants (within 5km)
-      const nearby = restaurants
-        ?.map(restaurant => {
-          const distance = calculateDistance(
-            coords.latitude,
-            coords.longitude,
-            restaurant.latitude || 0,
-            restaurant.longitude || 0
-          );
-          return {
-            ...restaurant,
-            distance
-          };
-        })
-        .filter(restaurant => restaurant.distance <= 5) // Within 5km
-        .sort((a, b) => a.distance - b.distance)
-        .slice(0, 5); // Top 5 closest
-
-      setNearbyRestaurants(nearby || []);
-    } catch (err) {
-      console.error('Error fetching nearby restaurants:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
     const R = 6371; // Earth's radius in km

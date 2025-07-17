@@ -6,9 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Edit, Trash2, Calendar } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { Plus, Edit, Trash2, Calendar, Clock, Users, MapPin, Phone, Mail, CheckCircle, XCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getSupabaseClient } from '@/lib/supabase';
 import { getLocalizedValue } from '@/utils/localization';
 
 interface Reservation {
@@ -17,6 +17,17 @@ interface Reservation {
   name: string;
   date: string;
   comment: string;
+  status: string;
+  restaurant: {
+    name: string;
+    address: string;
+    phone: string;
+  };
+  user: {
+    name: string;
+    email: string;
+    phone: string;
+  };
 }
 
 interface Restaurant {
@@ -47,25 +58,34 @@ const ReservationManagement: React.FC = () => {
   });
 
   useEffect(() => {
+    const fetchReservations = async () => {
+      try {
+        const supabase = getSupabaseClient();
+        const { data, error } = await supabase
+          .from('reservations')
+          .select(`
+            *,
+            restaurants(name, address, phone),
+            users(name, email, phone)
+          `)
+          .order('reservation_date', { ascending: true })
+          .order('reservation_time', { ascending: true });
+
+        if (error) {
+          console.error('Error fetching reservations:', error);
+        } else {
+          setReservations(data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching reservations:', error);
+      }
+    };
+
     fetchReservations();
-    fetchRestaurants();
   }, []);
 
-  const fetchReservations = async () => {
-    const { data, error } = await supabase
-      .from('reservations')
-      .select('*')
-      .order('date', { ascending: true });
-    
-    if (error) {
-      console.error('Error fetching reservations:', error);
-    } else {
-      setReservations(data || []);
-    }
-  };
-
   const fetchRestaurants = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('restaurants')
       .select('id, name_ja, name_en, name_json')
       .order('name_en');
@@ -81,7 +101,7 @@ const ReservationManagement: React.FC = () => {
     e.preventDefault();
     
     if (editingReservation) {
-      const { error } = await supabase
+      const { error } = await getSupabaseClient()
         .from('reservations')
         .update(formData)
         .eq('id', editingReservation.id);
@@ -93,7 +113,7 @@ const ReservationManagement: React.FC = () => {
         resetForm();
       }
     } else {
-      const { error } = await supabase
+      const { error } = await getSupabaseClient()
         .from('reservations')
         .insert([formData]);
       
@@ -130,7 +150,7 @@ const ReservationManagement: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (confirm(t('confirm.delete'))) {
-      const { error } = await supabase
+      const { error } = await getSupabaseClient()
         .from('reservations')
         .delete()
         .eq('id', id);
@@ -159,6 +179,28 @@ const ReservationManagement: React.FC = () => {
   const formatDate = (dateString: string) => {
     const locale = currentLanguage === 'ja' ? 'ja-JP' : 'en-US';
     return new Date(dateString).toLocaleString(locale);
+  };
+
+  const updateReservationStatus = async (id: string, status: string) => {
+    try {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase
+        .from('reservations')
+        .update({ status })
+        .eq('id', id);
+
+      if (error) {
+        console.error('Error updating reservation:', error);
+      } else {
+        // Refresh the list
+        const updatedReservations = reservations.map(reservation =>
+          reservation.id === id ? { ...reservation, status } : reservation
+        );
+        setReservations(updatedReservations);
+      }
+    } catch (error) {
+      console.error('Error updating reservation:', error);
+    }
   };
 
   return (
