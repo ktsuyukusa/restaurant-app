@@ -16,6 +16,7 @@ import OrdersManagement from './OrdersManagement';
 import RoleSwitcher from './RoleSwitcher';
 import Profile from './Profile';
 import SecureRoute from './SecureRoute';
+import SubscriptionManagement from './SubscriptionManagement';
 
 const AppLayout: React.FC = () => {
   const { 
@@ -172,6 +173,12 @@ const AppLayout: React.FC = () => {
         return (
           <SecureRoute requiredRole="restaurant_owner">
             <RestaurantManagement />
+          </SecureRoute>
+        );
+      case 'subscription':
+        return (
+          <SecureRoute requiredRole="restaurant_owner">
+            <SubscriptionManagement />
           </SecureRoute>
         );
       

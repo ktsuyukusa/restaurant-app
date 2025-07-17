@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Users, Store, BookOpen, Calendar, BarChart3, Settings, ShoppingCart } from 'lucide-react';
+import { Users, Store, BookOpen, Calendar, BarChart3, Settings, ShoppingCart, CreditCard } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAppContext } from '@/contexts/AppContext';
 
@@ -25,6 +25,7 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate, currentSection }) =
     { id: 'orders', label: 'Orders', icon: Calendar },
     { id: 'menu-management', label: 'Menu Management', icon: BookOpen },
     { id: 'restaurants', label: t('restaurants'), icon: Store },
+    { id: 'subscription', label: 'Subscription', icon: CreditCard },
   ];
 
   // Admin navigation items (includes everything)
