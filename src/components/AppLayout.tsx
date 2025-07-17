@@ -106,13 +106,37 @@ const AppLayout: React.FC = () => {
               <p className="text-navikko-secondary mb-4">
                 {t('welcome.signup_message')}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
                 <button 
                   onClick={() => setShowAuthModal(true)}
                   className="px-6 py-3 bg-navikko-primary text-white rounded-lg hover:bg-navikko-primary/90 transition-colors font-semibold"
                 >
                   {t('welcome.get_started')}
                 </button>
+              </div>
+              
+              {/* Policy Links */}
+              <div className="text-center text-sm text-gray-500">
+                <p className="mb-2">By using this app, you agree to our</p>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <a 
+                    href="/terms-of-service" 
+                    className="text-navikko-primary hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Terms of Service
+                  </a>
+                  <span className="hidden sm:inline">and</span>
+                  <a 
+                    href="/privacy-policy" 
+                    className="text-navikko-primary hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Privacy Policy
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -219,6 +243,35 @@ const AppLayout: React.FC = () => {
           {renderCurrentView()}
         </div>
       </main>
+      
+      {/* Footer with Policy Links */}
+      <footer className="bg-white border-t border-gray-200 mt-8">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
+            <div className="mb-4 sm:mb-0">
+              <p>&copy; 2024 WaSanDo 和讃堂. All rights reserved.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <a 
+                href="/privacy-policy" 
+                className="text-navikko-primary hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Privacy Policy
+              </a>
+              <a 
+                href="/terms-of-service" 
+                className="text-navikko-primary hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Terms of Service
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

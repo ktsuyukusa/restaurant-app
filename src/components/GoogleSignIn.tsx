@@ -86,8 +86,9 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
               <div class="space-y-2 text-xs text-orange-600">
                 <p><strong>1.</strong> Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="underline">Google Cloud Console</a></p>
                 <p><strong>2.</strong> Create OAuth 2.0 Client ID for Web application</p>
-                <p><strong>3.</strong> Add authorized origins: <code class="bg-orange-100 px-1 rounded">http://localhost:8082</code></p>
+                <p><strong>3.</strong> Add authorized origins: <code class="bg-orange-100 px-1 rounded">http://localhost:8082</code> and <code class="bg-orange-100 px-1 rounded">https://restaurant-app-xi-ashy.vercel.app</code></p>
                 <p><strong>4.</strong> Create <code class="bg-orange-100 px-1 rounded">.env</code> file with: <code class="bg-orange-100 px-1 rounded">VITE_GOOGLE_CLIENT_ID=your-client-id</code></p>
+                <p><strong>5.</strong> Add environment variable in Vercel dashboard for production</p>
               </div>
               <button 
                 onclick="window.open('https://console.cloud.google.com/apis/credentials', '_blank')"

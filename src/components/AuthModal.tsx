@@ -344,6 +344,28 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     className="w-full"
                   />
                 </div>
+                
+                {/* Policy Links for Login */}
+                <div className="mt-4 text-center text-xs text-gray-500">
+                  <p>By logging in, you agree to our</p>
+                  <div className="flex justify-center gap-2 mt-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowTermsOfService(true)}
+                      className="text-navikko-primary hover:underline"
+                    >
+                      Terms of Service
+                    </button>
+                    <span>and</span>
+                    <button
+                      type="button"
+                      onClick={() => setShowPrivacyPolicy(true)}
+                      className="text-navikko-primary hover:underline"
+                    >
+                      Privacy Policy
+                    </button>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
