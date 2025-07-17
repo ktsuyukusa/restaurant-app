@@ -478,15 +478,26 @@ class AuthService {
     }
   }
 
-  // Admin signup with strict access control
+  // Admin signup with admin code validation
   async signupAdmin(data: SignupData): Promise<User> {
     if (data.userType !== 'admin') {
       throw new Error('Invalid user type for admin signup');
     }
 
-    // Validate admin code using secure configuration
-    if (!data.adminCode || !validateAdminCode(data.adminCode)) {
-      throw new Error('Invalid admin access code');
+    // Validate required fields
+    if (!data.email || !data.password || !data.name || !data.phone || !data.adminCode) {
+      throw new Error('All fields including admin code are required');
+    }
+
+    // Validate admin code
+    const adminLevel = validateAdminCode(data.adminCode);
+    if (!adminLevel) {
+      throw new Error('Invalid admin code');
+    }
+
+    // Check IP restrictions for admin access
+    if (!this.isIPAllowedForAdmin()) {
+      throw new Error('Admin access is restricted from this IP address');
     }
 
     // Check if user already exists
@@ -497,6 +508,7 @@ class AuthService {
 
     try {
       // Create user in Supabase
+      const supabase = getSupabaseClient();
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert({
@@ -509,18 +521,17 @@ class AuthService {
         .single();
 
       if (userError) {
-        console.error('Error creating admin:', userError);
+        console.error('Error creating admin user:', userError);
         throw new Error('Failed to create admin account');
       }
 
-      // Create admin access
-      const adminLevel = getAdminLevel(data.adminCode!);
+      // Create admin access record
       const { error: adminError } = await supabase
         .from('admin_access')
         .insert({
           user_id: userData.id,
           level: adminLevel,
-          permissions: ['read', 'write', 'delete'],
+          permissions: this.getPermissionsForLevel(adminLevel),
           access_code: data.adminCode
         });
 
@@ -539,8 +550,8 @@ class AuthService {
         userType: userData.user_type,
         adminAccess: {
           level: adminLevel,
-          permissions: ['read', 'write', 'delete'],
-          accessCode: data.adminCode!
+          permissions: this.getPermissionsForLevel(adminLevel),
+          accessCode: data.adminCode
         },
         createdAt: userData.created_at
       };
@@ -1022,22 +1033,18 @@ class AuthService {
   // Sign up with email/password
   async signUp(userData: any) {
     try {
-      if (isSupabaseAvailable()) {
-        const { data, error } = await supabase.auth.signUp({
-          email: userData.email,
-          password: userData.password,
-          options: {
-            data: {
-              name: userData.name,
-              user_type: userData.user_type || 'customer'
-            }
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password,
+        options: {
+          data: {
+            name: userData.name,
+            user_type: userData.user_type || 'customer'
           }
-        });
-        return { data, error };
-      } else {
-        // Use mock authentication
-        return await mockAuth.signUp(userData);
-      }
+        }
+      });
+      return { data, error };
     } catch (error) {
       console.error('Sign up error:', error);
       return { data: null, error };
@@ -1047,13 +1054,9 @@ class AuthService {
   // Sign in with email/password
   async signInWithPassword(credentials: { email: string; password: string }) {
     try {
-      if (isSupabaseAvailable()) {
-        const { data, error } = await supabase.auth.signInWithPassword(credentials);
-        return { data, error };
-      } else {
-        // Use mock authentication
-        return await mockAuth.signInWithPassword(credentials);
-      }
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase.auth.signInWithPassword(credentials);
+      return { data, error };
     } catch (error) {
       console.error('Sign in error:', error);
       return { data: null, error };
@@ -1063,13 +1066,9 @@ class AuthService {
   // Sign out
   async signOut() {
     try {
-      if (isSupabaseAvailable()) {
-        const { error } = await supabase.auth.signOut();
-        return { error };
-      } else {
-        // Use mock authentication
-        return await mockAuth.signOut();
-      }
+      const supabase = getSupabaseClient();
+      const { error } = await supabase.auth.signOut();
+      return { error };
     } catch (error) {
       console.error('Sign out error:', error);
       return { error };
@@ -1079,13 +1078,9 @@ class AuthService {
   // Get current session
   async getSession() {
     try {
-      if (isSupabaseAvailable()) {
-        const { data, error } = await supabase.auth.getSession();
-        return { data, error };
-      } else {
-        // Use mock authentication
-        return await mockAuth.getSession();
-      }
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase.auth.getSession();
+      return { data, error };
     } catch (error) {
       console.error('Get session error:', error);
       return { data: null, error };
