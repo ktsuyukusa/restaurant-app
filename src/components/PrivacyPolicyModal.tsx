@@ -66,8 +66,9 @@ You can disable location access at any time in your device settings.`
         {
           title: '7. Contact Us',
           content: `If you have questions about this Privacy Policy, please contact us at:
-Email: privacy@navikko.com
-Address: Navikko Inc., 123 Main Street, Saku, Nagano, Japan`
+Email: privacy@wasando.com
+Address: WaSanDo 和讃堂, 1499-28 Kosato, Ueda, Nagano-ken, 386-0005 Japan
+WhatsApp: +81-70-3782-2505`
         }
       ]
     },
@@ -125,8 +126,9 @@ Address: Navikko Inc., 123 Main Street, Saku, Nagano, Japan`
         {
           title: '7. お問い合わせ',
           content: `このプライバシーポリシーについてご質問がある場合は、以下までお問い合わせください：
-メール: privacy@navikko.com
-住所: Navikko Inc., 123 Main Street, Saku, Nagano, Japan`
+メール: privacy@wasando.com
+住所: WaSanDo 和讃堂, 〒386-0005長野県上田市古里1499-28
+WhatsApp: +81-70-3782-2505`
         }
       ]
     },
@@ -184,8 +186,9 @@ Address: Navikko Inc., 123 Main Street, Saku, Nagano, Japan`
         {
           title: '7. 联系我们',
           content: `如果您对本隐私政策有任何疑问，请联系我们：
-电子邮件: privacy@navikko.com
-地址: Navikko Inc., 123 Main Street, Saku, Nagano, Japan`
+电子邮件: privacy@wasando.com
+地址: WaSanDo 和讃堂, 〒386-0005长野县上田市古里1499-28, 日本
+WhatsApp: +81-70-3782-2505`
         }
       ]
     }

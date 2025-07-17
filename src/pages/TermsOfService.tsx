@@ -83,8 +83,9 @@ const TermsOfService: React.FC = () => {
         {
           title: '12. Contact Information',
           content: `If you have any questions about these Terms of Service, please contact us at:
-Email: legal@navikko.com
-Address: Navikko Inc., 123 Main Street, Saku, Nagano, Japan`
+Email: legal@wasando.com
+Address: WaSanDo 和讃堂, 1499-28 Kosato, Ueda, Nagano-ken, 386-0005 Japan
+WhatsApp: +81-70-3782-2505`
         }
       ]
     },
@@ -162,8 +163,9 @@ Address: Navikko Inc., 123 Main Street, Saku, Nagano, Japan`
         {
           title: '12. 連絡先情報',
           content: `この利用規約についてご質問がある場合は、以下までお問い合わせください：
-メール: legal@navikko.com
-住所: Navikko Inc., 123 Main Street, Saku, Nagano, Japan`
+メール: legal@wasando.com
+住所: WaSanDo 和讃堂, 〒386-0005長野県上田市古里1499-28
+WhatsApp: +81-70-3782-2505`
         }
       ]
     },
@@ -241,8 +243,9 @@ Address: Navikko Inc., 123 Main Street, Saku, Nagano, Japan`
         {
           title: '12. 联系信息',
           content: `如果您对这些服务条款有任何疑问，请联系我们：
-电子邮件: legal@navikko.com
-地址: Navikko Inc., 123 Main Street, Saku, Nagano, Japan`
+电子邮件: legal@wasando.com
+地址: WaSanDo 和讃堂, 〒386-0005长野县上田市古里1499-28, 日本
+WhatsApp: +81-70-3782-2505`
         }
       ]
     }
