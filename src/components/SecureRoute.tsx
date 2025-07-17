@@ -66,7 +66,7 @@ const SecureRoute: React.FC<SecureRouteProps> = ({
           <AlertTriangle className="w-12 h-12 mx-auto text-orange-400 mb-4" />
           <CardTitle>{t('auth.insufficientPermissions')}</CardTitle>
           <CardDescription>
-            {t('auth.roleRequired', { role: requiredRole })}
+            {t('auth.roleRequired', { role: t(`role.${requiredRole}`) })}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">

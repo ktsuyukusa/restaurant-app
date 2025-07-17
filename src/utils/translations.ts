@@ -200,7 +200,10 @@ const baseTranslations: Translations = {
     'welcome.for_owners': 'For Restaurant Owners',
     'welcome.for_owners_desc': 'Manage your restaurant, orders, and menus with powerful tools',
     'welcome.for_admins': 'For Administrators',
-    'welcome.for_admins_desc': 'Full system access and comprehensive management capabilities'
+    'welcome.for_admins_desc': 'Full system access and comprehensive management capabilities',
+    'role.admin': 'Administrator',
+    'role.restaurant_owner': 'Restaurant Owner',
+    'role.customer': 'Customer'
   },
   ja: {
     'app.title': 'Navikko',
@@ -393,7 +396,10 @@ const baseTranslations: Translations = {
     'welcome.for_owners': 'レストランオーナー向け',
     'welcome.for_owners_desc': '強力なツールでレストラン、注文、メニューを管理',
     'welcome.for_admins': '管理者向け',
-    'welcome.for_admins_desc': 'システム全体へのアクセスと包括的な管理機能'
+    'welcome.for_admins_desc': 'システム全体へのアクセスと包括的な管理機能',
+    'role.admin': 'Administrator',
+    'role.restaurant_owner': 'Restaurant Owner',
+    'role.customer': 'Customer'
   },
   pl: {
     'app.title': 'Navikko',
@@ -491,7 +497,10 @@ const baseTranslations: Translations = {
     'welcome.for_owners': 'Dla właścicieli restauracji',
     'welcome.for_owners_desc': 'Zarządzaj swoją restauracją, zamówieniami i menu za pomocą potężnych narzędzi',
     'welcome.for_admins': 'Dla administratorów',
-    'welcome.for_admins_desc': 'Pełny dostęp do systemu i kompleksowe możliwości zarządzania'
+    'welcome.for_admins_desc': 'Pełny dostęp do systemu i kompleksowe możliwości zarządzania',
+    'role.admin': 'Administrator',
+    'role.restaurant_owner': 'Restaurant Owner',
+    'role.customer': 'Customer'
   },
   zh: {
     'app.title': 'Navikko',
@@ -548,7 +557,10 @@ const baseTranslations: Translations = {
     'welcome.for_owners': '餐厅老板专用',
     'welcome.for_owners_desc': '使用强大的工具管理您的餐厅、订单和菜单',
     'welcome.for_admins': '管理员专用',
-    'welcome.for_admins_desc': '完整的系统访问和综合管理功能'
+    'welcome.for_admins_desc': '完整的系统访问和综合管理功能',
+    'role.admin': 'Administrator',
+    'role.restaurant_owner': 'Restaurant Owner',
+    'role.customer': 'Customer'
   }
 };
 
