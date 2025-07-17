@@ -20,8 +20,8 @@ interface AppContextType {
   removeFromCart: (itemId: string) => void;
   updateCartQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
-  currentView: 'restaurants' | 'restaurant-details' | 'cart' | 'profile' | 'users' | 'menus' | 'reservations' | 'dashboard' | 'orders' | 'menu-management';
-  setCurrentView: (view: 'restaurants' | 'restaurant-details' | 'cart' | 'profile' | 'users' | 'menus' | 'reservations' | 'dashboard' | 'orders' | 'menu-management') => void;
+  currentView: 'restaurants' | 'restaurant-details' | 'cart' | 'profile' | 'users' | 'menus' | 'reservations' | 'dashboard' | 'orders' | 'menu-management' | 'role-switcher';
+  setCurrentView: (view: 'restaurants' | 'restaurant-details' | 'cart' | 'profile' | 'users' | 'menus' | 'reservations' | 'dashboard' | 'orders' | 'menu-management' | 'role-switcher') => void;
   selectedRestaurantId: string | null;
   setSelectedRestaurantId: (id: string | null) => void;
   userRole: UserRole;
@@ -39,8 +39,6 @@ interface AppContextType {
   logout: () => void;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
-  currentUser: any;
-  setCurrentUser: (user: any) => void;
   hasRole: (role: 'customer' | 'restaurant_owner' | 'admin') => boolean;
 }
 
@@ -61,10 +59,10 @@ interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [currentView, setCurrentView] = useState<'restaurants' | 'restaurant-details' | 'cart' | 'profile' | 'users' | 'menus' | 'reservations' | 'dashboard' | 'orders' | 'menu-management'>('restaurants');
+  const [currentView, setCurrentView] = useState<'restaurants' | 'restaurant-details' | 'cart' | 'profile' | 'users' | 'menus' | 'reservations' | 'dashboard' | 'orders' | 'menu-management' | 'role-switcher'>('restaurants');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   
-  // Load user role from localStorage or default to customer
+  // Load user role from localStorage or default to null
   const [userRole, setUserRole] = useState<UserRole>(() => {
     const savedRole = localStorage.getItem('navikko_user_role');
     return (savedRole as UserRole) || null;
@@ -191,15 +189,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const handleSetCurrentUser = (user: any) => {
-    setUser(user);
-    if (user) {
-      setUserRole(user.userType);
-    } else {
-      setUserRole(null);
-    }
-  };
-
   const logout = () => {
     authService.logout();
     setUser(null);
@@ -244,8 +233,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     logout,
     showAuthModal,
     setShowAuthModal,
-    currentUser,
-    setCurrentUser: handleSetCurrentUser,
     hasRole,
   };
 

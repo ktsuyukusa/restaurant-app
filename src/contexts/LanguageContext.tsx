@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { dictionary, Language, TranslationKey } from '@/utils/dictionary';
+import { translate, getLanguageName } from '@/utils/translations';
+
+type Language = 'en' | 'ja' | 'pl' | 'zh';
 
 interface LanguageContextType {
   currentLanguage: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: TranslationKey) => string;
+  t: (key: string, params?: Record<string, string>) => string;
   availableLanguages: { code: Language; name: string }[];
 }
 
@@ -29,18 +31,24 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     { code: 'en' as Language, name: 'English' },
     { code: 'ja' as Language, name: '日本語' },
     { code: 'pl' as Language, name: 'Polski' },
-    { code: 'th' as Language, name: 'ไทย' },
-    { code: 'ms' as Language, name: 'Bahasa Melayu' },
-    { code: 'id' as Language, name: 'Bahasa Indonesia' },
-    { code: 'es' as Language, name: 'Español' }
+    { code: 'zh' as Language, name: '中文' }
   ];
 
   const setLanguage = (lang: Language) => {
     setCurrentLanguage(lang);
   };
 
-  const t = (key: TranslationKey): string => {
-    return dictionary[currentLanguage][key] || dictionary.en[key] || key;
+  const t = (key: string, params?: Record<string, string>): string => {
+    let translation = translate(key, currentLanguage);
+    
+    // Replace parameters if provided
+    if (params) {
+      Object.entries(params).forEach(([param, value]) => {
+        translation = translation.replace(new RegExp(`{{${param}}}`, 'g'), value);
+      });
+    }
+    
+    return translation;
   };
 
   return (

@@ -188,7 +188,19 @@ const baseTranslations: Translations = {
     'auth.subscriptionRequired': 'Active subscription required',
     'auth.adminSecurityMessage': 'Admin access requires additional security verification and is restricted to authorized IP addresses.',
     'auth.subscriptionExpiredMessage': 'Your restaurant subscription has expired. Please renew to access restaurant management features.',
-    'auth.logout': 'Logout'
+    'auth.logout': 'Logout',
+    
+    // Welcome screen
+    'welcome.title': 'Welcome to Navikko',
+    'welcome.subtitle': 'Your multilingual dining companion for seamless restaurant experiences',
+    'welcome.signup_message': 'Please sign up or log in to continue',
+    'welcome.get_started': 'Get Started',
+    'welcome.for_customers': 'For Customers',
+    'welcome.for_customers_desc': 'Browse restaurants, place orders, and enjoy seamless dining experiences',
+    'welcome.for_owners': 'For Restaurant Owners',
+    'welcome.for_owners_desc': 'Manage your restaurant, orders, and menus with powerful tools',
+    'welcome.for_admins': 'For Administrators',
+    'welcome.for_admins_desc': 'Full system access and comprehensive management capabilities'
   },
   ja: {
     'app.title': 'Navikko',
@@ -369,7 +381,19 @@ const baseTranslations: Translations = {
     'auth.subscriptionRequired': 'アクティブなサブスクリプションが必要です',
     'auth.adminSecurityMessage': '管理者アクセスには追加のセキュリティ認証が必要で、承認されたIPアドレスからのみアクセス可能です。',
     'auth.subscriptionExpiredMessage': 'レストランサブスクリプションが期限切れです。レストラン管理機能にアクセスするには更新してください。',
-    'auth.logout': 'ログアウト'
+    'auth.logout': 'ログアウト',
+    
+    // Welcome screen
+    'welcome.title': 'Navikkoへようこそ',
+    'welcome.subtitle': '多言語対応のダイニングコンパニオンで、シームレスなレストラン体験を',
+    'welcome.signup_message': '続行するにはサインアップまたはログインしてください',
+    'welcome.get_started': '始める',
+    'welcome.for_customers': 'お客様向け',
+    'welcome.for_customers_desc': 'レストランを閲覧し、注文して、シームレスなダイニング体験をお楽しみください',
+    'welcome.for_owners': 'レストランオーナー向け',
+    'welcome.for_owners_desc': '強力なツールでレストラン、注文、メニューを管理',
+    'welcome.for_admins': '管理者向け',
+    'welcome.for_admins_desc': 'システム全体へのアクセスと包括的な管理機能'
   },
   pl: {
     'app.title': 'Navikko',
@@ -455,7 +479,19 @@ const baseTranslations: Translations = {
     'auth.subscriptionRequired': 'Wymagana aktywna subskrypcja',
     'auth.adminSecurityMessage': 'Dostęp administratora wymaga dodatkowej weryfikacji bezpieczeństwa i jest ograniczony do autoryzowanych adresów IP.',
     'auth.subscriptionExpiredMessage': 'Twoja subskrypcja restauracji wygasła. Odnów ją, aby uzyskać dostęp do funkcji zarządzania restauracją.',
-    'auth.logout': 'Wyloguj się'
+    'auth.logout': 'Wyloguj się',
+    
+    // Welcome screen
+    'welcome.title': 'Witamy w Navikko',
+    'welcome.subtitle': 'Twój wielojęzyczny towarzysz gastronomiczny dla płynnych doświadczeń restauracyjnych',
+    'welcome.signup_message': 'Zarejestruj się lub zaloguj, aby kontynuować',
+    'welcome.get_started': 'Rozpocznij',
+    'welcome.for_customers': 'Dla klientów',
+    'welcome.for_customers_desc': 'Przeglądaj restauracje, składaj zamówienia i ciesz się płynnymi doświadczeniami gastronomicznymi',
+    'welcome.for_owners': 'Dla właścicieli restauracji',
+    'welcome.for_owners_desc': 'Zarządzaj swoją restauracją, zamówieniami i menu za pomocą potężnych narzędzi',
+    'welcome.for_admins': 'Dla administratorów',
+    'welcome.for_admins_desc': 'Pełny dostęp do systemu i kompleksowe możliwości zarządzania'
   },
   zh: {
     'app.title': 'Navikko',
@@ -500,7 +536,19 @@ const baseTranslations: Translations = {
     'auth.subscriptionRequired': '需要有效的订阅',
     'auth.adminSecurityMessage': '管理员访问需要额外的安全验证，仅限授权IP地址访问。',
     'auth.subscriptionExpiredMessage': '您的餐厅订阅已过期。请续订以访问餐厅管理功能。',
-    'auth.logout': '登出'
+    'auth.logout': '登出',
+    
+    // Welcome screen
+    'welcome.title': '欢迎使用Navikko',
+    'welcome.subtitle': '您的多语言餐饮伴侣，提供无缝的餐厅体验',
+    'welcome.signup_message': '请注册或登录以继续',
+    'welcome.get_started': '开始使用',
+    'welcome.for_customers': '顾客专用',
+    'welcome.for_customers_desc': '浏览餐厅、下单并享受无缝的用餐体验',
+    'welcome.for_owners': '餐厅老板专用',
+    'welcome.for_owners_desc': '使用强大的工具管理您的餐厅、订单和菜单',
+    'welcome.for_admins': '管理员专用',
+    'welcome.for_admins_desc': '完整的系统访问和综合管理功能'
   }
 };
 
