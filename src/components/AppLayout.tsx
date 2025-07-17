@@ -2,6 +2,7 @@ import React from 'react';
 import { useAppContext } from '@/contexts/AppContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Link } from 'react-router-dom';
 import Header from './Header';
 import Navigation from './Navigation';
 import RestaurantList from './RestaurantList';
@@ -119,23 +120,19 @@ const AppLayout: React.FC = () => {
               <div className="text-center text-sm text-gray-500">
                 <p className="mb-2">By using this app, you agree to our</p>
                 <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                  <a 
-                    href="/terms-of-service" 
+                  <Link 
+                    to="/terms-of-service" 
                     className="text-navikko-primary hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
                   >
                     Terms of Service
-                  </a>
+                  </Link>
                   <span className="hidden sm:inline">and</span>
-                  <a 
-                    href="/privacy-policy" 
+                  <Link 
+                    to="/privacy-policy" 
                     className="text-navikko-primary hover:underline"
-                    target="_blank"
-                    rel="noopener noreferrer"
                   >
                     Privacy Policy
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -252,22 +249,18 @@ const AppLayout: React.FC = () => {
               <p>&copy; 2024 WaSanDo 和讃堂. All rights reserved.</p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a 
-                href="/privacy-policy" 
+              <Link 
+                to="/privacy-policy" 
                 className="text-navikko-primary hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
               >
                 Privacy Policy
-              </a>
-              <a 
-                href="/terms-of-service" 
+              </Link>
+              <Link 
+                to="/terms-of-service" 
                 className="text-navikko-primary hover:underline"
-                target="_blank"
-                rel="noopener noreferrer"
               >
                 Terms of Service
-              </a>
+              </Link>
             </div>
           </div>
         </div>

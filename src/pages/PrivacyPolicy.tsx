@@ -7,8 +7,6 @@ import { useNavigate } from 'react-router-dom';
 const PrivacyPolicy: React.FC = () => {
   const { t, currentLanguage } = useLanguage();
   const navigate = useNavigate();
-  
-  console.log('PrivacyPolicy component rendered');
 
   const privacyPolicyContent = {
     en: {
