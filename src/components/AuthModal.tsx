@@ -18,7 +18,8 @@ import {
   MapPin,
   CreditCard,
   Eye,
-  EyeOff
+  EyeOff,
+  Shield
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAppContext } from '@/contexts/AppContext';
@@ -29,6 +30,7 @@ import PaymentMethodRegistration from './PaymentMethodRegistration';
 import GoogleSignIn from './GoogleSignIn';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 import TermsOfServiceModal from './TermsOfServiceModal';
+import TwoFactorAuthModal from './TwoFactorAuthModal';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -59,32 +61,38 @@ interface LoginFormData {
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
-  const { t } = useLanguage();
-  const { setUserRole } = useAppContext();
-  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { t, currentLanguage } = useLanguage();
+  const { login, signup } = useAppContext();
+  const [activeTab, setActiveTab] = useState('login');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showSubscriptionPurchase, setShowSubscriptionPurchase] = useState(false);
-  const [showPaymentMethodRegistration, setShowPaymentMethodRegistration] = useState(false);
-  const [signupStep, setSignupStep] = useState<'userType' | 'details' | 'subscription' | 'payment' | 'complete'>('userType');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const [showTermsOfService, setShowTermsOfService] = useState(false);
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [showTwoFactorAuth, setShowTwoFactorAuth] = useState(false);
+  const [pendingLoginData, setPendingLoginData] = useState<AuthLoginData | null>(null);
 
-  const [signupData, setSignupData] = useState<SignupFormData>({
+  // Login form state
+  const [loginData, setLoginData] = useState<AuthLoginData>({
+    email: '',
+    password: ''
+  });
+
+  // Signup form state
+  const [signupData, setSignupData] = useState<AuthSignupData>({
     email: '',
     password: '',
     confirmPassword: '',
     name: '',
     phone: '',
-    userType: 'customer'
-  });
-
-  const [loginData, setLoginFormData] = useState<LoginFormData>({
-    email: '',
-    password: ''
+    userType: 'customer',
+    locationConsent: false,
+    restaurantName: '',
+    restaurantAddress: '',
+    restaurantPhone: '',
+    adminCode: ''
   });
 
   const userTypes = [
@@ -118,6 +126,51 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     'Japanese', 'Italian', 'Chinese', 'Korean', 'French', 'Thai', 
     'Indian', 'American', 'Mexican', 'Mediterranean', 'Fusion', 'Other'
   ];
+
+  const updateLoginField = (field: keyof AuthLoginData, value: string) => {
+    setLoginData(prev => ({ ...prev, [field]: value }));
+    setError(null);
+  };
+
+  const updateSignupField = (field: keyof AuthSignupData, value: any) => {
+    setSignupData(prev => ({ ...prev, [field]: value }));
+    setError(null);
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const user = await authService.login(loginData);
+      login(loginData.email, loginData.password);
+      onClose();
+    } catch (error: any) {
+      if (error.message === '2FA_REQUIRED') {
+        setPendingLoginData(loginData);
+        setShowTwoFactorAuth(true);
+      } else {
+        setError(error.message || 'Login failed');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handle2FAVerification = async (code: string) => {
+    if (!pendingLoginData) return;
+
+    try {
+      const user = await authService.login(pendingLoginData, code);
+      login(pendingLoginData.email, pendingLoginData.password);
+      setShowTwoFactorAuth(false);
+      setPendingLoginData(null);
+      onClose();
+    } catch (error: any) {
+      throw error;
+    }
+  };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,311 +216,89 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     }
 
     try {
-      const authSignupData: AuthSignupData = {
-        email: signupData.email,
-        password: signupData.password,
-        name: signupData.name,
-        phone: signupData.phone,
-        userType: signupData.userType,
-        locationConsent: signupData.userType === 'customer' ? signupData.locationConsent : undefined,
-        restaurantInfo: signupData.userType === 'restaurant_owner' ? {
-          name: signupData.restaurantName!,
-          address: signupData.restaurantAddress!,
-          phone: signupData.restaurantPhone!,
-          cuisine: signupData.cuisine || 'Other'
-        } : undefined,
-        adminCode: signupData.userType === 'admin' ? signupData.adminCode : undefined
-      };
-
-      const user = await authService.signup(authSignupData);
-      setUserRole(user.userType);
-      
-      // Handle post-signup flow based on user type
-      if (user.userType === 'customer') {
-        // Customer registration complete - no payment required initially
-        onClose();
-        resetForm();
-      } else if (user.userType === 'restaurant_owner') {
-        setShowSubscriptionPurchase(true);
-      } else {
-        // Admin - complete signup
-        onClose();
-        resetForm();
-      }
-    } catch (err: any) {
-      setError(err.message || 'Signup failed. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsLoading(true);
-
-    try {
-      const authLoginData: AuthLoginData = {
-        email: loginData.email,
-        password: loginData.password
-      };
-
-      const user = await authService.login(authLoginData);
-      setUserRole(user.userType);
+      const user = await authService.signup(signupData);
+      signup(signupData);
       onClose();
-      
-      // Reset form
-      setLoginFormData({
-        email: '',
-        password: ''
-      });
-    } catch (err: any) {
-      setError(err.message || 'Login failed. Please try again.');
+    } catch (error: any) {
+      setError(error.message || 'Signup failed');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const updateSignupField = (field: keyof SignupFormData, value: string | boolean) => {
-    setSignupData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const updateLoginField = (field: keyof LoginFormData, value: string) => {
-    setLoginFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const resetForm = () => {
+  const resetForms = () => {
+    setLoginData({ email: '', password: '' });
     setSignupData({
       email: '',
       password: '',
       confirmPassword: '',
       name: '',
       phone: '',
-      userType: 'customer'
+      userType: 'customer',
+      locationConsent: false,
+      restaurantName: '',
+      restaurantAddress: '',
+      restaurantPhone: '',
+      adminCode: ''
     });
-    setSignupStep('userType');
+    setError(null);
+    setAgreeToTerms(false);
   };
 
-  const handleSubscriptionPurchased = () => {
-    setShowSubscriptionPurchase(false);
+  const handleClose = () => {
+    resetForms();
     onClose();
-    resetForm();
-  };
-
-  const handlePaymentMethodAdded = () => {
-    setShowPaymentMethodRegistration(false);
-    onClose();
-    resetForm();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center">
-            {t('auth.welcome')}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl font-bold">
+              {t('auth.welcome', 'Welcome to Navikko')}
+            </DialogTitle>
+          </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'signup')}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">{t('auth.login')}</TabsTrigger>
-            <TabsTrigger value="signup">{t('auth.signup')}</TabsTrigger>
-          </TabsList>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login">{t('auth.login', 'Login')}</TabsTrigger>
+              <TabsTrigger value="signup">{t('auth.signup', 'Sign Up')}</TabsTrigger>
+            </TabsList>
 
-          {/* Login Tab */}
-          <TabsContent value="login" className="space-y-4">
-            <Card>
-              <CardContent className="pt-6">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="login-email">{t('auth.email')}</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <TabsContent value="login" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Mail className="h-5 w-5" />
+                    {t('auth.login_title', 'Login to Your Account')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <div>
+                      <Label htmlFor="login-email">{t('auth.email', 'Email')}</Label>
                       <Input
                         id="login-email"
                         type="email"
-                        placeholder={t('auth.enter_email')}
+                        placeholder={t('auth.enter_email', 'Enter your email')}
                         value={loginData.email}
                         onChange={(e) => updateLoginField('email', e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="login-password">{t('auth.password')}</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <Input
-                        id="login-password"
-                        type={showPassword ? 'text' : 'password'}
-                        placeholder={t('auth.enter_password')}
-                        value={loginData.password}
-                        onChange={(e) => updateLoginField('password', e.target.value)}
-                        className="pl-10 pr-10"
-                        required
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-
-                  {error && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-red-600 text-sm">{error}</p>
-                    </div>
-                  )}
-
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? t('auth.logging_in') : t('auth.login')}
-                  </Button>
-                </form>
-
-                {/* Google Sign-In for Login */}
-                <div className="mt-4">
-                  <GoogleSignIn
-                    userType="customer"
-                    onSuccess={(user) => {
-                      onClose();
-                      setLoginFormData({ email: '', password: '' });
-                    }}
-                    onError={(error) => setError(error)}
-                    className="w-full"
-                  />
-                </div>
-                
-                {/* Policy Links for Login */}
-                <div className="mt-4 text-center text-xs text-gray-500">
-                  <p>By logging in, you agree to our</p>
-                  <div className="flex justify-center gap-2 mt-1">
-                    <button
-                      type="button"
-                      onClick={() => setShowTermsOfService(true)}
-                      className="text-navikko-primary hover:underline"
-                    >
-                      Terms of Service
-                    </button>
-                    <span>and</span>
-                    <button
-                      type="button"
-                      onClick={() => setShowPrivacyPolicy(true)}
-                      className="text-navikko-primary hover:underline"
-                    >
-                      Privacy Policy
-                    </button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Signup Tab */}
-          <TabsContent value="signup" className="space-y-4">
-            <Card>
-              <CardContent className="pt-6">
-                <form onSubmit={handleSignup} className="space-y-4">
-                  {/* User Type Selection */}
-                  <div className="space-y-2">
-                    <Label>{t('auth.i_am_a')}</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      {userTypes.map((type) => {
-                        const Icon = type.icon;
-                        const isSelected = signupData.userType === type.id;
-                        
-                        return (
-                          <div
-                            key={type.id}
-                            className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                              isSelected 
-                                ? 'border-navikko-primary bg-navikko-primary/5' 
-                                : 'border-gray-200 hover:border-gray-300'
-                            }`}
-                            onClick={() => updateSignupField('userType', type.id)}
-                          >
-                            <div className="flex items-center gap-2 mb-2">
-                              <Icon className="h-4 w-4" />
-                              <span className="font-medium">{t(`auth.${type.id}`)}</span>
-                              {isSelected && (
-                                <Badge className="bg-navikko-primary text-white text-xs">
-                                  {t('auth.selected')}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-xs text-gray-600">{t(`auth.${type.id}_desc`)}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Basic Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-name">{t('auth.full_name')}</Label>
-                      <Input
-                        id="signup-name"
-                        type="text"
-                        placeholder={t('auth.enter_full_name')}
-                        value={signupData.name}
-                        onChange={(e) => updateSignupField('name', e.target.value)}
                         required
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-phone">{t('auth.phone_number')}</Label>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                        <Input
-                          id="signup-phone"
-                          type="tel"
-                          placeholder={t('auth.enter_phone')}
-                          value={signupData.phone}
-                          onChange={(e) => updateSignupField('phone', e.target.value)}
-                          className="pl-10"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">{t('auth.email')}</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                      <Input
-                        id="signup-email"
-                        type="email"
-                        placeholder={t('auth.enter_email')}
-                        value={signupData.email}
-                        onChange={(e) => updateSignupField('email', e.target.value)}
-                        className="pl-10"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password">{t('auth.password')}</Label>
+                    <div>
+                      <Label htmlFor="login-password">{t('auth.password', 'Password')}</Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                         <Input
-                          id="signup-password"
+                          id="login-password"
                           type={showPassword ? 'text' : 'password'}
-                          placeholder={t('auth.create_password')}
-                          value={signupData.password}
-                          onChange={(e) => updateSignupField('password', e.target.value)}
-                          className="pl-10 pr-10"
+                          placeholder={t('auth.enter_password', 'Enter your password')}
+                          value={loginData.password}
+                          onChange={(e) => updateLoginField('password', e.target.value)}
+                          className="pl-10"
                           required
                         />
                         <Button
@@ -477,292 +308,364 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                           className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                           onClick={() => setShowPassword(!showPassword)}
                         >
-                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-confirm-password">{t('auth.confirm_password')}</Label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                        <Input
-                          id="signup-confirm-password"
-                          type={showConfirmPassword ? 'text' : 'password'}
-                          placeholder={t('auth.confirm_password_placeholder')}
-                          value={signupData.confirmPassword}
-                          onChange={(e) => updateSignupField('confirmPassword', e.target.value)}
-                          className="pl-10 pr-10"
-                          required
-                        />
+                    {error && (
+                      <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+                        {error}
+                      </div>
+                    )}
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? t('auth.logging_in', 'Logging in...') : t('auth.login', 'Login')}
+                    </Button>
+
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600">
+                        {t('auth.or_login_with', 'Or login with')}
+                      </p>
+                      <GoogleSignIn onSuccess={onClose} />
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="signup" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5" />
+                    {t('auth.create_account', 'Create Your Account')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSignup} className="space-y-4">
+                    <div>
+                      <Label>{t('auth.account_type', 'Account Type')}</Label>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
                         <Button
                           type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          variant={signupData.userType === 'customer' ? 'default' : 'outline'}
+                          onClick={() => updateSignupField('userType', 'customer')}
+                          className="flex flex-col items-center gap-2 h-auto p-4"
                         >
-                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          <User className="h-5 w-5" />
+                          <span className="text-sm">{t('auth.customer', 'Customer')}</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={signupData.userType === 'restaurant_owner' ? 'default' : 'outline'}
+                          onClick={() => updateSignupField('userType', 'restaurant_owner')}
+                          className="flex flex-col items-center gap-2 h-auto p-4"
+                        >
+                          <Store className="h-5 w-5" />
+                          <span className="text-sm">{t('auth.restaurant_owner', 'Restaurant Owner')}</span>
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={signupData.userType === 'admin' ? 'default' : 'outline'}
+                          onClick={() => updateSignupField('userType', 'admin')}
+                          className="flex flex-col items-center gap-2 h-auto p-4"
+                        >
+                          <Crown className="h-5 w-5" />
+                          <span className="text-sm">{t('auth.admin', 'Admin')}</span>
                         </Button>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Customer Specific Fields */}
-                  {signupData.userType === 'customer' && (
-                    <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <h3 className="font-semibold text-blue-800 flex items-center gap-2">
-                        <User className="h-4 w-4" />
-                        {t('auth.customer_preferences')}
-                      </h3>
-                      
-                      <div className="space-y-3">
-                        <div className="flex items-start gap-3">
-                          <input
-                            type="checkbox"
-                            id="location-consent"
-                            checked={signupData.locationConsent || false}
-                            onChange={(e) => updateSignupField('locationConsent', e.target.checked)}
-                            className="mt-1 rounded"
-                          />
-                          <div>
-                            <Label htmlFor="location-consent" className="font-medium">
-                              {t('auth.location_consent')}
-                            </Label>
-                            <p className="text-sm text-blue-700 mt-1">
-                              {t('auth.location_consent_desc')}
-                            </p>
-                          </div>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="signup-name">{t('auth.name', 'Full Name')}</Label>
+                        <Input
+                          id="signup-name"
+                          type="text"
+                          placeholder={t('auth.enter_name', 'Enter your full name')}
+                          value={signupData.name}
+                          onChange={(e) => updateSignupField('name', e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="signup-phone">{t('auth.phone', 'Phone Number')}</Label>
+                        <Input
+                          id="signup-phone"
+                          type="tel"
+                          placeholder={t('auth.enter_phone', 'Enter your phone number')}
+                          value={signupData.phone}
+                          onChange={(e) => updateSignupField('phone', e.target.value)}
+                          required
+                        />
                       </div>
                     </div>
-                  )}
 
-                  {/* Restaurant Owner Specific Fields */}
-                  {signupData.userType === 'restaurant_owner' && (
-                    <div className="space-y-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <h3 className="font-semibold text-green-800 flex items-center gap-2">
-                        <Store className="h-4 w-4" />
-                        {t('auth.restaurant_information')}
-                      </h3>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="restaurant-name">{t('auth.restaurant_name')}</Label>
-                          <div className="relative">
-                            <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                            <Input
-                              id="restaurant-name"
-                              type="text"
-                              placeholder={t('auth.enter_restaurant_name')}
-                              value={signupData.restaurantName || ''}
-                              onChange={(e) => updateSignupField('restaurantName', e.target.value)}
-                              className="pl-10"
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="restaurant-phone">{t('auth.restaurant_phone')}</Label>
-                          <div className="relative">
-                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                            <Input
-                              id="restaurant-phone"
-                              type="tel"
-                              placeholder={t('auth.enter_restaurant_phone')}
-                              value={signupData.restaurantPhone || ''}
-                              onChange={(e) => updateSignupField('restaurantPhone', e.target.value)}
-                              className="pl-10"
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="restaurant-address">{t('auth.restaurant_address')}</Label>
-                        <div className="relative">
-                          <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                          <Input
-                            id="restaurant-address"
-                            type="text"
-                            placeholder={t('auth.enter_restaurant_address')}
-                            value={signupData.restaurantAddress || ''}
-                            onChange={(e) => updateSignupField('restaurantAddress', e.target.value)}
-                            className="pl-10"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="restaurant-cuisine">{t('auth.cuisine_type')}</Label>
-                        <Select 
-                          value={signupData.cuisine || ''} 
-                          onValueChange={(value) => updateSignupField('cuisine', value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder={t('auth.select_cuisine_type')} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {cuisines.map((cuisine) => (
-                              <SelectItem key={cuisine} value={cuisine}>
-                                {cuisine}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                    <div>
+                      <Label htmlFor="signup-email">{t('auth.email', 'Email')}</Label>
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        placeholder={t('auth.enter_email', 'Enter your email')}
+                        value={signupData.email}
+                        onChange={(e) => updateSignupField('email', e.target.value)}
+                        required
+                      />
                     </div>
-                  )}
 
-                  {/* Admin Specific Fields */}
-                  {signupData.userType === 'admin' && (
-                    <div className="space-y-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                      <h3 className="font-semibold text-purple-800 flex items-center gap-2">
-                        <Crown className="h-4 w-4" />
-                        {t('auth.admin_verification')}
-                      </h3>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="admin-code">{t('auth.admin_code')}</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="signup-password">{t('auth.password', 'Password')}</Label>
                         <div className="relative">
                           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                           <Input
-                            id="admin-code"
-                            type="password"
-                            placeholder={t('auth.enter_admin_code')}
-                            value={signupData.adminCode || ''}
-                            onChange={(e) => updateSignupField('adminCode', e.target.value)}
+                            id="signup-password"
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder={t('auth.enter_password', 'Enter your password')}
+                            value={signupData.password}
+                            onChange={(e) => updateSignupField('password', e.target.value)}
                             className="pl-10"
                             required
                           />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
                         </div>
-                        <p className="text-xs text-purple-600">
-                          {t('auth.admin_code_desc')}
-                        </p>
+                      </div>
+                      <div>
+                        <Label htmlFor="signup-confirm-password">{t('auth.confirm_password', 'Confirm Password')}</Label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                          <Input
+                            id="signup-confirm-password"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            placeholder={t('auth.confirm_password', 'Confirm your password')}
+                            value={signupData.confirmPassword}
+                            onChange={(e) => updateSignupField('confirmPassword', e.target.value)}
+                            className="pl-10"
+                            required
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  )}
 
-                  {/* Terms and Privacy Policy Agreement */}
-                  <div className="space-y-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        id="agree-terms"
-                        checked={agreeToTerms}
-                        onChange={(e) => setAgreeToTerms(e.target.checked)}
-                        className="mt-1 rounded"
-                        required
-                      />
-                      <div className="text-sm">
-                        <Label htmlFor="agree-terms" className="font-medium">
-                          {t('auth.agree_to_terms')}
-                        </Label>
-                        <div className="mt-1 space-x-2">
+                    {signupData.userType === 'customer' && (
+                      <div className="space-y-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h3 className="font-semibold text-blue-800 flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          {t('auth.location_services', 'Location Services')}
+                        </h3>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id="location-consent"
+                              checked={signupData.locationConsent}
+                              onChange={(e) => updateSignupField('locationConsent', e.target.checked)}
+                              className="rounded"
+                            />
+                            <Label htmlFor="location-consent" className="text-sm">
+                              {t('auth.location_consent', 'Allow location access')}
+                            </Label>
+                          </div>
+                          <p className="text-xs text-blue-600">
+                            {t('auth.location_consent_desc', 'This helps us show you nearby restaurants and provide location-based recommendations.')}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {signupData.userType === 'restaurant_owner' && (
+                      <div className="space-y-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <h3 className="font-semibold text-green-800 flex items-center gap-2">
+                          <Building className="h-4 w-4" />
+                          {t('auth.restaurant_information', 'Restaurant Information')}
+                        </h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="restaurant-name">{t('auth.restaurant_name', 'Restaurant Name')}</Label>
+                            <Input
+                              id="restaurant-name"
+                              type="text"
+                              placeholder={t('auth.enter_restaurant_name', 'Enter restaurant name')}
+                              value={signupData.restaurantName}
+                              onChange={(e) => updateSignupField('restaurantName', e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="restaurant-phone">{t('auth.restaurant_phone', 'Restaurant Phone')}</Label>
+                            <Input
+                              id="restaurant-phone"
+                              type="tel"
+                              placeholder={t('auth.enter_restaurant_phone', 'Enter restaurant phone')}
+                              value={signupData.restaurantPhone}
+                              onChange={(e) => updateSignupField('restaurantPhone', e.target.value)}
+                              required
+                            />
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="restaurant-address">{t('auth.restaurant_address', 'Restaurant Address')}</Label>
+                          <Input
+                            id="restaurant-address"
+                            type="text"
+                            placeholder={t('auth.enter_restaurant_address', 'Enter restaurant address')}
+                            value={signupData.restaurantAddress}
+                            onChange={(e) => updateSignupField('restaurantAddress', e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {signupData.userType === 'admin' && (
+                      <div className="space-y-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                        <h3 className="font-semibold text-purple-800 flex items-center gap-2">
+                          <Shield className="h-4 w-4" />
+                          {t('auth.admin_verification', 'Admin Verification')}
+                        </h3>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="admin-code">{t('auth.admin_code', 'Admin Code')}</Label>
+                          <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                            <Input
+                              id="admin-code"
+                              type="password"
+                              placeholder={t('auth.enter_admin_code', 'Enter admin verification code')}
+                              value={signupData.adminCode || ''}
+                              onChange={(e) => updateSignupField('adminCode', e.target.value)}
+                              className="pl-10"
+                              required
+                            />
+                          </div>
+                          <p className="text-xs text-purple-600">
+                            {t('auth.admin_code_desc', 'Admin code required for system administrator access')}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Terms and Privacy Policy Agreement */}
+                    <div className="space-y-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                      <div className="flex items-start space-x-2">
+                        <input
+                          type="checkbox"
+                          id="agree-terms"
+                          checked={agreeToTerms}
+                          onChange={(e) => setAgreeToTerms(e.target.checked)}
+                          className="mt-1 rounded"
+                          required
+                        />
+                        <Label htmlFor="agree-terms" className="text-sm">
+                          {t('auth.agree_to_terms', 'I agree to the')}{' '}
                           <button
                             type="button"
                             onClick={() => setShowTermsOfService(true)}
-                            className="text-navikko-primary hover:underline text-sm"
+                            className="text-blue-600 hover:underline"
                           >
-                            {t('auth.terms_of_service')}
-                          </button>
-                          <span className="text-gray-500">and</span>
+                            {t('auth.terms_of_service', 'Terms of Service')}
+                          </button>{' '}
+                          {t('auth.and', 'and')}{' '}
                           <button
                             type="button"
                             onClick={() => setShowPrivacyPolicy(true)}
-                            className="text-navikko-primary hover:underline text-sm"
+                            className="text-blue-600 hover:underline"
                           >
-                            {t('auth.privacy_policy')}
+                            {t('auth.privacy_policy', 'Privacy Policy')}
                           </button>
-                        </div>
+                        </Label>
                       </div>
                     </div>
-                  </div>
 
-                  {error && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-red-600 text-sm">{error}</p>
+                    {error && (
+                      <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+                        {error}
+                      </div>
+                    )}
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading || !agreeToTerms}
+                    >
+                      {isLoading ? t('auth.creating_account', 'Creating account...') : t('auth.create_account', 'Create Account')}
+                    </Button>
+
+                    <div className="text-center">
+                      <p className="text-sm text-gray-600">
+                        {t('auth.or_signup_with', 'Or sign up with')}
+                      </p>
+                      <GoogleSignIn onSuccess={onClose} />
                     </div>
-                  )}
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
 
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? t('auth.signing_up') : t('auth.signup')}
-                  </Button>
-                </form>
+      {/* Two-Factor Authentication Modal */}
+      <TwoFactorAuthModal
+        isOpen={showTwoFactorAuth}
+        onClose={() => {
+          setShowTwoFactorAuth(false);
+          setPendingLoginData(null);
+        }}
+        onVerify={handle2FAVerification}
+        email={pendingLoginData?.email || ''}
+        method="email"
+      />
 
-                {/* Google Sign-In for Signup */}
-                <div className="mt-4">
-                  <GoogleSignIn
-                    userType={signupData.userType}
-                    onSuccess={(user) => {
-                      if (user.userType === 'customer') {
-                        onClose();
-                        resetForm();
-                      } else if (user.userType === 'restaurant_owner') {
-                        setShowSubscriptionPurchase(true);
-                      } else {
-                        onClose();
-                        resetForm();
-                      }
-                    }}
-                    onError={(error) => setError(error)}
-                    locationConsent={signupData.locationConsent}
-                    restaurantInfo={signupData.userType === 'restaurant_owner' ? {
-                      name: signupData.restaurantName || '',
-                      address: signupData.restaurantAddress || '',
-                      phone: signupData.restaurantPhone || '',
-                      cuisine: signupData.cuisine || 'Other'
-                    } : undefined}
-                    adminCode={signupData.adminCode}
-                    phone={signupData.phone}
-                    className="w-full"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </DialogContent>
-      
-      {/* Subscription Purchase Modal */}
-      {showSubscriptionPurchase && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <SubscriptionPurchase
-              onSubscriptionPurchased={handleSubscriptionPurchased}
-              onCancel={() => setShowSubscriptionPurchase(false)}
-            />
-          </div>
-        </div>
-      )}
-      
-      {/* Payment Method Registration Modal */}
-      {showPaymentMethodRegistration && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <PaymentMethodRegistration
-              onPaymentMethodAdded={handlePaymentMethodAdded}
-              onCancel={() => setShowPaymentMethodRegistration(false)}
-            />
-          </div>
-        </div>
-      )}
-      
       {/* Privacy Policy Modal */}
-      <PrivacyPolicyModal 
-        isOpen={showPrivacyPolicy} 
-        onClose={() => setShowPrivacyPolicy(false)} 
+      <PrivacyPolicyModal
+        isOpen={showPrivacyPolicy}
+        onClose={() => setShowPrivacyPolicy(false)}
       />
-      
+
       {/* Terms of Service Modal */}
-      <TermsOfServiceModal 
-        isOpen={showTermsOfService} 
-        onClose={() => setShowTermsOfService(false)} 
+      <TermsOfServiceModal
+        isOpen={showTermsOfService}
+        onClose={() => setShowTermsOfService(false)}
       />
-    </Dialog>
+    </>
   );
 };
 

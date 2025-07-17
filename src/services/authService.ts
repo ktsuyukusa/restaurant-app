@@ -82,18 +82,32 @@ export interface GoogleSignInData {
   phone?: string; // Optional for Google Sign-In
 }
 
-// Supabase client
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Security configuration
+const SECURITY_CONFIG = {
+  MAX_LOGIN_ATTEMPTS: 10,
+  LOCKOUT_DURATION: 30 * 60 * 1000, // 30 minutes in milliseconds
+  ALLOWED_ADMIN_IPS: process.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [],
+  REQUIRE_2FA_FOR_ADMIN: true,
+  SESSION_TIMEOUT: 24 * 60 * 60 * 1000, // 24 hours
+};
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Login attempt tracking
+interface LoginAttempt {
+  email: string;
+  attempts: number;
+  lastAttempt: number;
+  lockedUntil?: number;
+  ipAddress?: string;
+}
 
 class AuthService {
   private static instance: AuthService;
   private currentUser: User | null = null;
+  private loginAttempts: Map<string, LoginAttempt> = new Map();
 
   private constructor() {
     this.loadUserFromStorage();
+    this.loadLoginAttempts();
   }
 
   public static getInstance(): AuthService {
@@ -125,6 +139,100 @@ class AuthService {
     console.log('Clearing user storage');
     localStorage.removeItem('navikko_user_data');
     localStorage.removeItem('navikko_user_role');
+  }
+
+  // Get client IP address (for admin access control)
+  private getClientIP(): string {
+    // In a real implementation, this would get the actual IP
+    // For now, we'll use a placeholder that should be replaced with actual IP detection
+    return '127.0.0.1';
+  }
+
+  // Check if IP is allowed for admin access
+  private isIPAllowedForAdmin(): boolean {
+    if (SECURITY_CONFIG.ALLOWED_ADMIN_IPS.length === 0) {
+      return true; // No restrictions if no IPs configured
+    }
+    const clientIP = this.getClientIP();
+    return SECURITY_CONFIG.ALLOWED_ADMIN_IPS.includes(clientIP);
+  }
+
+  // Track login attempts
+  private trackLoginAttempt(email: string, success: boolean): boolean {
+    const now = Date.now();
+    const attempt = this.loginAttempts.get(email) || {
+      email,
+      attempts: 0,
+      lastAttempt: 0,
+      ipAddress: this.getClientIP()
+    };
+
+    if (success) {
+      // Reset on successful login
+      this.loginAttempts.delete(email);
+      this.saveLoginAttempts();
+      return true;
+    }
+
+    // Check if account is locked
+    if (attempt.lockedUntil && now < attempt.lockedUntil) {
+      const remainingTime = Math.ceil((attempt.lockedUntil - now) / 1000 / 60);
+      throw new Error(`Account is locked. Please try again in ${remainingTime} minutes.`);
+    }
+
+    // Increment failed attempts
+    attempt.attempts += 1;
+    attempt.lastAttempt = now;
+
+    // Lock account if max attempts reached
+    if (attempt.attempts >= SECURITY_CONFIG.MAX_LOGIN_ATTEMPTS) {
+      attempt.lockedUntil = now + SECURITY_CONFIG.LOCKOUT_DURATION;
+      this.loginAttempts.set(email, attempt);
+      this.saveLoginAttempts();
+      throw new Error(`Account locked due to too many failed attempts. Please try again in 30 minutes.`);
+    }
+
+    this.loginAttempts.set(email, attempt);
+    this.saveLoginAttempts();
+    return false;
+  }
+
+  // Save login attempts to localStorage
+  private saveLoginAttempts(): void {
+    try {
+      const attemptsData = Array.from(this.loginAttempts.entries());
+      localStorage.setItem('navikko_login_attempts', JSON.stringify(attemptsData));
+    } catch (error) {
+      console.error('Failed to save login attempts:', error);
+    }
+  }
+
+  // Load login attempts from localStorage
+  private loadLoginAttempts(): void {
+    try {
+      const attemptsData = localStorage.getItem('navikko_login_attempts');
+      if (attemptsData) {
+        const attempts = JSON.parse(attemptsData);
+        this.loginAttempts = new Map(attempts);
+      }
+    } catch (error) {
+      console.error('Failed to load login attempts:', error);
+    }
+  }
+
+  // Check if user needs 2FA
+  private requires2FA(userType: string): boolean {
+    return SECURITY_CONFIG.REQUIRE_2FA_FOR_ADMIN && userType === 'admin';
+  }
+
+  // Generate 2FA code (simplified implementation)
+  private generate2FACode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  // Validate 2FA code
+  private validate2FACode(inputCode: string, expectedCode: string): boolean {
+    return inputCode === expectedCode;
   }
 
   // Check if user exists in Supabase
@@ -415,9 +523,14 @@ class AuthService {
     }
   }
 
-  // Login method
-  async login(data: LoginData): Promise<User> {
+  // Enhanced login method with security measures
+  async login(data: LoginData, twoFactorCode?: string): Promise<User> {
     console.log('Login attempt for email:', data.email);
+
+    // Check IP restriction for admin login
+    if (data.email.includes('admin') && !this.isIPAllowedForAdmin()) {
+      throw new Error('Access denied from this IP address for admin accounts.');
+    }
 
     try {
       // Find user in Supabase
@@ -428,7 +541,15 @@ class AuthService {
         .single();
 
       if (userError || !userData) {
+        this.trackLoginAttempt(data.email, false);
         throw new Error('Invalid email or password');
+      }
+
+      // Check if account is locked
+      const attempt = this.loginAttempts.get(data.email);
+      if (attempt?.lockedUntil && Date.now() < attempt.lockedUntil) {
+        const remainingTime = Math.ceil((attempt.lockedUntil - Date.now()) / 1000 / 60);
+        throw new Error(`Account is locked. Please try again in ${remainingTime} minutes.`);
       }
 
       // In a real app, you would verify the password here
@@ -482,6 +603,27 @@ class AuthService {
       }
 
       if (userData.user_type === 'admin') {
+        // Check 2FA for admin users
+        if (this.requires2FA(userData.user_type)) {
+          if (!twoFactorCode) {
+            // Generate and send 2FA code (in real implementation, send via SMS/email)
+            const twoFACode = this.generate2FACode();
+            // Store code temporarily (in real implementation, use secure storage)
+            sessionStorage.setItem('temp_2fa_code', twoFACode);
+            throw new Error('2FA_REQUIRED');
+          }
+
+          // Validate 2FA code
+          const expectedCode = sessionStorage.getItem('temp_2fa_code');
+          if (!expectedCode || !this.validate2FACode(twoFactorCode, expectedCode)) {
+            this.trackLoginAttempt(data.email, false);
+            sessionStorage.removeItem('temp_2fa_code');
+            throw new Error('Invalid 2FA code');
+          }
+
+          sessionStorage.removeItem('temp_2fa_code');
+        }
+
         const { data: adminData } = await supabase
           .from('admin_access')
           .select('*')
@@ -496,6 +638,9 @@ class AuthService {
           };
         }
       }
+
+      // Track successful login
+      this.trackLoginAttempt(data.email, true);
 
       this.currentUser = user;
       this.saveUserToStorage(user);

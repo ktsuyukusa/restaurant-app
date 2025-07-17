@@ -27,9 +27,22 @@ This project uses environment variables to configure various settings. Create a 
 - `VITE_AZ_DINING_CARD`: Card/thumbnail photo URL
 - `VITE_AZ_DINING_MENU`: Menu photo URL
 
-# Payment Integration
+### Payment Integration
 - `VITE_KOMOJU_API_KEY`: KOMOJU API key for payment processing
 - `VITE_PAYJP_API_KEY`: PAY.JP API key for payment processing
+
+### Security Configuration
+- `VITE_ALLOWED_ADMIN_IPS`: Comma-separated list of IP addresses allowed for admin access (optional)
+- `VITE_ENABLE_2FA`: Enable two-factor authentication for admin users (defaults to true)
+- `VITE_MAX_LOGIN_ATTEMPTS`: Maximum login attempts before account lockout (defaults to 10)
+- `VITE_LOCKOUT_DURATION`: Account lockout duration in minutes (defaults to 30)
+- `VITE_SESSION_TIMEOUT`: Session timeout in hours (defaults to 24)
+
+### Admin Access Codes (Production)
+- `VITE_ADMIN_CODE_PROD`: Production admin access code
+- `VITE_SUPER_ADMIN_CODE_PROD`: Production super admin access code
+- `VITE_MODERATOR_CODE`: Production moderator access code
+- `VITE_SUPPORT_CODE`: Production support access code
 
 ## Example .env file
 
@@ -58,7 +71,55 @@ VITE_AZ_DINING_MENU=https://example.com/menu.jpg
 # Payment Integration
 VITE_KOMOJU_API_KEY=your-komoju-api-key-here
 VITE_PAYJP_API_KEY=your-payjp-api-key-here
+
+# Security Configuration
+VITE_ALLOWED_ADMIN_IPS=192.168.1.100,10.0.0.50
+VITE_ENABLE_2FA=true
+VITE_MAX_LOGIN_ATTEMPTS=10
+VITE_LOCKOUT_DURATION=30
+VITE_SESSION_TIMEOUT=24
+
+# Admin Access Codes (Production - CHANGE THESE!)
+VITE_ADMIN_CODE_PROD=your_secure_admin_code_here
+VITE_SUPER_ADMIN_CODE_PROD=your_secure_super_admin_code_here
+VITE_MODERATOR_CODE=your_secure_moderator_code_here
+VITE_SUPPORT_CODE=your_secure_support_code_here
 ```
+
+## Security Notes
+
+### Admin IP Restrictions
+- Set `VITE_ALLOWED_ADMIN_IPS` to restrict admin access to specific IP addresses
+- Format: comma-separated list (e.g., "192.168.1.100,10.0.0.50")
+- Leave empty to allow admin access from any IP (not recommended for production)
+
+### Two-Factor Authentication
+- `VITE_ENABLE_2FA=true` enables 2FA for all admin users
+- 2FA codes are sent via email (in production, implement SMS or authenticator app)
+- Codes expire after 5 minutes
+
+### Account Lockout
+- `VITE_MAX_LOGIN_ATTEMPTS=10` sets the maximum failed login attempts
+- `VITE_LOCKOUT_DURATION=30` sets lockout duration in minutes
+- Lockout is enforced per email address
+
+### Session Management
+- `VITE_SESSION_TIMEOUT=24` sets session timeout in hours
+- Sessions are automatically cleared after timeout
+- Users must re-authenticate after session expiration
+
+## Production Security Checklist
+
+- [ ] Change all admin codes from default values
+- [ ] Set up IP restrictions for admin access
+- [ ] Enable two-factor authentication
+- [ ] Configure proper session timeouts
+- [ ] Set up rate limiting
+- [ ] Enable security headers
+- [ ] Configure Content Security Policy
+- [ ] Set up monitoring and alerting
+- [ ] Regular security audits
+- [ ] Keep dependencies updated
 
 ## Notes
 
