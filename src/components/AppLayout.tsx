@@ -126,12 +126,19 @@ const AppLayout: React.FC = () => {
                   >
                     Terms of Service
                   </Link>
-                  <span className="hidden sm:inline">and</span>
+                  <span className="hidden sm:inline">,</span>
                   <Link 
                     to="/privacy-policy" 
                     className="text-navikko-primary hover:underline"
                   >
                     Privacy Policy
+                  </Link>
+                  <span className="hidden sm:inline">, and</span>
+                  <Link 
+                    to="/commercial-transaction-act" 
+                    className="text-navikko-primary hover:underline"
+                  >
+                    特定商取引法
                   </Link>
                 </div>
               </div>
@@ -260,6 +267,12 @@ const AppLayout: React.FC = () => {
                 className="text-navikko-primary hover:underline"
               >
                 Terms of Service
+              </Link>
+              <Link 
+                to="/commercial-transaction-act" 
+                className="text-navikko-primary hover:underline"
+              >
+                特定商取引法
               </Link>
             </div>
           </div>

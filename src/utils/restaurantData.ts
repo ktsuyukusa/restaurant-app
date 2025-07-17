@@ -79,7 +79,7 @@ export const sampleRestaurants: Restaurant[] = [
     phone_number: '050-5266-1283',
     external_booking_url: 'https://www.slow-style.com/restaurants/azdining-saku/',
     // Payment integration
-    komoju_merchant_id: 'komoju_test_merchant_123',
+    komoju_merchant_id: 'your-actual-komoju-merchant-id',
     payjp_merchant_id: 'payjp_test_merchant_456',
     // Coordinates for distance calculation
     latitude: 36.248,
@@ -233,7 +233,7 @@ export const sampleRestaurants: Restaurant[] = [
     opening_hours: '11:30 - 21:30',
     phone_number: '+81-267-123-4568',
     // Payment integration
-    komoju_merchant_id: 'komoju_test_merchant_789',
+    komoju_merchant_id: 'your-actual-komoju-merchant-id',
     payjp_merchant_id: 'payjp_test_merchant_012',
     // Coordinates for distance calculation
     latitude: 36.250,
