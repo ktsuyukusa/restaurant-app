@@ -15,7 +15,7 @@ import RestaurantOwnerDashboard from './RestaurantOwnerDashboard';
 import OrdersManagement from './OrdersManagement';
 import RoleSwitcher from './RoleSwitcher';
 import Profile from './Profile';
-
+import SecureRoute from './SecureRoute';
 
 const AppLayout: React.FC = () => {
   const { 
@@ -149,23 +149,47 @@ const AppLayout: React.FC = () => {
     }
 
     switch (currentView) {
-      // Restaurant Owner & Admin Views
+      // Restaurant Owner Views (with SecureRoute)
       case 'dashboard':
-        return (isRestaurantOwner || isAdmin) ? <RestaurantOwnerDashboard /> : <RestaurantList onViewDetails={handleRestaurantSelect} />;
+        return (
+          <SecureRoute requiredRole="restaurant_owner">
+            <RestaurantOwnerDashboard />
+          </SecureRoute>
+        );
       case 'orders':
-        return (isRestaurantOwner || isAdmin) ? <OrdersManagement /> : <RestaurantList onViewDetails={handleRestaurantSelect} />;
+        return (
+          <SecureRoute requiredRole="restaurant_owner">
+            <OrdersManagement />
+          </SecureRoute>
+        );
       case 'menu-management':
-        return (isRestaurantOwner || isAdmin) ? <MenuManagement /> : <RestaurantList onViewDetails={handleRestaurantSelect} />;
+        return (
+          <SecureRoute requiredRole="restaurant_owner">
+            <MenuManagement />
+          </SecureRoute>
+        );
       case 'restaurants':
-        return (isRestaurantOwner || isAdmin) ? <RestaurantManagement /> : <RestaurantList onViewDetails={handleRestaurantSelect} />;
+        return (
+          <SecureRoute requiredRole="restaurant_owner">
+            <RestaurantManagement />
+          </SecureRoute>
+        );
       
-      // Admin-only Views
+      // Admin-only Views (with SecureRoute)
       case 'users':
-        return isAdmin ? <UserManagement /> : <RestaurantList onViewDetails={handleRestaurantSelect} />;
+        return (
+          <SecureRoute requiredRole="admin">
+            <UserManagement />
+          </SecureRoute>
+        );
       case 'reservations':
-        return isAdmin ? <ReservationManagement /> : <RestaurantList onViewDetails={handleRestaurantSelect} />;
+        return (
+          <SecureRoute requiredRole="admin">
+            <ReservationManagement />
+          </SecureRoute>
+        );
       
-      // Customer Views
+      // Customer Views (no restrictions needed)
       case 'restaurant-details':
         return selectedRestaurantId ? (
           <RestaurantDetails 
@@ -207,18 +231,30 @@ const AppLayout: React.FC = () => {
       case 'profile':
         return <Profile />;
       
-      // Legacy views
+      // Legacy views (with SecureRoute)
       case 'menus':
-        return <MenuManagement />;
+        return (
+          <SecureRoute requiredRole="restaurant_owner">
+            <MenuManagement />
+          </SecureRoute>
+        );
       
-      // Development/Testing
+      // Development/Testing (admin only)
       case 'role-switcher':
-        return <RoleSwitcher />;
+        return (
+          <SecureRoute requiredRole="admin">
+            <RoleSwitcher />
+          </SecureRoute>
+        );
       
       default:
-        // Default view based on user role
+        // Default view based on user role with proper access control
         if (isRestaurantOwner) {
-          return <RestaurantOwnerDashboard />;
+          return (
+            <SecureRoute requiredRole="restaurant_owner">
+              <RestaurantOwnerDashboard />
+            </SecureRoute>
+          );
         }
         return <RestaurantList onViewDetails={handleRestaurantSelect} />;
     }

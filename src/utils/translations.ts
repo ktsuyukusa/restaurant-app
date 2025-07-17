@@ -174,7 +174,21 @@ const baseTranslations: Translations = {
     'auth.or': 'or',
     'auth.google_signin': 'Sign in with Google',
     'auth.google_signup': 'Sign up with Google',
-    'auth.google_continue': 'Continue with Google'
+    'auth.google_continue': 'Continue with Google',
+    
+    // Security and Access Control
+    'auth.loginRequired': 'Login Required',
+    'auth.pleaseLoginToAccess': 'Please log in to access this feature',
+    'auth.goToLogin': 'Go to Login',
+    'auth.insufficientPermissions': 'Insufficient Permissions',
+    'auth.roleRequired': 'This feature requires {{role}} access',
+    'auth.backToHome': 'Back to Home',
+    'auth.accessDenied': 'Access Denied',
+    'auth.adminAccessRestricted': 'Admin access is restricted for security reasons',
+    'auth.subscriptionRequired': 'Active subscription required',
+    'auth.adminSecurityMessage': 'Admin access requires additional security verification and is restricted to authorized IP addresses.',
+    'auth.subscriptionExpiredMessage': 'Your restaurant subscription has expired. Please renew to access restaurant management features.',
+    'auth.logout': 'Logout'
   },
   ja: {
     'app.title': 'Navikko',
@@ -341,7 +355,21 @@ const baseTranslations: Translations = {
     'auth.or': 'または',
     'auth.google_signin': 'Googleでサインイン',
     'auth.google_signup': 'Googleでサインアップ',
-    'auth.google_continue': 'Googleで続行'
+    'auth.google_continue': 'Googleで続行',
+    
+    // Security and Access Control
+    'auth.loginRequired': 'ログインが必要です',
+    'auth.pleaseLoginToAccess': 'この機能にアクセスするにはログインしてください',
+    'auth.goToLogin': 'ログインへ',
+    'auth.insufficientPermissions': '権限が不足しています',
+    'auth.roleRequired': 'この機能には{{role}}アクセスが必要です',
+    'auth.backToHome': 'ホームに戻る',
+    'auth.accessDenied': 'アクセス拒否',
+    'auth.adminAccessRestricted': 'セキュリティのため管理者アクセスは制限されています',
+    'auth.subscriptionRequired': 'アクティブなサブスクリプションが必要です',
+    'auth.adminSecurityMessage': '管理者アクセスには追加のセキュリティ認証が必要で、承認されたIPアドレスからのみアクセス可能です。',
+    'auth.subscriptionExpiredMessage': 'レストランサブスクリプションが期限切れです。レストラン管理機能にアクセスするには更新してください。',
+    'auth.logout': 'ログアウト'
   },
   pl: {
     'app.title': 'Navikko',
@@ -413,8 +441,67 @@ const baseTranslations: Translations = {
     'auth.or': 'lub',
     'auth.google_signin': 'Zaloguj się przez Google',
     'auth.google_signup': 'Zarejestruj się przez Google',
-    'auth.google_continue': 'Kontynuuj przez Google'
+    'auth.google_continue': 'Kontynuuj przez Google',
+    
+    // Security and Access Control
+    'auth.loginRequired': 'Wymagane logowanie',
+    'auth.pleaseLoginToAccess': 'Zaloguj się, aby uzyskać dostęp do tej funkcji',
+    'auth.goToLogin': 'Przejdź do logowania',
+    'auth.insufficientPermissions': 'Niewystarczające uprawnienia',
+    'auth.roleRequired': 'Ta funkcja wymaga dostępu {{role}}',
+    'auth.backToHome': 'Wróć do strony głównej',
+    'auth.accessDenied': 'Dostęp zabroniony',
+    'auth.adminAccessRestricted': 'Dostęp administratora jest ograniczony ze względów bezpieczeństwa',
+    'auth.subscriptionRequired': 'Wymagana aktywna subskrypcja',
+    'auth.adminSecurityMessage': 'Dostęp administratora wymaga dodatkowej weryfikacji bezpieczeństwa i jest ograniczony do autoryzowanych adresów IP.',
+    'auth.subscriptionExpiredMessage': 'Twoja subskrypcja restauracji wygasła. Odnów ją, aby uzyskać dostęp do funkcji zarządzania restauracją.',
+    'auth.logout': 'Wyloguj się'
   },
+  zh: {
+    'app.title': 'Navikko',
+    'nav.users': '用户',
+    'nav.restaurants': '餐厅',
+    'nav.menus': '菜单',
+    'nav.reservations': '预订',
+    'nav.cart': '购物车',
+    'nav.profile': '个人资料',
+    'search.placeholder': '搜索餐厅...',
+    'filter.cuisine': '菜系',
+    'filter.price': '价格范围',
+    'filter.rating': '评分',
+    'filter.distance': '距离',
+    'restaurant.rating': '评分',
+    'restaurant.distance': '距离',
+    'restaurant.open': '营业中',
+    'restaurant.closed': '已关闭',
+    'cart.empty': '您的购物车是空的',
+    'cart.total': '总计',
+    'button.addToCart': '添加到购物车',
+    'button.viewMenu': '查看菜单',
+    'button.reserve': '预订餐桌',
+    'toast.addedToCart': '已添加到购物车',
+    'language.changed': '语言已更改为',
+    
+    // Google Sign-In
+    'auth.or': '或',
+    'auth.google_signin': '使用Google登录',
+    'auth.google_signup': '使用Google注册',
+    'auth.google_continue': '使用Google继续',
+    
+    // Security and Access Control
+    'auth.loginRequired': '需要登录',
+    'auth.pleaseLoginToAccess': '请登录以访问此功能',
+    'auth.goToLogin': '前往登录',
+    'auth.insufficientPermissions': '权限不足',
+    'auth.roleRequired': '此功能需要{{role}}访问权限',
+    'auth.backToHome': '返回首页',
+    'auth.accessDenied': '访问被拒绝',
+    'auth.adminAccessRestricted': '出于安全原因，管理员访问受到限制',
+    'auth.subscriptionRequired': '需要有效的订阅',
+    'auth.adminSecurityMessage': '管理员访问需要额外的安全验证，仅限授权IP地址访问。',
+    'auth.subscriptionExpiredMessage': '您的餐厅订阅已过期。请续订以访问餐厅管理功能。',
+    'auth.logout': '登出'
+  }
 };
 
 // Merge all translations
@@ -433,6 +520,7 @@ export const getLanguageName = (code: string): string => {
     en: 'English',
     ja: '日本語',
     pl: 'Polski',
+    zh: '中文',
   };
   return languageNames[code] || code;
 };

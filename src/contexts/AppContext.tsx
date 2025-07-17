@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import authService, { User } from '@/services/authService';
 
@@ -10,7 +10,7 @@ interface CartItem {
   restaurantId: string;
 }
 
-type UserRole = 'customer' | 'restaurant_owner' | 'admin';
+type UserRole = 'customer' | 'restaurant_owner' | 'admin' | null;
 
 interface AppContextType {
   sidebarOpen: boolean;
@@ -29,6 +29,8 @@ interface AppContextType {
   isRestaurantOwner: boolean;
   isAdmin: boolean;
   isCustomer: boolean;
+  canAccessAdminFeatures: boolean;
+  canAccessRestaurantFeatures: boolean;
   // Authentication
   isAuthenticated: boolean;
   user: any | null;
@@ -37,19 +39,26 @@ interface AppContextType {
   logout: () => void;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
+  currentUser: any;
+  setCurrentUser: (user: any) => void;
+  hasRole: (role: 'customer' | 'restaurant_owner' | 'admin') => boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export function useAppContext() {
+export const useAppContext = () => {
   const context = useContext(AppContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error('useAppContext must be used within an AppProvider');
   }
   return context;
+};
+
+interface AppProviderProps {
+  children: ReactNode;
 }
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [currentView, setCurrentView] = useState<'restaurants' | 'restaurant-details' | 'cart' | 'profile' | 'users' | 'menus' | 'reservations' | 'dashboard' | 'orders' | 'menu-management'>('restaurants');
@@ -58,7 +67,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Load user role from localStorage or default to customer
   const [userRole, setUserRole] = useState<UserRole>(() => {
     const savedRole = localStorage.getItem('navikko_user_role');
-    return (savedRole as UserRole) || 'customer';
+    return (savedRole as UserRole) || null;
   });
 
   // Authentication state
@@ -66,6 +75,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return authService.getCurrentUser();
   });
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // Load user data on mount
+  useEffect(() => {
+    const user = authService.getCurrentUser();
+    if (user) {
+      setUser(user);
+      setUserRole(user.userType);
+    }
+  }, []);
 
   const toggleSidebar = () => {
     setSidebarOpen(prev => !prev);
@@ -109,70 +127,131 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setCartItems([]);
   };
 
-  // Wrapper function to persist user role
-  const setUserRoleWithPersistence = (role: UserRole) => {
+  // Role-based access control functions
+  const hasRole = (role: 'customer' | 'restaurant_owner' | 'admin'): boolean => {
+    return userRole === role && user;
+  };
+
+  const isAdmin = hasRole('admin');
+  const isRestaurantOwner = hasRole('restaurant_owner');
+  const isCustomer = hasRole('customer');
+
+  // Enhanced access control with security validation
+  const canAccessAdminFeatures = (): boolean => {
+    if (!isAdmin || !user) return false;
+    
+    // Additional security checks for admin access
+    if (!user.adminAccess) return false;
+    
+    // Check if admin access is still valid
+    if (!user.adminAccess.accessCode) return false;
+    
+    // Check IP restrictions (if implemented)
+    if (typeof window !== 'undefined') {
+      // In production, this would validate against allowed IP ranges
+      const isLocalhost = window.location.hostname === 'localhost' || 
+                         window.location.hostname === '127.0.0.1';
+      const isVercel = window.location.hostname.includes('vercel.app');
+      
+      // For development, allow localhost and Vercel
+      if (!isLocalhost && !isVercel) {
+        console.warn('Admin access attempted from non-authorized domain');
+        return false;
+      }
+    }
+    
+    return true;
+  };
+
+  const canAccessRestaurantFeatures = (): boolean => {
+    if (!isRestaurantOwner || !user) return false;
+    
+    // Check if restaurant owner has valid subscription
+    if (!user.subscription) return false;
+    
+    // Check if subscription is active
+    if (user.subscription.status !== 'active') return false;
+    
+    // Check if subscription hasn't expired
+    const now = new Date();
+    const endDate = new Date(user.subscription.endDate);
+    if (endDate < now) return false;
+    
+    return true;
+  };
+
+  const handleSetUserRole = (role: UserRole) => {
     setUserRole(role);
-    localStorage.setItem('navikko_user_role', role);
+    
+    // Update authentication state
+    if (role) {
+      setUser(authService.getCurrentUser());
+    } else {
+      setUser(null);
+    }
   };
 
-  // Authentication functions
-  const login = async (email: string, password: string) => {
-    const user = await authService.login({ email, password });
+  const handleSetCurrentUser = (user: any) => {
     setUser(user);
-    setUserRole(user.userType);
-    setShowAuthModal(false);
-  };
-
-  const signup = async (userData: any) => {
-    const user = await authService.signup(userData);
-    setUser(user);
-    setUserRole(user.userType);
-    setShowAuthModal(false);
+    if (user) {
+      setUserRole(user.userType);
+    } else {
+      setUserRole(null);
+    }
   };
 
   const logout = () => {
     authService.logout();
     setUser(null);
-    setUserRole('customer');
+    setUserRole(null);
     setCurrentView('restaurants');
   };
 
-  // Computed properties for role checking
-  const isAuthenticated = authService.isAuthenticated();
-  const isRestaurantOwner = authService.isRestaurantOwner();
-  const isAdmin = authService.isAdmin();
-  const isCustomer = authService.isCustomer();
+  const value: AppContextType = {
+    sidebarOpen,
+    toggleSidebar,
+    cartItems,
+    addToCart,
+    removeFromCart,
+    updateCartQuantity,
+    clearCart,
+    currentView,
+    setCurrentView,
+    selectedRestaurantId,
+    setSelectedRestaurantId,
+    userRole,
+    setUserRole: handleSetUserRole,
+    isRestaurantOwner,
+    isAdmin,
+    isCustomer,
+    canAccessAdminFeatures: canAccessAdminFeatures(),
+    canAccessRestaurantFeatures: canAccessRestaurantFeatures(),
+    // Authentication
+    isAuthenticated: !!user,
+    user,
+    login: async (email: string, password: string) => {
+      const user = await authService.login({ email, password });
+      setUser(user);
+      setUserRole(user.userType);
+      setShowAuthModal(false);
+    },
+    signup: async (userData: any) => {
+      const user = await authService.signup(userData);
+      setUser(user);
+      setUserRole(user.userType);
+      setShowAuthModal(false);
+    },
+    logout,
+    showAuthModal,
+    setShowAuthModal,
+    currentUser,
+    setCurrentUser: handleSetCurrentUser,
+    hasRole,
+  };
 
   return (
-    <AppContext.Provider
-      value={{
-        sidebarOpen,
-        toggleSidebar,
-        cartItems,
-        addToCart,
-        removeFromCart,
-        updateCartQuantity,
-        clearCart,
-        currentView,
-        setCurrentView,
-        selectedRestaurantId,
-        setSelectedRestaurantId,
-        userRole,
-        setUserRole: setUserRoleWithPersistence,
-        isRestaurantOwner,
-        isAdmin,
-        isCustomer,
-        // Authentication
-        isAuthenticated,
-        user,
-        login,
-        signup,
-        logout,
-        showAuthModal,
-        setShowAuthModal,
-      }}
-    >
+    <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   );
-}
+};

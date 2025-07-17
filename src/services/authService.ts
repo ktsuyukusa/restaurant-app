@@ -818,19 +818,40 @@ class AuthService {
     return subscription;
   }
 
-  // Google Sign-In method
+  // Google Sign-In method with security enforcement
   async signInWithGoogle(googleUser: GoogleUser, signInData: GoogleSignInData): Promise<User> {
     console.log('Google Sign-In attempt for email:', googleUser.email);
+    
+    // Check IP restriction for admin login
+    if (signInData.userType === 'admin' && !this.isIPAllowedForAdmin()) {
+      throw new Error('Access denied from this IP address for admin accounts.');
+    }
+
+    // Validate admin code for admin signup
+    if (signInData.userType === 'admin') {
+      if (!signInData.adminCode || !validateAdminCode(signInData.adminCode)) {
+        throw new Error('Invalid admin access code required for admin registration.');
+      }
+    }
     
     // Check if user already exists
     const userExists = await this.checkUserExists(googleUser.email);
     
     if (userExists) {
-      // User exists, perform login
+      // User exists, perform login with security checks
       const storedUserData = localStorage.getItem('navikko_user_data');
       if (storedUserData) {
         const userData = JSON.parse(storedUserData);
         if (userData.email === googleUser.email) {
+          // Check if existing user is admin and requires 2FA
+          if (userData.userType === 'admin' && this.requires2FA(userData.userType)) {
+            // For existing admin users, require 2FA even with Google Sign-In
+            const twoFACode = this.generate2FACode();
+            sessionStorage.setItem('temp_2fa_code', twoFACode);
+            sessionStorage.setItem('temp_google_user', JSON.stringify({ googleUser, signInData }));
+            throw new Error('2FA_REQUIRED_GOOGLE');
+          }
+          
           this.currentUser = userData;
           this.saveUserToStorage(userData);
           console.log('Google Sign-In successful (existing user):', userData);
@@ -839,7 +860,7 @@ class AuthService {
       }
     }
 
-    // User doesn't exist, create new account
+    // User doesn't exist, create new account with security validation
     const user: User = {
       id: `${signInData.userType}_${Date.now()}`,
       email: googleUser.email,
@@ -849,7 +870,7 @@ class AuthService {
       locationConsent: signInData.locationConsent || false,
       paymentMethods: [],
       restaurantInfo: signInData.restaurantInfo,
-      adminAccess: signInData.adminCode ? {
+      adminAccess: signInData.userType === 'admin' && signInData.adminCode ? {
         level: getAdminLevel(signInData.adminCode) || 'admin',
         permissions: ['user_management', 'restaurant_management', 'system_settings', 'analytics'],
         accessCode: signInData.adminCode
@@ -866,10 +887,90 @@ class AuthService {
       createdAt: new Date().toISOString()
     };
 
+    // For new admin users, require 2FA setup
+    if (signInData.userType === 'admin' && this.requires2FA(signInData.userType)) {
+      const twoFACode = this.generate2FACode();
+      sessionStorage.setItem('temp_2fa_code', twoFACode);
+      sessionStorage.setItem('temp_google_user', JSON.stringify({ googleUser, signInData }));
+      throw new Error('2FA_REQUIRED_GOOGLE');
+    }
+
     console.log('Created user object via Google Sign-In:', user);
     this.currentUser = user;
     this.saveUserToStorage(user);
     console.log('Google Sign-In successful (new user):', user);
+    return user;
+  }
+
+  // Complete Google Sign-In with 2FA verification
+  async completeGoogleSignInWith2FA(twoFactorCode: string): Promise<User> {
+    const storedData = sessionStorage.getItem('temp_google_user');
+    if (!storedData) {
+      throw new Error('No pending Google Sign-In found');
+    }
+
+    const { googleUser, signInData } = JSON.parse(storedData);
+    const expectedCode = sessionStorage.getItem('temp_2fa_code');
+
+    if (!expectedCode || !this.validate2FACode(twoFactorCode, expectedCode)) {
+      this.trackLoginAttempt(googleUser.email, false);
+      sessionStorage.removeItem('temp_2fa_code');
+      sessionStorage.removeItem('temp_google_user');
+      throw new Error('Invalid 2FA code');
+    }
+
+    // Clear temporary data
+    sessionStorage.removeItem('temp_2fa_code');
+    sessionStorage.removeItem('temp_google_user');
+
+    // Create or retrieve user
+    const userExists = await this.checkUserExists(googleUser.email);
+    
+    if (userExists) {
+      // User exists, retrieve existing data
+      const storedUserData = localStorage.getItem('navikko_user_data');
+      if (storedUserData) {
+        const userData = JSON.parse(storedUserData);
+        if (userData.email === googleUser.email) {
+          this.currentUser = userData;
+          this.saveUserToStorage(userData);
+          this.trackLoginAttempt(googleUser.email, true);
+          return userData;
+        }
+      }
+    }
+
+    // Create new user
+    const user: User = {
+      id: `${signInData.userType}_${Date.now()}`,
+      email: googleUser.email,
+      name: googleUser.name,
+      phone: signInData.phone || '',
+      userType: signInData.userType,
+      locationConsent: signInData.locationConsent || false,
+      paymentMethods: [],
+      restaurantInfo: signInData.restaurantInfo,
+      adminAccess: signInData.userType === 'admin' && signInData.adminCode ? {
+        level: getAdminLevel(signInData.adminCode) || 'admin',
+        permissions: ['user_management', 'restaurant_management', 'system_settings', 'analytics'],
+        accessCode: signInData.adminCode
+      } : undefined,
+      subscription: signInData.userType === 'restaurant_owner' ? {
+        id: `sub_${Date.now()}`,
+        plan: 'basic',
+        status: 'active',
+        startDate: new Date().toISOString(),
+        endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+        price: 5000,
+        currency: 'JPY'
+      } : undefined,
+      createdAt: new Date().toISOString()
+    };
+
+    this.currentUser = user;
+    this.saveUserToStorage(user);
+    this.trackLoginAttempt(googleUser.email, true);
+    console.log('Google Sign-In with 2FA successful:', user);
     return user;
   }
 }

@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAppContext } from '@/contexts/AppContext';
 import authService, { GoogleUser, GoogleSignInData } from '@/services/authService';
+import TwoFactorAuthModal from './TwoFactorAuthModal';
 
 interface GoogleSignInProps {
   userType: 'customer' | 'restaurant_owner' | 'admin';
@@ -47,6 +48,8 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
   const { setUserRole } = useAppContext();
   const buttonRef = useRef<HTMLDivElement>(null);
   const isInitialized = useRef(false);
+  const [showTwoFactorAuth, setShowTwoFactorAuth] = useState(false);
+  const [pendingGoogleData, setPendingGoogleData] = useState<{ googleUser: GoogleUser; signInData: GoogleSignInData } | null>(null);
 
   useEffect(() => {
     // Load Google Identity Services script
@@ -135,6 +138,11 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
 
   const handleGoogleSignIn = async (response: any) => {
     try {
+      // Validate admin code for admin signup
+      if (userType === 'admin' && (!adminCode || adminCode.trim() === '')) {
+        throw new Error('Admin code is required for admin registration via Google Sign-In.');
+      }
+
       // Decode the JWT token to get user info
       const payload = JSON.parse(atob(response.credential.split('.')[1]));
       
@@ -163,8 +171,50 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
       }
     } catch (error: any) {
       console.error('Google Sign-In error:', error);
+      
+      if (error.message === '2FA_REQUIRED_GOOGLE') {
+        // Store pending data and show 2FA modal
+        const payload = JSON.parse(atob(response.credential.split('.')[1]));
+        const googleUser: GoogleUser = {
+          id: payload.sub,
+          email: payload.email,
+          name: payload.name,
+          picture: payload.picture,
+          given_name: payload.given_name,
+          family_name: payload.family_name,
+        };
+        const signInData: GoogleSignInData = {
+          userType,
+          locationConsent,
+          restaurantInfo,
+          adminCode,
+          phone,
+        };
+        setPendingGoogleData({ googleUser, signInData });
+        setShowTwoFactorAuth(true);
+        return;
+      }
+      
       if (onError) {
         onError(error.message || 'Google Sign-In failed');
+      }
+    }
+  };
+
+  const handle2FAVerification = async (code: string) => {
+    try {
+      const user = await authService.completeGoogleSignInWith2FA(code);
+      setUserRole(user.userType);
+      setShowTwoFactorAuth(false);
+      setPendingGoogleData(null);
+      
+      if (onSuccess) {
+        onSuccess(user);
+      }
+    } catch (error: any) {
+      console.error('2FA verification error:', error);
+      if (onError) {
+        onError(error.message || '2FA verification failed');
       }
     }
   };
@@ -180,14 +230,28 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
   };
 
   return (
-    <div className={className}>
-      <div ref={buttonRef} className="w-full" />
-      <div className="mt-2 text-center">
-        <span className="text-xs text-gray-500">
-          {t('auth.or')}
-        </span>
+    <>
+      <div className={className}>
+        <div ref={buttonRef} className="w-full" />
+        <div className="mt-2 text-center">
+          <span className="text-xs text-gray-500">
+            {t('auth.or')}
+          </span>
+        </div>
       </div>
-    </div>
+
+      {/* Two-Factor Authentication Modal for Google Sign-In */}
+      <TwoFactorAuthModal
+        isOpen={showTwoFactorAuth}
+        onClose={() => {
+          setShowTwoFactorAuth(false);
+          setPendingGoogleData(null);
+        }}
+        onVerify={handle2FAVerification}
+        email={pendingGoogleData?.googleUser.email || ''}
+        method="email"
+      />
+    </>
   );
 };
 
