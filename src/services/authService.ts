@@ -82,9 +82,9 @@ export interface GoogleSignInData {
   phone?: string; // Optional for Google Sign-In
 }
 
-// Mock Supabase client (replace with real credentials)
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
+// Supabase client
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -127,17 +127,23 @@ class AuthService {
     localStorage.removeItem('navikko_user_role');
   }
 
-  // Check if user exists
+  // Check if user exists in Supabase
   async checkUserExists(email: string): Promise<boolean> {
-    const storedUserData = localStorage.getItem('navikko_user_data');
-    if (!storedUserData) {
-      return false;
-    }
-
     try {
-      const userData = JSON.parse(storedUserData);
-      return userData.email === email;
+      const { data, error } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
+        console.error('Error checking user existence:', error);
+        return false;
+      }
+
+      return !!data;
     } catch (error) {
+      console.error('Error checking user existence:', error);
       return false;
     }
   }
@@ -165,25 +171,45 @@ class AuthService {
       throw new Error('User with this email already exists. Please login instead.');
     }
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Create user in Supabase
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .insert({
+          email: data.email,
+          name: data.name,
+          phone: data.phone,
+          user_type: 'customer',
+          location_consent: data.locationConsent
+        })
+        .select()
+        .single();
 
-    const user: User = {
-      id: `customer_${Date.now()}`,
-      email: data.email,
-      name: data.name,
-      phone: data.phone,
-      userType: 'customer',
-      locationConsent: data.locationConsent,
-      paymentMethods: [],
-      createdAt: new Date().toISOString()
-    };
+      if (userError) {
+        console.error('Error creating user:', userError);
+        throw new Error('Failed to create user account');
+      }
 
-    console.log('Created user object:', user);
-    this.currentUser = user;
-    this.saveUserToStorage(user);
-    console.log('Customer signup successful for user:', user);
-    return user;
+      const user: User = {
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        phone: userData.phone,
+        userType: userData.user_type,
+        locationConsent: userData.location_consent,
+        paymentMethods: [],
+        createdAt: userData.created_at
+      };
+
+      console.log('Created user object:', user);
+      this.currentUser = user;
+      this.saveUserToStorage(user);
+      console.log('Customer signup successful for user:', user);
+      return user;
+    } catch (error: any) {
+      console.error('Customer signup error:', error);
+      throw new Error(error.message || 'Failed to create customer account');
+    }
   }
 
   // Restaurant owner signup with subscription requirement
@@ -201,43 +227,102 @@ class AuthService {
       throw new Error('Restaurant information is required');
     }
 
-    // Check if subscription is required (in real app, this would check payment)
-    const hasSubscription = await this.checkRestaurantSubscription(data.email);
-    if (!hasSubscription) {
-      throw new Error('Restaurant subscription is required. Please purchase a subscription first.');
+    // Check if user already exists
+    const userExists = await this.checkUserExists(data.email);
+    if (userExists) {
+      throw new Error('User with this email already exists. Please login instead.');
     }
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Create user in Supabase
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .insert({
+          email: data.email,
+          name: data.name,
+          phone: data.phone,
+          user_type: 'restaurant_owner'
+        })
+        .select()
+        .single();
 
-    const user: User = {
-      id: `restaurant_${Date.now()}`,
-      email: data.email,
-      name: data.name,
-      phone: data.phone,
-      userType: 'restaurant_owner',
-      restaurantInfo: {
-        name: data.restaurantInfo.name,
-        address: data.restaurantInfo.address,
-        phone: data.restaurantInfo.phone,
-        cuisine: data.restaurantInfo.cuisine || 'Other',
-        subscriptionId: `sub_${Date.now()}`
-      },
-      subscription: {
-        id: `sub_${Date.now()}`,
-        plan: 'basic',
-        status: 'active',
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
-        price: 5000,
-        currency: 'JPY'
-      },
-      createdAt: new Date().toISOString()
-    };
+      if (userError) {
+        console.error('Error creating restaurant owner:', userError);
+        throw new Error('Failed to create restaurant owner account');
+      }
 
-    this.currentUser = user;
-    this.saveUserToStorage(user);
-    return user;
+      // Create restaurant info
+      const { error: restaurantError } = await supabase
+        .from('restaurant_info')
+        .insert({
+          user_id: userData.id,
+          name: data.restaurantInfo.name,
+          address: data.restaurantInfo.address,
+          phone: data.restaurantInfo.phone,
+          cuisine: data.restaurantInfo.cuisine || 'Other'
+        });
+
+      if (restaurantError) {
+        console.error('Error creating restaurant info:', restaurantError);
+        // Clean up user if restaurant info creation fails
+        await supabase.from('users').delete().eq('id', userData.id);
+        throw new Error('Failed to create restaurant information');
+      }
+
+      // Create subscription (assuming basic plan for now)
+      const subscriptionId = `sub_${Date.now()}`;
+      const { error: subscriptionError } = await supabase
+        .from('subscriptions')
+        .insert({
+          user_id: userData.id,
+          plan: 'basic',
+          status: 'active',
+          start_date: new Date().toISOString(),
+          end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          price: 5000,
+          currency: 'JPY'
+        });
+
+      if (subscriptionError) {
+        console.error('Error creating subscription:', subscriptionError);
+        // Clean up if subscription creation fails
+        await supabase.from('restaurant_info').delete().eq('user_id', userData.id);
+        await supabase.from('users').delete().eq('id', userData.id);
+        throw new Error('Failed to create subscription');
+      }
+
+      const user: User = {
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        phone: userData.phone,
+        userType: userData.user_type,
+        restaurantInfo: {
+          name: data.restaurantInfo.name,
+          address: data.restaurantInfo.address,
+          phone: data.restaurantInfo.phone,
+          cuisine: data.restaurantInfo.cuisine || 'Other',
+          subscriptionId
+        },
+        subscription: {
+          id: subscriptionId,
+          plan: 'basic',
+          status: 'active',
+          startDate: new Date().toISOString(),
+          endDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          price: 5000,
+          currency: 'JPY'
+        },
+        createdAt: userData.created_at
+      };
+
+      this.currentUser = user;
+      this.saveUserToStorage(user);
+      return user;
+    } catch (error: any) {
+      console.error('Restaurant owner signup error:', error);
+      throw new Error(error.message || 'Failed to create restaurant owner account');
+    }
   }
 
   // Admin signup with strict access control
@@ -251,34 +336,72 @@ class AuthService {
       throw new Error('Invalid admin access code');
     }
 
-    // Additional validation for admin signup
-    if (!data.email || !data.password || !data.name || !data.phone) {
-      throw new Error('All fields are required');
+    // Check if user already exists
+    const userExists = await this.checkUserExists(data.email);
+    if (userExists) {
+      throw new Error('User with this email already exists. Please login instead.');
     }
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      // Create user in Supabase
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .insert({
+          email: data.email,
+          name: data.name,
+          phone: data.phone,
+          user_type: 'admin'
+        })
+        .select()
+        .single();
 
-    const user: User = {
-      id: `admin_${Date.now()}`,
-      email: data.email,
-      name: data.name,
-      phone: data.phone,
-      userType: 'admin',
-      adminAccess: {
-        level: getAdminLevel(data.adminCode) || 'admin',
-        permissions: ['user_management', 'restaurant_management', 'system_settings', 'analytics'],
-        accessCode: data.adminCode
-      },
-      createdAt: new Date().toISOString()
-    };
+      if (userError) {
+        console.error('Error creating admin:', userError);
+        throw new Error('Failed to create admin account');
+      }
 
-    this.currentUser = user;
-    this.saveUserToStorage(user);
-    return user;
+      // Create admin access
+      const adminLevel = getAdminLevel(data.adminCode!);
+      const { error: adminError } = await supabase
+        .from('admin_access')
+        .insert({
+          user_id: userData.id,
+          level: adminLevel,
+          permissions: ['read', 'write', 'delete'],
+          access_code: data.adminCode
+        });
+
+      if (adminError) {
+        console.error('Error creating admin access:', adminError);
+        // Clean up user if admin access creation fails
+        await supabase.from('users').delete().eq('id', userData.id);
+        throw new Error('Failed to create admin access');
+      }
+
+      const user: User = {
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        phone: userData.phone,
+        userType: userData.user_type,
+        adminAccess: {
+          level: adminLevel,
+          permissions: ['read', 'write', 'delete'],
+          accessCode: data.adminCode!
+        },
+        createdAt: userData.created_at
+      };
+
+      this.currentUser = user;
+      this.saveUserToStorage(user);
+      return user;
+    } catch (error: any) {
+      console.error('Admin signup error:', error);
+      throw new Error(error.message || 'Failed to create admin account');
+    }
   }
 
-  // Main signup method
+  // Unified signup method
   async signup(data: SignupData): Promise<User> {
     switch (data.userType) {
       case 'customer':
@@ -295,41 +418,92 @@ class AuthService {
   // Login method
   async login(data: LoginData): Promise<User> {
     console.log('Login attempt for email:', data.email);
-    
-    if (!data.email || !data.password) {
-      throw new Error('Email and password are required');
-    }
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Check if user exists in localStorage (in real app, this would query the database)
-    const storedUserData = localStorage.getItem('navikko_user_data');
-    console.log('Stored user data:', storedUserData);
-    
-    if (!storedUserData) {
-      throw new Error('No such user. Please sign up first.');
-    }
 
     try {
-      const userData = JSON.parse(storedUserData);
-      console.log('Parsed user data:', userData);
-      
-      // Check if email matches (in real app, you would also verify password hash)
-      if (userData.email !== data.email) {
+      // Find user in Supabase
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', data.email)
+        .single();
+
+      if (userError || !userData) {
         throw new Error('Invalid email or password');
       }
 
-      // For demo purposes, we'll accept any password if email matches
-      // In real app, you would verify the password hash here
+      // In a real app, you would verify the password here
+      // For now, we'll just check if the user exists
       
-      this.currentUser = userData;
-      this.saveUserToStorage(userData);
-      console.log('Login successful for user:', userData);
-      return userData;
-    } catch (error) {
-      console.error('Error parsing user data:', error);
-      throw new Error('Invalid user data. Please sign up again.');
+      const user: User = {
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        phone: userData.phone,
+        userType: userData.user_type,
+        locationConsent: userData.location_consent,
+        createdAt: userData.created_at
+      };
+
+      // Load additional data based on user type
+      if (userData.user_type === 'restaurant_owner') {
+        const { data: restaurantData } = await supabase
+          .from('restaurant_info')
+          .select('*')
+          .eq('user_id', userData.id)
+          .single();
+
+        if (restaurantData) {
+          user.restaurantInfo = {
+            name: restaurantData.name,
+            address: restaurantData.address,
+            phone: restaurantData.phone,
+            cuisine: restaurantData.cuisine,
+            subscriptionId: restaurantData.subscription_id
+          };
+        }
+
+        const { data: subscriptionData } = await supabase
+          .from('subscriptions')
+          .select('*')
+          .eq('user_id', userData.id)
+          .single();
+
+        if (subscriptionData) {
+          user.subscription = {
+            id: subscriptionData.id,
+            plan: subscriptionData.plan,
+            status: subscriptionData.status,
+            startDate: subscriptionData.start_date,
+            endDate: subscriptionData.end_date,
+            price: parseFloat(subscriptionData.price),
+            currency: subscriptionData.currency
+          };
+        }
+      }
+
+      if (userData.user_type === 'admin') {
+        const { data: adminData } = await supabase
+          .from('admin_access')
+          .select('*')
+          .eq('user_id', userData.id)
+          .single();
+
+        if (adminData) {
+          user.adminAccess = {
+            level: adminData.level,
+            permissions: adminData.permissions,
+            accessCode: adminData.access_code
+          };
+        }
+      }
+
+      this.currentUser = user;
+      this.saveUserToStorage(user);
+      console.log('Login successful for user:', user);
+      return user;
+    } catch (error: any) {
+      console.error('Login error:', error);
+      throw new Error(error.message || 'Login failed');
     }
   }
 
