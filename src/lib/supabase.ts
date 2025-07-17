@@ -8,6 +8,14 @@ const isSupabaseConfigured = supabaseUrl && supabaseAnonKey &&
   supabaseUrl !== 'https://your-project.supabase.co' && 
   supabaseAnonKey !== 'your-anon-key-here';
 
+console.log('Supabase Configuration Check:', {
+  hasUrl: !!supabaseUrl,
+  hasKey: !!supabaseAnonKey,
+  isDefaultUrl: supabaseUrl === 'https://your-project.supabase.co',
+  isDefaultKey: supabaseAnonKey === 'your-anon-key-here',
+  isConfigured: isSupabaseConfigured
+});
+
 // Create Supabase client only if properly configured
 export const supabase = isSupabaseConfigured 
   ? createClient(supabaseUrl, supabaseAnonKey)
@@ -38,5 +46,7 @@ export const mockSupabase = {
 
 // Export the appropriate client
 export const getSupabaseClient = () => {
-  return isSupabaseAvailable() ? supabase : mockSupabase;
+  const client = isSupabaseAvailable() ? supabase : mockSupabase;
+  console.log('getSupabaseClient called, returning:', isSupabaseAvailable() ? 'real client' : 'mock client');
+  return client;
 };
