@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { validateAdminCode, getAdminLevel } from '@/config/adminCodes';
-import { supabase, isSupabaseAvailable, getSupabaseClient } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 import { ADMIN_CODES } from '@/config/adminCodes';
 
 // Types for authentication
@@ -280,6 +280,7 @@ class AuthService {
   // Check if user exists in Supabase
   async checkUserExists(email: string): Promise<boolean> {
     try {
+      const supabase = getSupabaseClient();
       const { data, error } = await supabase
         .from('users')
         .select('id')
@@ -323,6 +324,7 @@ class AuthService {
 
     try {
       // Create user in Supabase
+      const supabase = getSupabaseClient();
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert({
@@ -385,6 +387,7 @@ class AuthService {
 
     try {
       // Create user in Supabase
+      const supabase = getSupabaseClient();
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert({
