@@ -201,6 +201,8 @@ const baseTranslations: Translations = {
     'welcome.for_owners_desc': 'Manage your restaurant, orders, and menus with powerful tools',
     'welcome.for_admins': 'For Administrators',
     'welcome.for_admins_desc': 'Full system access and comprehensive management capabilities',
+    
+    // Role translations
     'role.admin': 'Administrator',
     'role.restaurant_owner': 'Restaurant Owner',
     'role.customer': 'Customer'
@@ -229,39 +231,6 @@ const baseTranslations: Translations = {
     'button.reserve': 'テーブル予約',
     'toast.addedToCart': 'カートに追加されました',
     'language.changed': '言語が変更されました',
-    
-    // Order System
-    'order.title': '注文・支払い',
-    'order.summary': '注文サマリー',
-    'order.total': '合計',
-    'order.pickupTime': '受け取り時間',
-    'order.selectTime': '受け取り時間を選択',
-    'order.notes': '特別な指示',
-    'order.notesPlaceholder': '特別なリクエストや食事制限など...',
-    'order.paymentMethod': '支払い方法',
-    'order.processing': '処理中...',
-    'order.payNow': '今すぐ支払う',
-    'order.confirmation.title': '注文完了！',
-    'order.confirmation.subtitle': '注文が正常に完了し、支払いが完了しました。',
-    'order.details': '注文詳細',
-    'order.orderNumber': '注文番号',
-    'order.date': '注文日時',
-    'order.status': 'ステータス',
-    'order.items': '注文商品',
-    'order.qrCode': '受け取りQRコード',
-    'order.qrCode.instructions': '商品を受け取る際にこのQRコードを提示してください',
-    'order.downloadReceipt': '領収書をダウンロード',
-    'order.done': '完了',
-    'order.importantNotes': '重要な注意事項',
-    'order.notes.pickup': '選択した受け取り時間にレストランにお越しください',
-    'order.notes.qrCode': '受け取り時にQRコードをスタッフに提示してください',
-    'order.notes.contact': '注文の変更が必要な場合はレストランにお問い合わせください',
-    'order.notes.receipt': '記録のためにこの確認書を保管してください',
-    'order.orderNow': '今すぐ注文',
-    'order.notAvailable': 'このレストランではオンライン注文は利用できません。直接お問い合わせください。',
-    'open': '営業中',
-    'closed': '閉店',
-    'viewMenu': 'メニューを見る',
     'filter.all_cuisines': 'すべての料理',
     'filter.all_prices': 'すべての価格',
     'filter.all_ratings': 'すべての評価',
@@ -397,9 +366,11 @@ const baseTranslations: Translations = {
     'welcome.for_owners_desc': '強力なツールでレストラン、注文、メニューを管理',
     'welcome.for_admins': '管理者向け',
     'welcome.for_admins_desc': 'システム全体へのアクセスと包括的な管理機能',
-    'role.admin': 'Administrator',
-    'role.restaurant_owner': 'Restaurant Owner',
-    'role.customer': 'Customer'
+    
+    // Role translations
+    'role.admin': '管理者',
+    'role.restaurant_owner': 'レストランオーナー',
+    'role.customer': 'お客様'
   },
   pl: {
     'app.title': 'Navikko',
@@ -498,9 +469,11 @@ const baseTranslations: Translations = {
     'welcome.for_owners_desc': 'Zarządzaj swoją restauracją, zamówieniami i menu za pomocą potężnych narzędzi',
     'welcome.for_admins': 'Dla administratorów',
     'welcome.for_admins_desc': 'Pełny dostęp do systemu i kompleksowe możliwości zarządzania',
+    
+    // Role translations
     'role.admin': 'Administrator',
-    'role.restaurant_owner': 'Restaurant Owner',
-    'role.customer': 'Customer'
+    'role.restaurant_owner': 'Właściciel Restauracji',
+    'role.customer': 'Klient'
   },
   zh: {
     'app.title': 'Navikko',
@@ -558,18 +531,16 @@ const baseTranslations: Translations = {
     'welcome.for_owners_desc': '使用强大的工具管理您的餐厅、订单和菜单',
     'welcome.for_admins': '管理员专用',
     'welcome.for_admins_desc': '完整的系统访问和综合管理功能',
-    'role.admin': 'Administrator',
-    'role.restaurant_owner': 'Restaurant Owner',
-    'role.customer': 'Customer'
+    
+    // Role translations
+    'role.admin': '管理员',
+    'role.restaurant_owner': '餐厅老板',
+    'role.customer': '顾客'
   }
 };
 
-// Merge all translations
-const translations: Translations = {
-  ...baseTranslations,
-  ...extendedTranslations,
-  ...finalTranslations,
-};
+// Use only base translations to avoid conflicts
+const translations: Translations = baseTranslations;
 
 export const translate = (key: string, language: string): string => {
   return translations[language]?.[key] || translations['en'][key] || key;
