@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { validateAdminCode, getAdminLevel } from '@/config/adminCodes';
+import { supabase, isSupabaseAvailable, getSupabaseClient } from '@/lib/supabase';
+import { ADMIN_CODES } from '@/config/adminCodes';
 
 // Types for authentication
 export interface User {
@@ -82,6 +84,12 @@ export interface GoogleSignInData {
   phone?: string; // Optional for Google Sign-In
 }
 
+// Mock user data for development/testing
+const mockUsers = new Map();
+
+// Mock subscription data
+const mockSubscriptions = new Map();
+
 // Security configuration
 const SECURITY_CONFIG = {
   MAX_LOGIN_ATTEMPTS: 10,
@@ -99,6 +107,40 @@ interface LoginAttempt {
   lockedUntil?: number;
   ipAddress?: string;
 }
+
+const loginAttempts = new Map<string, LoginAttempt>();
+
+// Mock authentication functions
+const mockAuth = {
+  signUp: async (userData: any) => {
+    const user = {
+      id: `mock-user-${Date.now()}`,
+      email: userData.email,
+      name: userData.name,
+      user_type: userData.user_type || 'customer',
+      subscription: null,
+      created_at: new Date().toISOString()
+    };
+    mockUsers.set(userData.email, user);
+    return { data: { user }, error: null };
+  },
+
+  signInWithPassword: async (credentials: { email: string; password: string }) => {
+    const user = mockUsers.get(credentials.email);
+    if (user) {
+      return { data: { user }, error: null };
+    }
+    return { data: { user: null }, error: { message: 'Invalid credentials' } };
+  },
+
+  signOut: async () => {
+    return { error: null };
+  },
+
+  getSession: async () => {
+    return { data: { session: null }, error: null };
+  }
+};
 
 class AuthService {
   private static instance: AuthService;
@@ -972,6 +1014,79 @@ class AuthService {
     this.trackLoginAttempt(googleUser.email, true);
     console.log('Google Sign-In with 2FA successful:', user);
     return user;
+  }
+
+  // Sign up with email/password
+  async signUp(userData: any) {
+    try {
+      if (isSupabaseAvailable()) {
+        const { data, error } = await supabase.auth.signUp({
+          email: userData.email,
+          password: userData.password,
+          options: {
+            data: {
+              name: userData.name,
+              user_type: userData.user_type || 'customer'
+            }
+          }
+        });
+        return { data, error };
+      } else {
+        // Use mock authentication
+        return await mockAuth.signUp(userData);
+      }
+    } catch (error) {
+      console.error('Sign up error:', error);
+      return { data: null, error };
+    }
+  }
+
+  // Sign in with email/password
+  async signInWithPassword(credentials: { email: string; password: string }) {
+    try {
+      if (isSupabaseAvailable()) {
+        const { data, error } = await supabase.auth.signInWithPassword(credentials);
+        return { data, error };
+      } else {
+        // Use mock authentication
+        return await mockAuth.signInWithPassword(credentials);
+      }
+    } catch (error) {
+      console.error('Sign in error:', error);
+      return { data: null, error };
+    }
+  }
+
+  // Sign out
+  async signOut() {
+    try {
+      if (isSupabaseAvailable()) {
+        const { error } = await supabase.auth.signOut();
+        return { error };
+      } else {
+        // Use mock authentication
+        return await mockAuth.signOut();
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+      return { error };
+    }
+  }
+
+  // Get current session
+  async getSession() {
+    try {
+      if (isSupabaseAvailable()) {
+        const { data, error } = await supabase.auth.getSession();
+        return { data, error };
+      } else {
+        // Use mock authentication
+        return await mockAuth.getSession();
+      }
+    } catch (error) {
+      console.error('Get session error:', error);
+      return { data: null, error };
+    }
   }
 }
 

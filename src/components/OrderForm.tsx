@@ -9,10 +9,13 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Clock, MapPin, CreditCard, ShoppingCart, Plus, Minus, Trash2, Smartphone } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAppContext } from '@/contexts/AppContext';
 import { supabase } from '@/lib/supabase';
 import paymentService from '@/services/paymentService';
 import PaymentMethodRegistration from './PaymentMethodRegistration';
 import authService from '@/services/authService';
+import { getSupabaseClient } from '@/lib/supabase';
+import { toast } from '@/components/ui/use-toast';
 
 interface MenuItem {
   id: string;
@@ -165,6 +168,9 @@ const OrderForm: React.FC<OrderFormProps> = ({
 
     setIsProcessing(true);
     try {
+      // Get the appropriate Supabase client
+      const supabase = getSupabaseClient();
+      
       // Create order in database (or mock if Supabase not configured)
       let order;
       let orderError;

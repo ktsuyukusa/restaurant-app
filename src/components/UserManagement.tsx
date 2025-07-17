@@ -6,8 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Edit, Trash2, User, Store } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getSupabaseClient } from '@/lib/supabase';
 import RestaurantOwnerRegistration from './RestaurantOwnerRegistration';
 
 interface UserProfile {
@@ -47,6 +47,7 @@ const UserManagement: React.FC = () => {
   }, []);
 
   const createUserProfilesTable = async () => {
+    const supabase = getSupabaseClient();
     const { error } = await supabase.rpc('exec_sql', {
       sql: `
         CREATE TABLE IF NOT EXISTS user_profiles (
@@ -66,6 +67,7 @@ const UserManagement: React.FC = () => {
   };
 
   const fetchUsers = async () => {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('user_profiles')
       .select('*')
@@ -82,6 +84,7 @@ const UserManagement: React.FC = () => {
     e.preventDefault();
     
     if (editingUser) {
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('user_profiles')
         .update({ ...formData, updated_at: new Date().toISOString() })
@@ -94,6 +97,7 @@ const UserManagement: React.FC = () => {
         resetForm();
       }
     } else {
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('user_profiles')
         .insert([formData]);
@@ -129,6 +133,7 @@ const UserManagement: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (confirm(t('confirm.delete'))) {
+      const supabase = getSupabaseClient();
       const { error } = await supabase
         .from('user_profiles')
         .delete()
