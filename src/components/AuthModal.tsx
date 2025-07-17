@@ -27,6 +27,8 @@ import { validateAdminCode } from '@/config/adminCodes';
 import SubscriptionPurchase from './SubscriptionPurchase';
 import PaymentMethodRegistration from './PaymentMethodRegistration';
 import GoogleSignIn from './GoogleSignIn';
+import PrivacyPolicyModal from './PrivacyPolicyModal';
+import TermsOfServiceModal from './TermsOfServiceModal';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -67,6 +69,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [showSubscriptionPurchase, setShowSubscriptionPurchase] = useState(false);
   const [showPaymentMethodRegistration, setShowPaymentMethodRegistration] = useState(false);
   const [signupStep, setSignupStep] = useState<'userType' | 'details' | 'subscription' | 'payment' | 'complete'>('userType');
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+  const [showTermsOfService, setShowTermsOfService] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   const [signupData, setSignupData] = useState<SignupFormData>({
     email: '',
@@ -117,6 +122,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    
+    // Check if user agreed to terms
+    if (!agreeToTerms) {
+      setError(t('auth.terms_required'));
+      return;
+    }
+    
     setIsLoading(true);
 
     // Basic validation
@@ -612,6 +624,42 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     </div>
                   )}
 
+                  {/* Terms and Privacy Policy Agreement */}
+                  <div className="space-y-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        id="agree-terms"
+                        checked={agreeToTerms}
+                        onChange={(e) => setAgreeToTerms(e.target.checked)}
+                        className="mt-1 rounded"
+                        required
+                      />
+                      <div className="text-sm">
+                        <Label htmlFor="agree-terms" className="font-medium">
+                          {t('auth.agree_to_terms')}
+                        </Label>
+                        <div className="mt-1 space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => setShowTermsOfService(true)}
+                            className="text-navikko-primary hover:underline text-sm"
+                          >
+                            {t('auth.terms_of_service')}
+                          </button>
+                          <span className="text-gray-500">and</span>
+                          <button
+                            type="button"
+                            onClick={() => setShowPrivacyPolicy(true)}
+                            className="text-navikko-primary hover:underline text-sm"
+                          >
+                            {t('auth.privacy_policy')}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {error && (
                     <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                       <p className="text-red-600 text-sm">{error}</p>
@@ -680,6 +728,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
       )}
+      
+      {/* Privacy Policy Modal */}
+      <PrivacyPolicyModal 
+        isOpen={showPrivacyPolicy} 
+        onClose={() => setShowPrivacyPolicy(false)} 
+      />
+      
+      {/* Terms of Service Modal */}
+      <TermsOfServiceModal 
+        isOpen={showTermsOfService} 
+        onClose={() => setShowTermsOfService(false)} 
+      />
     </Dialog>
   );
 };

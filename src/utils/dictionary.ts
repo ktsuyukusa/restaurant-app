@@ -247,6 +247,11 @@ export const dictionary = {
     'auth.admin_code': 'Admin Code',
     'auth.enter_admin_code': 'Enter admin verification code',
     'auth.admin_code_desc': 'Admin code required for system administrator access',
+    'auth.privacy_policy': 'Privacy Policy',
+    'auth.terms_of_service': 'Terms of Service',
+    'auth.agree_to_terms': 'I agree to the Terms of Service and Privacy Policy',
+    'auth.terms_required': 'You must agree to the Terms of Service and Privacy Policy',
+    'common.close': 'Close',
   },
   ja: {
     // Navigation
@@ -425,6 +430,10 @@ export const dictionary = {
     'auth.admin_code': '管理者コード',
     'auth.enter_admin_code': '管理者認証コードを入力',
     'auth.admin_code_desc': 'システム管理者アクセスには管理者コードが必要です',
+    'auth.privacy_policy': 'プライバシーポリシー',
+    'auth.terms_of_service': '利用規約',
+    'auth.agree_to_terms': '利用規約とプライバシーポリシーに同意します',
+    'auth.terms_required': '利用規約とプライバシーポリシーに同意する必要があります',
     
     // Confirmations
     'confirm.delete': 'この項目を削除してもよろしいですか？',
@@ -741,6 +750,10 @@ export const dictionary = {
     'auth.admin_code': '管理员代码',
     'auth.enter_admin_code': '输入管理员验证代码',
     'auth.admin_code_desc': '系统管理员访问需要管理员代码',
+    'auth.privacy_policy': '隐私政策',
+    'auth.terms_of_service': '服务条款',
+    'auth.agree_to_terms': '我同意服务条款和隐私政策',
+    'auth.terms_required': '您必须同意服务条款和隐私政策',
   },
   ko: {
     // Navigation
