@@ -43,8 +43,7 @@ interface Restaurant {
   address?: Record<string, string>;
   phone: string;
   opening_hours?: string;
-  komoju_merchant_id?: string;
-  payjp_merchant_id?: string;
+  stripe_account_id?: string;
 }
 
 interface OrderFormProps {
@@ -70,7 +69,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
     notes: ''
   });
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<'komoju' | 'payjp'>('komoju');
+  const [paymentMethod, setPaymentMethod] = useState<'stripe'>('stripe');
   const [showPaymentRegistration, setShowPaymentRegistration] = useState(false);
   const [userPaymentMethods, setUserPaymentMethods] = useState<PaymentMethod[]>([]);
 
@@ -272,7 +271,7 @@ const OrderForm: React.FC<OrderFormProps> = ({
         }))
       };
 
-      const session = await paymentService.createPaymentSession(orderPayment, paymentMethod);
+      const session = await paymentService.createPaymentSession(orderPayment);
       return session;
     } catch (error) {
       console.error('Payment session creation error:', error);
@@ -450,25 +449,16 @@ const OrderForm: React.FC<OrderFormProps> = ({
                         <div className="flex gap-4 mt-2">
                           <Button
                             type="button"
-                            variant={paymentMethod === 'komoju' ? 'default' : 'outline'}
-                            onClick={() => setPaymentMethod('komoju')}
+                            variant="default"
                             className="flex-1"
+                            disabled
                           >
                             <CreditCard className="h-4 w-4 mr-2" />
-                            Credit Card
-                          </Button>
-                          <Button
-                            type="button"
-                            variant={paymentMethod === 'payjp' ? 'default' : 'outline'}
-                            onClick={() => setPaymentMethod('payjp')}
-                            className="flex-1"
-                          >
-                            <Smartphone className="h-4 w-4 mr-2" />
-                            QR Code Payment
+                            Stripe (Credit Card, Apple Pay, Google Pay)
                           </Button>
                         </div>
                         <p className="text-xs text-gray-600 mt-2">
-                          QR Code supports PayPay, WeChat Pay, Alipay, and other mobile payments
+                          Secure payment processing with Stripe. Supports credit cards, Apple Pay, and Google Pay.
                         </p>
                       </div>
 

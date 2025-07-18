@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getLocalizedValue } from '@/utils/localization';
+import { isValidUrl } from '@/utils/securityHeaders';
 import ReservationForm from './ReservationForm';
 
 interface Restaurant {
@@ -38,8 +39,14 @@ const ReservationButton: React.FC<ReservationButtonProps> = ({
 
   const handleReservationClick = () => {
     if (hasExternalBooking && externalUrl) {
-      // Open external booking URL
-      window.open(externalUrl, '_blank');
+      // Validate URL before opening
+      if (isValidUrl(externalUrl)) {
+        window.open(externalUrl, '_blank');
+      } else {
+        console.warn('Invalid external booking URL:', externalUrl);
+        // Fallback to internal reservation form
+        setIsReservationOpen(true);
+      }
     } else {
       // Open internal reservation form
       setIsReservationOpen(true);

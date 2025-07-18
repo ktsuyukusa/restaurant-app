@@ -1,6 +1,8 @@
 // API endpoint for scraping restaurant information from websites
 // This is a basic structure that can be expanded with actual scraping logic
 
+import { isValidUrl } from '@/utils/securityHeaders';
+
 export interface ScrapedRestaurantData {
   name?: string;
   description?: string;
@@ -98,16 +100,6 @@ export function extractRestaurantInfo(html: string): ScrapedRestaurantData {
   // This would contain actual HTML parsing logic
   // For now, return empty data
   return {};
-}
-
-// Helper function to validate URLs
-export function isValidUrl(url: string): boolean {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
 }
 
 // Helper function to get domain from URL

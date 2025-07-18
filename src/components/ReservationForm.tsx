@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Calendar, Clock, Users, User, Phone, Mail, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getLocalizedValue } from '@/utils/localization';
+import { isValidUrl } from '@/utils/securityHeaders';
 
 interface Restaurant {
   id: string;
@@ -61,7 +62,12 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ restaurant, isOpen, o
 
   const handleExternalBooking = () => {
     if (externalUrl) {
-      window.open(externalUrl, '_blank');
+      // Validate URL before opening
+      if (isValidUrl(externalUrl)) {
+        window.open(externalUrl, '_blank');
+      } else {
+        console.warn('Invalid external booking URL:', externalUrl);
+      }
     }
   };
 
@@ -73,7 +79,7 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ restaurant, isOpen, o
   const handleConfirm = async () => {
     try {
       // Save to database
-      const { error } = await fetch('/api/reservations', {
+      const { error } = await fetch(`${window.location.origin || 'http://localhost:8080'}/api/reservations`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +123,7 @@ const ReservationForm: React.FC<ReservationFormProps> = ({ restaurant, isOpen, o
     };
 
     // Send to your notification endpoint
-    await fetch('/api/notifications', {
+    await fetch(`${window.location.origin || 'http://localhost:8080'}/api/notifications`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -213,7 +213,7 @@ const RestaurantOwnerRegistration: React.FC = () => {
     try {
       // This would be a backend API call to scrape the website
       // For now, we'll simulate the scraping
-      const response = await fetch('/api/scrape-restaurant', {
+      const response = await fetch(`${window.location.origin || 'http://localhost:8080'}/api/scrape-restaurant`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: formData.website })
@@ -247,7 +247,7 @@ const RestaurantOwnerRegistration: React.FC = () => {
     setIsScraping(true);
     try {
       // This would be a backend API call to scrape social media
-      const response = await fetch('/api/scrape-social', {
+      const response = await fetch(`${window.location.origin || 'http://localhost:8080'}/api/scrape-social`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ platform, url })
@@ -290,7 +290,7 @@ const RestaurantOwnerRegistration: React.FC = () => {
       });
 
       // Submit to backend
-      const response = await fetch('/api/register-restaurant', {
+      const response = await fetch(`${window.location.origin || 'http://localhost:8080'}/api/register-restaurant`, {
         method: 'POST',
         body: submitData
       });

@@ -163,10 +163,20 @@ export const sanitizeInput = (input: string): string => {
 
 // URL validation
 export const isValidUrl = (url: string): boolean => {
+  if (!url || typeof url !== 'string') {
+    console.warn('isValidUrl: Invalid input:', url);
+    return false;
+  }
+  
   try {
     const urlObj = new URL(url);
-    return ['http:', 'https:'].includes(urlObj.protocol);
-  } catch {
+    const isValid = ['http:', 'https:'].includes(urlObj.protocol);
+    if (!isValid) {
+      console.warn('isValidUrl: Invalid protocol:', urlObj.protocol, 'for URL:', url);
+    }
+    return isValid;
+  } catch (error) {
+    console.warn('isValidUrl: Failed to construct URL:', url, 'Error:', error);
     return false;
   }
 };

@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExternalLink, Globe, Image as ImageIcon } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { isValidUrl } from '@/utils/securityHeaders';
 
 interface MenuItem {
   name: Record<string, string>;
@@ -170,6 +171,23 @@ const MultilingualMenu: React.FC<MultilingualMenuProps> = ({
     );
   };
 
+  const handleOpenMenu = (url: string) => {
+    if (!url) return;
+    
+    // Convert relative paths to absolute URLs
+    let fullUrl = url;
+    if (url.startsWith('/')) {
+      fullUrl = window.location.origin + url;
+    }
+    
+    // Validate URL before opening
+    if (isValidUrl(fullUrl)) {
+      window.open(fullUrl, '_blank');
+    } else {
+      console.warn('Invalid menu URL:', url);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -179,7 +197,7 @@ const MultilingualMenu: React.FC<MultilingualMenuProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.open(menuUrl, '_blank')}
+              onClick={() => handleOpenMenu(menuUrl)}
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               {t('menu.view_original')}

@@ -94,7 +94,7 @@ const mockSubscriptions = new Map();
 const SECURITY_CONFIG = {
   MAX_LOGIN_ATTEMPTS: 10,
   LOCKOUT_DURATION: 30 * 60 * 1000, // 30 minutes in milliseconds
-  ALLOWED_ADMIN_IPS: process.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [],
+  ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [],
   REQUIRE_2FA_FOR_ADMIN: true,
   SESSION_TIMEOUT: 24 * 60 * 60 * 1000, // 24 hours
 };

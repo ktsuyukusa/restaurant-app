@@ -9,6 +9,7 @@ import { getRestaurantById, type Restaurant, type MenuItem } from '@/utils/resta
 import { getLocalizedValue } from '@/utils/localization';
 import ReservationButton from './ReservationButton';
 import PlaceholderImage from './PlaceholderImage';
+import { isValidUrl } from '@/utils/securityHeaders';
 
 interface RestaurantDetailsProps {
   restaurantId: string;
@@ -45,6 +46,23 @@ const RestaurantDetails: React.FC<RestaurantDetailsProps> = ({ restaurantId, onB
       console.error('Error fetching restaurant:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenMenu = (url: string) => {
+    if (!url) return;
+    
+    // Convert relative paths to absolute URLs
+    let fullUrl = url;
+    if (url.startsWith('/')) {
+      fullUrl = window.location.origin + url;
+    }
+    
+    // Validate URL before opening
+    if (isValidUrl(fullUrl)) {
+      window.open(fullUrl, '_blank');
+    } else {
+      console.warn('Invalid menu URL:', url);
     }
   };
 
@@ -185,7 +203,7 @@ const RestaurantDetails: React.FC<RestaurantDetailsProps> = ({ restaurantId, onB
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => window.open(restaurant.menuUrl, '_blank')}
+                onClick={() => handleOpenMenu(restaurant.menuUrl || '')}
                 className="text-navikko-primary border-navikko-primary hover:bg-navikko-primary hover:text-white"
               >
                 Open Menu in New Tab
@@ -201,7 +219,7 @@ const RestaurantDetails: React.FC<RestaurantDetailsProps> = ({ restaurantId, onB
           <div className="relative w-full h-full flex items-center justify-center">
             <div className="absolute top-4 right-4 z-10 flex gap-2">
               <Button
-                onClick={() => window.open(restaurant.menuUrl, '_blank')}
+                onClick={() => handleOpenMenu(restaurant.menuUrl || '')}
                 variant="outline"
                 size="sm"
                 className="bg-white hover:bg-gray-100"

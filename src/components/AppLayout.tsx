@@ -17,6 +17,7 @@ import RoleSwitcher from './RoleSwitcher';
 import Profile from './Profile';
 import SecureRoute from './SecureRoute';
 import SubscriptionManagement from './SubscriptionManagement';
+import SupabaseTest from './SupabaseTest';
 
 const AppLayout: React.FC = () => {
   const { 
@@ -35,6 +36,9 @@ const AppLayout: React.FC = () => {
     user,
     setShowAuthModal
   } = useAppContext();
+  
+  // Always show Supabase test for debugging
+  const [showSupabaseTest, setShowSupabaseTest] = useState(true);
   const { t } = useLanguage();
   const isMobile = useIsMobile();
 
@@ -108,6 +112,12 @@ const AppLayout: React.FC = () => {
               <p className="text-navikko-secondary mb-4">
                 {t('welcome.signup_message')}
               </p>
+              
+              {/* Supabase Test Component */}
+              <div className="mb-6">
+                <SupabaseTest />
+              </div>
+              
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
                 <button 
                   onClick={() => setShowAuthModal(true)}
@@ -269,6 +279,19 @@ const AppLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-navikko-background">
+      {/* Supabase Test - Always visible for debugging */}
+      {showSupabaseTest && (
+        <div className="fixed top-4 right-4 z-50 max-w-sm">
+          <SupabaseTest />
+          <button 
+            onClick={() => setShowSupabaseTest(false)}
+            className="absolute top-2 right-2 text-red-600 hover:text-red-800"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+      
       <Header 
         onMenuClick={toggleSidebar}
         cartItemCount={cartItemCount}

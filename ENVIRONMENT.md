@@ -28,8 +28,7 @@ This project uses environment variables to configure various settings. Create a 
 - `VITE_AZ_DINING_MENU`: Menu photo URL
 
 ### Payment Integration
-- `VITE_KOMOJU_API_KEY`: KOMOJU API key for payment processing
-- `VITE_PAYJP_API_KEY`: PAY.JP API key for payment processing
+- `VITE_STRIPE_PUBLISHABLE_KEY`: Stripe publishable key for payment processing
 
 ### Security Configuration
 - `VITE_ALLOWED_ADMIN_IPS`: Comma-separated list of IP addresses allowed for admin access (optional)
