@@ -1,6 +1,6 @@
-import Stripe from 'stripe';
+const Stripe = require('stripe');
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -160,7 +160,7 @@ async function handleCheckoutSessionExpired(session) {
 }
 
 // Configure for raw body parsing
-export const config = {
+module.exports.config = {
   api: {
     bodyParser: false,
   },
