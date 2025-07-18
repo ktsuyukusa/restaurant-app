@@ -69,7 +69,7 @@ const AppLayout: React.FC = () => {
   };
 
   const handleNavigate = (section: string) => {
-    setCurrentView(section as any);
+    setCurrentView(section as 'dashboard' | 'orders' | 'menu-management' | 'restaurants' | 'subscription' | 'users' | 'reservations' | 'restaurant-details' | 'cart' | 'profile' | 'menus' | 'role-switcher');
   };
 
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);

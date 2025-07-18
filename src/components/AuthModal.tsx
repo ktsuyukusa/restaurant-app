@@ -132,7 +132,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setError(null);
   };
 
-  const updateSignupField = (field: keyof AuthSignupData, value: any) => {
+  const updateSignupField = (field: keyof AuthSignupData, value: string | boolean) => {
     setSignupData(prev => ({ ...prev, [field]: value }));
     setError(null);
   };
@@ -146,12 +146,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       const user = await authService.login(loginData);
       login(loginData.email, loginData.password);
       onClose();
-    } catch (error: any) {
-      if (error.message === '2FA_REQUIRED') {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Login failed';
+      if (errorMessage === '2FA_REQUIRED') {
         setPendingLoginData(loginData);
         setShowTwoFactorAuth(true);
       } else {
-        setError(error.message || 'Login failed');
+        setError(errorMessage);
       }
     } finally {
       setIsLoading(false);
@@ -161,15 +162,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handle2FAVerification = async (code: string) => {
     if (!pendingLoginData) return;
 
-    try {
-      const user = await authService.login(pendingLoginData, code);
-      login(pendingLoginData.email, pendingLoginData.password);
-      setShowTwoFactorAuth(false);
-      setPendingLoginData(null);
-      onClose();
-    } catch (error: any) {
-      throw error;
-    }
+    const user = await authService.login(pendingLoginData, code);
+    login(pendingLoginData.email, pendingLoginData.password);
+    setShowTwoFactorAuth(false);
+    setPendingLoginData(null);
+    onClose();
   };
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -219,8 +216,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       const user = await authService.signup(signupData);
       signup(signupData);
       onClose();
-    } catch (error: any) {
-      setError(error.message || 'Signup failed');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Signup failed';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -84,17 +84,19 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
       // Sort
       filtered.sort((a, b) => {
         switch (sortBy) {
-          case 'name':
+          case 'name': {
             const nameA = getLocalizedValue(a.name, currentLanguage);
             const nameB = getLocalizedValue(b.name, currentLanguage);
             return nameA.localeCompare(nameB);
+          }
           case 'rating':
             return b.rating - a.rating;
-          case 'distance':
+          case 'distance': {
             // Use calculated distance if available, otherwise fallback to string parsing
             const distanceA = a.calculatedDistance || parseFloat(a.distance.replace(/[^\d.]/g, ''));
             const distanceB = b.calculatedDistance || parseFloat(b.distance.replace(/[^\d.]/g, ''));
             return distanceA - distanceB;
+          }
           case 'price':
             return a.priceRange.localeCompare(b.priceRange);
           default:

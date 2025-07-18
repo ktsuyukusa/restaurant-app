@@ -33,9 +33,9 @@ interface AppContextType {
   canAccessRestaurantFeatures: boolean;
   // Authentication
   isAuthenticated: boolean;
-  user: any | null;
+  user: unknown | null;
   login: (email: string, password: string) => Promise<void>;
-  signup: (userData: any) => Promise<void>;
+  signup: (userData: unknown) => Promise<void>;
   logout: () => void;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
@@ -224,7 +224,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setUserRole(user.userType);
       setShowAuthModal(false);
     },
-    signup: async (userData: any) => {
+    signup: async (userData: unknown) => {
       const user = await authService.signup(userData);
       setUser(user);
       setUserRole(user.userType);

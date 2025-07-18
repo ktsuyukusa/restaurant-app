@@ -7,10 +7,10 @@ import TwoFactorAuthModal from './TwoFactorAuthModal';
 
 interface GoogleSignInProps {
   userType: 'customer' | 'restaurant_owner' | 'admin';
-  onSuccess?: (user: any) => void;
+  onSuccess?: (user: unknown) => void;
   onError?: (error: string) => void;
   locationConsent?: boolean;
-  restaurantInfo?: any;
+  restaurantInfo?: unknown;
   adminCode?: string;
   phone?: string;
   className?: string;
@@ -23,8 +23,8 @@ declare global {
     google: {
       accounts: {
         id: {
-          initialize: (config: any) => void;
-          renderButton: (element: HTMLElement, options: any) => void;
+          initialize: (config: unknown) => void;
+          renderButton: (element: HTMLElement, options: unknown) => void;
           prompt: () => void;
         };
       };
@@ -136,7 +136,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
     };
   }, []);
 
-  const handleGoogleSignIn = async (response: any) => {
+  const handleGoogleSignIn = async (response: unknown) => {
     try {
       // Validate admin code for admin signup
       if (userType === 'admin' && (!adminCode || adminCode.trim() === '')) {
@@ -169,10 +169,11 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
       if (onSuccess) {
         onSuccess(user);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Google Sign-In error:', error);
       
-      if (error.message === '2FA_REQUIRED_GOOGLE') {
+      const errorMessage = error instanceof Error ? error.message : 'Google Sign-In failed';
+      if (errorMessage === '2FA_REQUIRED_GOOGLE') {
         // Store pending data and show 2FA modal
         const payload = JSON.parse(atob(response.credential.split('.')[1]));
         const googleUser: GoogleUser = {
@@ -196,7 +197,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
       }
       
       if (onError) {
-        onError(error.message || 'Google Sign-In failed');
+        onError(errorMessage);
       }
     }
   };
@@ -211,10 +212,11 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
       if (onSuccess) {
         onSuccess(user);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('2FA verification error:', error);
+      const errorMessage = error instanceof Error ? error.message : '2FA verification failed';
       if (onError) {
-        onError(error.message || '2FA verification failed');
+        onError(errorMessage);
       }
     }
   };
