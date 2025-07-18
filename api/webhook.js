@@ -1,11 +1,22 @@
-const Stripe = require('stripe');
+import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+// Check if Stripe is configured
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error('STRIPE_SECRET_KEY is not configured');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Check if Stripe is configured
+  if (!process.env.STRIPE_SECRET_KEY || !webhookSecret) {
+    console.error('Stripe not configured for webhooks');
+    return res.status(500).json({ error: 'Webhook service not configured' });
   }
 
   const sig = req.headers['stripe-signature'];
