@@ -4,6 +4,10 @@
       "runtime": "nodejs18.x"
     }
   },
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "framework": "vite",
   "redirects": [
     {
       "source": "/privacy-policy",
