@@ -19,14 +19,21 @@ const AppStatus: React.FC = () => {
         const hasSupabaseKey = !!import.meta.env.VITE_SUPABASE_ANON_KEY;
         const hasStripeKey = !!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
-        // Test URL construction
+        // Test URL construction with better validation
         let supabaseUrlValid = false;
         try {
           if (hasSupabaseUrl && import.meta.env.VITE_SUPABASE_URL) {
             const url = import.meta.env.VITE_SUPABASE_URL;
-            if (url && url.trim() !== '') {
-              new URL(url);
-              supabaseUrlValid = true;
+            if (url && typeof url === 'string' && url.trim() !== '') {
+              // Additional validation before constructing URL
+              if (url.startsWith('http://') || url.startsWith('https://')) {
+                new URL(url);
+                supabaseUrlValid = true;
+              } else {
+                console.warn('Supabase URL missing protocol:', url);
+              }
+            } else {
+              console.warn('Supabase URL is empty or invalid type');
             }
           }
         } catch (e) {
