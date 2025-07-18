@@ -69,7 +69,7 @@ const Index: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {['en', 'ja', 'zh', 'ko'].map((lang) => (
+              {['en', 'ja', 'pl', 'zh', 'ko', 'ms', 'id', 'vi', 'th', 'es', 'ro'].map((lang) => (
                 <Badge 
                   key={lang} 
                   variant={currentLanguage === lang ? "default" : "outline"}
@@ -113,6 +113,13 @@ const Index: React.FC = () => {
                 className="text-navikko-primary hover:underline"
               >
                 Privacy Policy
+              </a>
+              <span className="hidden sm:inline">,</span>
+              <a 
+                href="/commercial-transaction-act" 
+                className="text-navikko-primary hover:underline"
+              >
+                特定商取引法
               </a>
             </div>
           </div>
