@@ -168,6 +168,18 @@ export const isValidUrl = (url: string): boolean => {
     return false;
   }
   
+  // Additional validation before URL construction
+  if (url.trim() === '') {
+    console.warn('isValidUrl: Empty URL string');
+    return false;
+  }
+  
+  // Check if URL has proper protocol
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    console.warn('isValidUrl: URL missing protocol:', url);
+    return false;
+  }
+  
   try {
     const urlObj = new URL(url);
     const isValid = ['http:', 'https:'].includes(urlObj.protocol);

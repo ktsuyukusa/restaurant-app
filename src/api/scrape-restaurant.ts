@@ -105,9 +105,22 @@ export function extractRestaurantInfo(html: string): ScrapedRestaurantData {
 // Helper function to get domain from URL
 export function getDomain(url: string): string {
   try {
+    // Validate URL before constructing
+    if (!url || typeof url !== 'string' || url.trim() === '') {
+      console.warn('getDomain: Invalid URL input:', url);
+      return '';
+    }
+    
+    // Check if URL has proper protocol
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      console.warn('getDomain: URL missing protocol:', url);
+      return '';
+    }
+    
     const urlObj = new URL(url);
     return urlObj.hostname;
-  } catch {
+  } catch (error) {
+    console.warn('getDomain: Failed to construct URL:', url, 'Error:', error);
     return '';
   }
 } 
