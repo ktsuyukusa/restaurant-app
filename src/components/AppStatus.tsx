@@ -22,9 +22,12 @@ const AppStatus: React.FC = () => {
         // Test URL construction
         let supabaseUrlValid = false;
         try {
-          if (hasSupabaseUrl) {
-            new URL(import.meta.env.VITE_SUPABASE_URL);
-            supabaseUrlValid = true;
+          if (hasSupabaseUrl && import.meta.env.VITE_SUPABASE_URL) {
+            const url = import.meta.env.VITE_SUPABASE_URL;
+            if (url && url.trim() !== '') {
+              new URL(url);
+              supabaseUrlValid = true;
+            }
           }
         } catch (e) {
           console.warn('Supabase URL invalid:', e);
