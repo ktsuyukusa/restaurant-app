@@ -443,6 +443,7 @@ export const dictionary = {
     close: '閉じる',
     save: '保存',
     cancel: 'キャンセル',
+    'common.close': '閉じる',
     
     // Cart
     'nav.cart': 'カート',
@@ -624,6 +625,7 @@ export const dictionary = {
     close: '关闭',
     save: '保存',
     cancel: '取消',
+    'common.close': '关闭',
     
     // Cart
     'nav.cart': '购物车',
@@ -874,6 +876,7 @@ export const dictionary = {
     close: '닫기',
     save: '저장',
     cancel: '취소',
+    'common.close': '닫기',
     
     // Cart
     'nav.cart': '장바구니',
@@ -1120,6 +1123,7 @@ export const dictionary = {
     close: 'Zamknij',
     save: 'Zapisz',
     cancel: 'Anuluj',
+    'common.close': 'Zamknij',
     
     // Cart
     'nav.cart': 'Koszyk',
@@ -1367,6 +1371,7 @@ export const dictionary = {
     close: 'ปิด',
     save: 'บันทึก',
     cancel: 'ยกเลิก',
+    'common.close': 'ปิด',
     
     // Cart
     'nav.cart': 'ตะกร้า',
@@ -1551,8 +1556,9 @@ export const dictionary = {
     'auth.admin_verification': 'Pengesahan Pentadbir',
     'auth.admin_code': 'Kod Pentadbir',
     'auth.enter_admin_code': 'Masukkan kod pengesahan pentadbir',
-    'auth.admin_code_desc': 'Kod pentadbir diperlukan untuk akses pentadbir sistem'
-  },
+    'auth.admin_code_desc': 'Kod pentadbir diperlukan untuk akses pentadbir sistem',
+    'common.close': 'Tutup'
+  },,
   id: {
     // Basic translations for Indonesian
     'welcome.title': 'Selamat Datang di Navikko',
@@ -1608,8 +1614,9 @@ export const dictionary = {
     'auth.admin_verification': 'Verifikasi Administrator',
     'auth.admin_code': 'Kode Administrator',
     'auth.enter_admin_code': 'Masukkan kode verifikasi administrator',
-    'auth.admin_code_desc': 'Kode administrator diperlukan untuk akses administrator sistem'
-  },
+    'auth.admin_code_desc': 'Kode administrator diperlukan untuk akses administrator sistem',
+    'common.close': 'Tutup'
+  },,
   es: {
     // Basic translations for Spanish
     'welcome.title': 'Bienvenido a Navikko',
@@ -1665,7 +1672,8 @@ export const dictionary = {
     'auth.admin_verification': 'Verificación de Administrador',
     'auth.admin_code': 'Código de Administrador',
     'auth.enter_admin_code': 'Ingresa el código de verificación de administrador',
-    'auth.admin_code_desc': 'Código de administrador requerido para acceso de administrador del sistema'
+    'auth.admin_code_desc': 'Código de administrador requerido para acceso de administrador del sistema',
+    'common.close': 'Cerrar'
   }
 };
 
