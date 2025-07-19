@@ -121,15 +121,31 @@ const Header: React.FC<HeaderProps> = ({
                 </Button>
               </div>
             ) : (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setShowAuthModal(true)}
-                className="text-gray-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
-                title="Login / Sign Up"
-              >
-                <LogIn className="h-5 w-5" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowAuthModal(true)}
+                  className="text-gray-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                  title="Login / Sign Up"
+                >
+                  <LogIn className="h-5 w-5" />
+                </Button>
+                {/* Debug button to force logout */}
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => {
+                    localStorage.removeItem('navikko_user_data');
+                    localStorage.removeItem('navikko_user_role');
+                    window.location.reload();
+                  }}
+                  className="text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors text-xs"
+                  title="Force Logout (Debug)"
+                >
+                  🗑️
+                </Button>
+              </div>
             )}
             
             {/* Admin Actions */}
