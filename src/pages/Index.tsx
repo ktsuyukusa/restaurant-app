@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAppContext } from '@/contexts/AppContext';
 import { Button } from '@/components/ui/button';
@@ -8,13 +9,24 @@ import { Globe, Users, Store, MapPin, Star } from 'lucide-react';
 
 const Index: React.FC = () => {
   const { t, currentLanguage } = useLanguage();
-  const { setShowAuthModal } = useAppContext();
+  const { setShowAuthModal, isAuthenticated } = useAppContext();
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      // If user is already authenticated, go directly to the app
+      navigate('/app');
+    } else {
+      // If not authenticated, show auth modal
+      setShowAuthModal(true);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <div className="flex justify-center mb-8">
             <div className="w-20 h-20 bg-navikko-primary rounded-full flex items-center justify-center shadow-lg">
               <img 
@@ -37,30 +49,30 @@ const Index: React.FC = () => {
         </div>
 
         {/* Features */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <Card className="text-center p-8 border border-gray-200 bg-white rounded-xl shadow-sm">
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          <div className="text-center p-8 bg-white rounded-xl border border-gray-200 shadow-sm">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Users className="h-8 w-8 text-blue-600" />
             </div>
             <h3 className="text-xl font-semibold mb-3 text-gray-900">{t('features.multilingual')}</h3>
             <p className="text-gray-600 leading-relaxed">{t('features.multilingual_desc')}</p>
-          </Card>
+          </div>
 
-          <Card className="text-center p-8 border border-gray-200 bg-white rounded-xl shadow-sm">
+          <div className="text-center p-8 bg-white rounded-xl border border-gray-200 shadow-sm">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Store className="h-8 w-8 text-green-600" />
             </div>
             <h3 className="text-xl font-semibold mb-3 text-gray-900">{t('features.restaurants')}</h3>
             <p className="text-gray-600 leading-relaxed">{t('features.restaurants_desc')}</p>
-          </Card>
+          </div>
 
-          <Card className="text-center p-8 border border-gray-200 bg-white rounded-xl shadow-sm">
+          <div className="text-center p-8 bg-white rounded-xl border border-gray-200 shadow-sm">
             <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <MapPin className="h-8 w-8 text-purple-600" />
             </div>
             <h3 className="text-xl font-semibold mb-3 text-gray-900">{t('features.location')}</h3>
             <p className="text-gray-600 leading-relaxed">{t('features.location_desc')}</p>
-          </Card>
+          </div>
         </div>
 
         {/* Language Support */}
@@ -98,7 +110,7 @@ const Index: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <button 
-              onClick={() => setShowAuthModal(true)}
+              onClick={handleGetStarted}
               className="px-8 py-4 bg-navikko-primary text-white rounded-lg hover:bg-navikko-primary/90 transition-colors font-semibold text-lg shadow-sm"
             >
               {t('welcome.get_started')}
