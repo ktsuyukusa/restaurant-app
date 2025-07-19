@@ -823,15 +823,15 @@ const baseTranslations: Translations = {
     'reservation.date': 'Data',
     'reservation.time': 'Ora',
     'reservation.guests': 'Numărul de oaspeți',
-    'reservation.name': 'Numele',
-    'reservation.contact': 'Contact (telefon/email)',
+    'reservation.name': 'Imię',
+    'reservation.contact': 'Kontakt (telefon/email)',
     'reservation.notes': 'Cerințe speciale',
     'reservation.select_time': 'Selectează ora',
     'reservation.person': 'persoană',
     'reservation.contact_placeholder': 'Număr de telefon sau email',
     'reservation.notes_placeholder': 'Orice cerințe speciale sau restricții alimentare',
     'reservation.continue': 'Continuă',
-    'reservation.cancel': 'Anulează',
+    'reservation.cancel': 'Anuluj',
     'reservation.confirmation_title': 'Detaliile rezervării',
     'reservation.confirm': 'Confirmă rezervarea',
     'reservation.back': 'Înapoi',
@@ -1190,7 +1190,21 @@ const translations: Translations = {
 };
 
 export const translate = (key: string, language: string): string => {
-  return translations[language]?.[key] || translations['en'][key] || key;
+  // First try to get the translation for the specific language
+  const translation = translations[language]?.[key];
+  if (translation) {
+    return translation;
+  }
+  
+  // If not found, try English as fallback
+  const englishTranslation = translations['en']?.[key];
+  if (englishTranslation) {
+    return englishTranslation;
+  }
+  
+  // If still not found, return the key itself
+  console.warn(`Translation key not found: ${key} for language: ${language}`);
+  return key;
 };
 
 export const getLanguageName = (code: string): string => {

@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Globe, Users, Store, MapPin, Star } from 'lucide-react';
-import AppStatus from '@/components/AppStatus';
 
 const Index: React.FC = () => {
   const { t, currentLanguage } = useLanguage();
@@ -14,9 +13,6 @@ const Index: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-12">
-        {/* App Status Component */}
-        <AppStatus />
-        
         {/* Header */}
         <div className="text-center mb-16">
           <div className="flex justify-center mb-8">
@@ -119,7 +115,7 @@ const Index: React.FC = () => {
               >
                 Terms of Service
               </a>
-              <span className="hidden sm:inline">,</span>
+              <span className="hidden sm:inline">, and</span>
               <a 
                 href="/privacy-policy" 
                 className="text-navikko-primary hover:underline"

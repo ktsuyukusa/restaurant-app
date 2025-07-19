@@ -38,8 +38,6 @@ const AppLayout: React.FC = () => {
     setShowAuthModal
   } = useAppContext();
   
-  // Always show Supabase test for debugging
-  const [showSupabaseTest, setShowSupabaseTest] = useState(true);
   const { t } = useLanguage();
   const isMobile = useIsMobile();
 
@@ -134,11 +132,6 @@ const AppLayout: React.FC = () => {
               {t('welcome.signup_message')}
             </p>
             
-            {/* Supabase Test Component */}
-            <div className="mb-8">
-              <SupabaseTest />
-            </div>
-            
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <button 
                 onClick={() => setShowAuthModal(true)}
@@ -158,7 +151,7 @@ const AppLayout: React.FC = () => {
                 >
                   Terms of Service
                 </Link>
-                <span className="hidden sm:inline">,</span>
+                <span className="hidden sm:inline">, and</span>
                 <Link 
                   to="/privacy-policy" 
                   className="text-navikko-primary hover:underline"
@@ -299,19 +292,6 @@ const AppLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Supabase Test - Always visible for debugging */}
-      {showSupabaseTest && (
-        <div className="fixed top-4 right-4 z-50 max-w-sm">
-          <SupabaseTest />
-          <button 
-            onClick={() => setShowSupabaseTest(false)}
-            className="absolute top-2 right-2 text-red-600 hover:text-red-800"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-      
       <Header 
         onMenuClick={toggleSidebar}
         cartItemCount={cartItemCount}
