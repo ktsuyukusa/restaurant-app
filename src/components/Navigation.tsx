@@ -48,9 +48,9 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate, currentSection }) =
   const navigationItems = getNavigationItems();
 
   return (
-    <nav className="bg-gradient-to-r from-[#F8FDF7] to-[#F4D35E] shadow-sm border-b border-[#6CBF72]">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-        <div className="flex flex-wrap justify-center sm:justify-start gap-1 sm:gap-2 py-2">
+    <nav className="bg-white border-b border-gray-100 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-wrap justify-center sm:justify-start gap-1 py-3">
           {navigationItems.map((item) => {
             const Icon = item.icon;
             
@@ -58,15 +58,15 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate, currentSection }) =
               <Button
                 key={item.id}
                 variant={currentSection === item.id ? 'default' : 'ghost'}
-                className={`flex items-center gap-1 sm:gap-2 py-2 px-2 sm:px-3 text-xs sm:text-sm whitespace-nowrap rounded-md transition-all duration-200 ${
+                className={`flex items-center gap-2 py-2 px-4 text-sm font-medium rounded-lg transition-all duration-200 ${
                   currentSection === item.id 
-                    ? 'bg-[#6CBF72] text-white hover:bg-[#5ba865] shadow-md' 
-                    : 'text-[#007C91] hover:bg-[#6CBF72] hover:text-white'
+                    ? 'bg-navikko-primary text-white hover:bg-navikko-primary/90 shadow-sm' 
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                 }`}
                 onClick={() => onNavigate(item.id)}
               >
-                <Icon className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-                <span className="truncate font-medium">{item.label}</span>
+                <Icon className="h-4 w-4" />
+                <span>{item.label}</span>
               </Button>
             );
           })}

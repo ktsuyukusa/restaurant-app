@@ -156,7 +156,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
   return (
     <div className="space-y-6">
       {/* Search and Filters */}
-      <Card className="p-4">
+      <Card className="p-6 border border-gray-200 bg-white rounded-xl shadow-sm">
         <div className="space-y-4">
           {/* Search Bar */}
           <div className="relative">
@@ -165,14 +165,14 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
               placeholder={t('search.placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-11 border-gray-200 focus:border-navikko-primary focus:ring-navikko-primary/20 rounded-lg"
             />
           </div>
 
           {/* Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <Select value={selectedCuisine} onValueChange={setSelectedCuisine}>
-              <SelectTrigger>
+              <SelectTrigger className="h-11 border-gray-200 focus:border-navikko-primary focus:ring-navikko-primary/20 rounded-lg">
                 <SelectValue placeholder={t('filter.cuisine')} />
               </SelectTrigger>
               <SelectContent>
@@ -186,7 +186,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
             </Select>
 
             <Select value={priceRange} onValueChange={setPriceRange}>
-              <SelectTrigger>
+              <SelectTrigger className="h-11 border-gray-200 focus:border-navikko-primary focus:ring-navikko-primary/20 rounded-lg">
                 <SelectValue placeholder={t('filter.priceRange')} />
               </SelectTrigger>
               <SelectContent>
@@ -200,7 +200,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
             </Select>
 
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger>
+              <SelectTrigger className="h-11 border-gray-200 focus:border-navikko-primary focus:ring-navikko-primary/20 rounded-lg">
                 <SelectValue placeholder={t('filter.sortBy')} />
               </SelectTrigger>
               <SelectContent>
@@ -211,7 +211,11 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
               </SelectContent>
             </Select>
 
-            <Button onClick={clearFilters} variant="outline" className="w-full">
+            <Button 
+              onClick={clearFilters} 
+              variant="outline" 
+              className="h-11 border-gray-200 hover:bg-gray-50 text-gray-700 rounded-lg"
+            >
               <Filter className="h-4 w-4 mr-2" />
               {t('filter.clear')}
             </Button>
@@ -221,19 +225,19 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
 
       {/* Results Count */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <p className="text-sm text-gray-600">
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-semibold text-gray-900">
             {filteredRestaurants.length} {t('search.results').replace('{{count}}', filteredRestaurants.length.toString())}
-          </p>
+          </h2>
           {hasLocation && (
-            <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+            <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full font-medium">
               📍 From your location
             </span>
           )}
         </div>
         <button
           onClick={() => setShowMapModal(true)}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-navikko-primary transition-colors cursor-pointer"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-navikko-primary transition-colors cursor-pointer font-medium"
         >
           <MapPin className="h-4 w-4" />
           <span>{t('search.nearby')}</span>
@@ -252,25 +256,24 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
           ))}
         </div>
       ) : (
-        <Card className="p-8 text-center">
-          <div className="space-y-4">
-            <Search className="h-12 w-12 mx-auto text-gray-400" />
-            <h3 className="text-lg font-semibold text-gray-600">
-              {t('search.noResults')}
-            </h3>
-            <p className="text-gray-500">
-              {t('search.tryDifferent')}
-            </p>
+        <Card className="p-8 text-center border border-gray-200 bg-white rounded-xl">
+          <div className="w-16 h-16 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <Search className="h-8 w-8 text-gray-400" />
           </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No restaurants found</h3>
+          <p className="text-gray-600 mb-4">Try adjusting your search criteria or filters</p>
+          <Button onClick={clearFilters} variant="outline" className="border-gray-300">
+            Clear all filters
+          </Button>
         </Card>
       )}
 
-      {/* Restaurant Map Modal */}
+      {/* Map Modal */}
       <RestaurantMapModal
         isOpen={showMapModal}
         onClose={() => setShowMapModal(false)}
         restaurants={filteredRestaurants}
-        userLocation={userLocation}
+        onRestaurantSelect={onViewDetails}
       />
     </div>
   );

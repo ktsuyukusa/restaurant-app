@@ -18,6 +18,7 @@ import Profile from './Profile';
 import SecureRoute from './SecureRoute';
 import SubscriptionManagement from './SubscriptionManagement';
 import SupabaseTest from './SupabaseTest';
+import { Users, Store, MapPin } from 'lucide-react';
 
 const AppLayout: React.FC = () => {
   const { 
@@ -78,80 +79,99 @@ const AppLayout: React.FC = () => {
     // Show welcome screen for unauthenticated users
     if (!isAuthenticated) {
       return (
-        <div className="p-4 sm:p-8 text-center bg-white rounded-lg shadow-sm border-navikko-primary/20 border">
-          <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl sm:text-4xl font-bold mb-6 text-navikko-secondary">
-              {t('welcome.title')}
-            </h1>
-            <p className="text-lg text-navikko-secondary mb-8">
-              {t('welcome.subtitle')}
-            </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
-                <h3 className="font-semibold text-blue-800 mb-2">{t('welcome.for_customers')}</h3>
-                <p className="text-sm text-blue-700">
-                  {t('welcome.for_customers_desc')}
-                </p>
-              </div>
-              <div className="p-6 bg-green-50 rounded-lg border border-green-200">
-                <h3 className="font-semibold text-green-800 mb-2">{t('welcome.for_owners')}</h3>
-                <p className="text-sm text-green-700">
-                  {t('welcome.for_owners_desc')}
-                </p>
-              </div>
-              <div className="p-6 bg-purple-50 rounded-lg border border-purple-200">
-                <h3 className="font-semibold text-purple-800 mb-2">{t('welcome.for_admins')}</h3>
-                <p className="text-sm text-purple-700">
-                  {t('welcome.for_admins_desc')}
-                </p>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-12">
+            <div className="flex justify-center mb-8">
+              <div className="w-20 h-20 bg-navikko-primary rounded-full flex items-center justify-center shadow-lg">
+                <img 
+                  src="/AZ Dining Saku/Navikko2.svg"
+                  alt="Navikko" 
+                  className="h-12 w-12 object-contain"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                  }}
+                />
               </div>
             </div>
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+              {t('welcome.title')}
+            </h1>
+            <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
+              {t('welcome.subtitle')}
+            </p>
+          </div>
+
+          {/* Features */}
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            <div className="text-center p-8 bg-white rounded-xl border border-gray-200 shadow-sm">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Users className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">{t('features.multilingual')}</h3>
+              <p className="text-gray-600 leading-relaxed">{t('features.multilingual_desc')}</p>
+            </div>
+
+            <div className="text-center p-8 bg-white rounded-xl border border-gray-200 shadow-sm">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Store className="h-8 w-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">{t('features.restaurants')}</h3>
+              <p className="text-gray-600 leading-relaxed">{t('features.restaurants_desc')}</p>
+            </div>
+
+            <div className="text-center p-8 bg-white rounded-xl border border-gray-200 shadow-sm">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <MapPin className="h-8 w-8 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">{t('features.location')}</h3>
+              <p className="text-gray-600 leading-relaxed">{t('features.location_desc')}</p>
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <p className="text-gray-700 mb-8 text-lg">
+              {t('welcome.signup_message')}
+            </p>
             
-            <div className="text-center">
-              <p className="text-navikko-secondary mb-4">
-                {t('welcome.signup_message')}
-              </p>
-              
-              {/* Supabase Test Component */}
-              <div className="mb-6">
-                <SupabaseTest />
-              </div>
-              
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-                <button 
-                  onClick={() => setShowAuthModal(true)}
-                  className="px-6 py-3 bg-navikko-primary text-white rounded-lg hover:bg-navikko-primary/90 transition-colors font-semibold"
+            {/* Supabase Test Component */}
+            <div className="mb-8">
+              <SupabaseTest />
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+              <button 
+                onClick={() => setShowAuthModal(true)}
+                className="px-8 py-4 bg-navikko-primary text-white rounded-lg hover:bg-navikko-primary/90 transition-colors font-semibold text-lg shadow-sm"
+              >
+                {t('welcome.get_started')}
+              </button>
+            </div>
+            
+            {/* Policy Links */}
+            <div className="text-center text-sm text-gray-500">
+              <p className="mb-3">By using this app, you agree to our</p>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <Link 
+                  to="/terms-of-service" 
+                  className="text-navikko-primary hover:underline"
                 >
-                  {t('welcome.get_started')}
-                </button>
-              </div>
-              
-              {/* Policy Links */}
-              <div className="text-center text-sm text-gray-500">
-                <p className="mb-2">By using this app, you agree to our</p>
-                <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                  <Link 
-                    to="/terms-of-service" 
-                    className="text-navikko-primary hover:underline"
-                  >
-                    Terms of Service
-                  </Link>
-                  <span className="hidden sm:inline">,</span>
-                  <Link 
-                    to="/privacy-policy" 
-                    className="text-navikko-primary hover:underline"
-                  >
-                    Privacy Policy
-                  </Link>
-                  <span className="hidden sm:inline">, and</span>
-                  <Link 
-                    to="/commercial-transaction-act" 
-                    className="text-navikko-primary hover:underline"
-                  >
-                    特定商取引法
-                  </Link>
-                </div>
+                  Terms of Service
+                </Link>
+                <span className="hidden sm:inline">,</span>
+                <Link 
+                  to="/privacy-policy" 
+                  className="text-navikko-primary hover:underline"
+                >
+                  Privacy Policy
+                </Link>
+                <span className="hidden sm:inline">, and</span>
+                <Link 
+                  to="/commercial-transaction-act" 
+                  className="text-navikko-primary hover:underline"
+                >
+                  特定商取引法
+                </Link>
               </div>
             </div>
           </div>
@@ -278,7 +298,7 @@ const AppLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-navikko-background">
+    <div className="min-h-screen bg-gray-50">
       {/* Supabase Test - Always visible for debugging */}
       {showSupabaseTest && (
         <div className="fixed top-4 right-4 z-50 max-w-sm">
@@ -308,15 +328,15 @@ const AppLayout: React.FC = () => {
         />
       )}
       
-      <main className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-8">
-        <div className="w-full overflow-hidden">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="w-full">
           {renderCurrentView()}
         </div>
       </main>
       
       {/* Footer with Policy Links */}
-      <footer className="bg-white border-t border-gray-200 mt-8">
-        <div className="max-w-7xl mx-auto px-4 py-6">
+      <footer className="bg-white border-t border-gray-200 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
             <div className="mb-4 sm:mb-0">
               <p>&copy; 2024 WaSanDo 和讃堂. All rights reserved.</p>
