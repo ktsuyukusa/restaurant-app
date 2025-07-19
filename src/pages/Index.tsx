@@ -105,26 +105,6 @@ const Index: React.FC = () => {
             </button>
           </div>
           
-          {/* Debug Section */}
-          <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">Debug Info:</h3>
-            <div className="text-xs text-gray-600 space-y-1">
-              <p>Auth Modal State: {JSON.stringify(useAppContext().showAuthModal)}</p>
-              <p>Is Authenticated: {JSON.stringify(useAppContext().isAuthenticated)}</p>
-              <p>User Role: {JSON.stringify(useAppContext().userRole)}</p>
-              <button 
-                onClick={() => {
-                  localStorage.removeItem('navikko_user_data');
-                  localStorage.removeItem('navikko_user_role');
-                  window.location.reload();
-                }}
-                className="text-red-600 hover:underline text-xs"
-              >
-                Clear Auth Data
-              </button>
-            </div>
-          </div>
-          
           {/* Policy Links */}
           <div className="text-center text-sm text-gray-500 mt-8">
             <p className="mb-3">By using this app, you agree to our</p>
