@@ -1558,7 +1558,7 @@ export const dictionary = {
     'auth.enter_admin_code': 'Masukkan kod pengesahan pentadbir',
     'auth.admin_code_desc': 'Kod pentadbir diperlukan untuk akses pentadbir sistem',
     'common.close': 'Tutup'
-  },,
+  },
   id: {
     // Basic translations for Indonesian
     'welcome.title': 'Selamat Datang di Navikko',
