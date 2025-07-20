@@ -174,7 +174,7 @@ const AppLayout: React.FC = () => {
 
     // Default to restaurants view for authenticated users
     if (currentView === 'restaurants' || !currentView) {
-      return <RestaurantList onRestaurantSelect={handleRestaurantSelect} />;
+      return <RestaurantList onViewDetails={handleRestaurantSelect} />;
     }
 
     switch (currentView) {
