@@ -6,7 +6,10 @@ interface Translations {
   };
 }
 
-const translations: Translations = {
+import { dictionary } from './dictionary';
+
+// Deprecated: use dictionary from dictionary.ts as the single source of truth
+// const translations: Translations = {
   en: {
     // App basics
     'app.title': 'Navikko',
@@ -519,6 +522,20 @@ const translations: Translations = {
 };
 
 export const translate = (key: string, language: string): string => {
+  // Use dictionary.ts as the single source of truth
+  const translation = dictionary[language]?.[key];
+  if (translation) {
+    return translation;
+  }
+  const englishTranslation = dictionary['en']?.[key];
+  if (englishTranslation) {
+    return englishTranslation;
+  }
+  console.warn(`Translation key not found: ${key} for language: ${language}`);
+  return key;
+};
+
+// Deprecated: translations object is no longer used
   // First try to get the translation for the specific language
   const translation = translations[language]?.[key];
   if (translation) {

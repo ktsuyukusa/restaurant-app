@@ -1616,7 +1616,7 @@ export const dictionary = {
     'auth.enter_admin_code': 'Masukkan kode verifikasi administrator',
     'auth.admin_code_desc': 'Kode administrator diperlukan untuk akses administrator sistem',
     'common.close': 'Tutup'
-  },,
+  },
   es: {
     // Basic translations for Spanish
     'welcome.title': 'Bienvenido a Navikko',
