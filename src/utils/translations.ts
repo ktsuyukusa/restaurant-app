@@ -9,7 +9,7 @@ interface Translations {
 import { dictionary } from './dictionary';
 
 // Deprecated: use dictionary from dictionary.ts as the single source of truth
-// const translations: Translations = {
+/* const translations: Translations = {
   en: {
     // App basics
     'app.title': 'Navikko',
@@ -519,7 +519,7 @@ import { dictionary } from './dictionary';
     'reservation.confirm_message': '予約詳細を確認してください：',
     'originalMenu': 'オリジナルメニュー'
   }
-};
+}; */
 
 export const translate = (key: string, language: string): string => {
   // Use dictionary.ts as the single source of truth
@@ -535,23 +535,7 @@ export const translate = (key: string, language: string): string => {
   return key;
 };
 
-// Deprecated: translations object is no longer used
-  // First try to get the translation for the specific language
-  const translation = translations[language]?.[key];
-  if (translation) {
-    return translation;
-  }
-  
-  // If not found, try English as fallback
-  const englishTranslation = translations['en']?.[key];
-  if (englishTranslation) {
-    return englishTranslation;
-  }
-  
-  // If still not found, return the key itself
-  console.warn(`Translation key not found: ${key} for language: ${language}`);
-  return key;
-};
+
 
 export const getLanguageName = (code: string): string => {
   const languageNames: { [key: string]: string } = {
@@ -570,4 +554,4 @@ export const getLanguageName = (code: string): string => {
   return languageNames[code] || code;
 };
 
-export default translations;
+export default dictionary;
