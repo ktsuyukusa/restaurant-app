@@ -28,13 +28,9 @@ const Index: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-8">
-           <img 
-            src="/AZ Dining Saku/Navikko2.svg"
-             alt="Navikko" 
-              className="h-16 w-auto object-contain"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
+           <div className="text-4xl font-bold text-navikko-primary">
+             Navikko
+             </div>
                 }}
               />
             </div>
