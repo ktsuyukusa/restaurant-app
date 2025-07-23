@@ -1,19 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Get environment variables with type checking
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Create Supabase client
-let supabase = null;
-
-if (supabaseUrl && supabaseAnonKey) {
-  try {
-    supabase = createClient(supabaseUrl, supabaseAnonKey);
-  } catch (error) {
-    console.error('Error creating Supabase client:', error);
-    supabase = null;
-  }
+// Validate environment variables
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Missing Supabase environment variables. Please check your .env or .env.local file.\n' +
+    'Required variables: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY'
+  );
 }
+
+// Create Supabase client
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export { supabase };
 
@@ -41,6 +41,4 @@ export const mockSupabase = {
 };
 
 // Export the appropriate client
-export const getSupabaseClient = () => {
-  return isSupabaseAvailable() ? supabase : mockSupabase;
-};
+export const getSupabaseClient = () => isSupabaseAvailable() ? supabase : mockSupabase;

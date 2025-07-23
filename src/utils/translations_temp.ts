@@ -8,12 +8,11 @@ import { authTranslations } from './authTranslations';
  * Translates a key into the specified language
  * First checks auth-specific translations, then falls back to general dictionary
  * @param key The translation key to look up
+ * @param lang The target language code
  * @param defaultValue Optional fallback value if no translation is found
- * @param lang The target language code (optional, defaults to current language)
  * @returns The translated string
  */
-export const translate = (key: string, defaultValue?: string, lang?: string): string => {
-  lang = lang || 'en'; // Default to English if no language specified
+export const translate = (key: string, lang: string, defaultValue?: string): string => {
   try {
     // Check for auth-specific translations first
     if (key.startsWith('auth.')) {
@@ -24,7 +23,7 @@ export const translate = (key: string, defaultValue?: string, lang?: string): st
     }
 
     // Fall back to general dictionary
-    const translation = dictionary[lang] ? dictionary[lang][key] : undefined;
+    const translation = dictionary[lang]?.[key];
     if (!translation) {
       console.warn(`Translation missing for key: ${key} in language: ${lang}`);
       return defaultValue || key.split('.').pop() || key;
@@ -55,5 +54,5 @@ export const getLanguageName = (code: string): string => {
     es: 'Español',
     ro: 'Română',
   };
-  return code in languageNames ? languageNames[code] : code;
+  return languageNames[code] || code;
 };
