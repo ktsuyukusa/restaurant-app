@@ -227,7 +227,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h2 className="text-lg font-semibold text-gray-900">
-            {filteredRestaurants.length} {t('search.results').replace('{{count}}', filteredRestaurants.length.toString())}
+            {t('search.results').replace('{{count}}', filteredRestaurants.length.toString())}
           </h2>
           {hasLocation && (
             <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full font-medium">
