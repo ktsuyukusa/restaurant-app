@@ -1766,7 +1766,7 @@ export const dictionary = {
     'auth.admin_code': 'Kode Administrator',
     'auth.enter_admin_code': 'Masukkan kode verifikasi administrator',
     'auth.admin_code_desc': 'Kode administrator diperlukan untuk akses administrator sistem',
-    'common.close': 'Tutup'
+    'common.close': 'Tutup',
 
     // Features
     'features.multilingual': 'Dukungan Multibahasa',
@@ -1846,7 +1846,7 @@ export const dictionary = {
     'auth.admin_code': 'Código de Administrador',
     'auth.enter_admin_code': 'Ingresa el código de verificación de administrador',
     'auth.admin_code_desc': 'Código de administrador requerido para acceso de administrador del sistema',
-    'common.close': 'Cerrar'
+    'common.close': 'Cerrar',
 
        // Features
     'features.multilingual': 'Soporte Multiidioma',
@@ -1909,7 +1909,7 @@ export const dictionary = {
     'auth.welcome': 'Chào mừng đến với Navikko',
     'auth.login': 'Đăng nhập',
     'auth.signup': 'Đăng ký',
-    'common.close': 'Đóng'
+    'common.close': 'Đóng',
  },
   ro: {
     // Basic translations for Romanian
@@ -1950,7 +1950,7 @@ export const dictionary = {
     'auth.welcome': 'Bun venit la Navikko',
     'auth.login': 'Conectare',
     'auth.signup': 'Înregistrare',
-    'common.close': 'Închide'
+    'common.close': 'Închide',
 };
 
 // Cuisine labels for different languages
