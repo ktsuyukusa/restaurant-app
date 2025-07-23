@@ -13,124 +13,76 @@ const TermsOfService: React.FC = () => {
               className="inline-flex items-center text-navikko-primary hover:text-navikko-primary/80 transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+              ホームに戻る / Back to Home
             </Link>
           </div>
           
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Terms of Service</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8 text-left">利用規約 / Terms of Service</h1>
           
-          <div className="prose prose-lg max-w-none">
-            <p className="text-gray-600 mb-6">
-              Last updated: {new Date().toLocaleDateString()}
-            </p>
-            
-            <section className="mb-8">
+          <div className="prose prose-lg max-w-none text-left">
+            <div className="mb-6 pb-4 border-b border-gray-200">
+              <p className="text-sm text-gray-600">
+                事業者名: WaSanDo 和讃堂<br/>
+                所在地: 〒386-0005 長野県上田市古里1499-28<br/>
+                Address: 1499-28 Kosato, Ueda, Nagano, 386-0005 Japan<br/>
+                電子メール: info@wasando.com<br/>
+                WhatsApp: <a href="https://wa.me/817037822505" className="text-navikko-primary hover:underline">お問い合わせ</a><br/>
+                最終更新: {new Date().toLocaleDateString()}
+              </p>
+            </div>
+
+            {/* Japanese Content */}
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">第1条（適用）</h2>
+              <p className="text-gray-700 mb-4">
+                本利用規約（以下「本規約」）は、WaSanDo 和讃堂（以下「当社」）が提供するNavikkoサービス（以下「本サービス」）の利用条件を定めるものです。
+              </p>
+              
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">第2条（利用登録）</h2>
+              <p className="text-gray-700 mb-4">
+                本サービスの利用を希望する方は、本規約に同意の上、当社の定める方法によって利用登録を申請し、当社がこれを承認することによって、利用登録が完了するものとします。
+              </p>
+              
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">第3条（禁止事項）</h2>
+              <p className="text-gray-700 mb-4">ユーザーは、本サービスの利用にあたり、以下の行為をしてはなりません：</p>
+              <ul className="list-disc pl-6 text-gray-700 space-y-2 mb-4">
+                <li>法令または公序良俗に違反する行為</li>
+                <li>犯罪行為に関連する行為</li>
+                <li>当社、本サービスの他の利用者、または第三者に迷惑をかける行為</li>
+              </ul>
+
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">第4条（お問い合わせ）</h2>
+              <p className="text-gray-700 mb-4">本規約に関するお問い合わせは下記までご連絡ください：</p>
+              <p className="text-gray-700 mb-6">
+                電子メール: info@wasando.com<br/>
+                WhatsApp: <a href="https://wa.me/817037822505" className="text-navikko-primary hover:underline">お問い合わせ</a>
+              </p>
+            </div>
+
+            {/* English Content */}
+            <div className="border-t pt-6">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
               <p className="text-gray-700 mb-4">
                 By accessing and using Navikko, you accept and agree to be bound by the terms and provision of this agreement.
               </p>
-            </section>
-            
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Description of Service</h2>
-              <p className="text-gray-700 mb-4">
-                Navikko is a multilingual restaurant platform that provides:
-              </p>
-              <ul className="list-disc pl-6 text-gray-700 space-y-2">
-                <li>Restaurant discovery and browsing</li>
-                <li>Online ordering and payment processing</li>
-                <li>Table reservations</li>
-                <li>Restaurant management tools</li>
-                <li>Multi-language support</li>
-              </ul>
-            </section>
-            
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. User Accounts</h2>
-              <p className="text-gray-700 mb-4">
-                To access certain features, you must create an account. You are responsible for:
-              </p>
-              <ul className="list-disc pl-6 text-gray-700 space-y-2">
-                <li>Maintaining the confidentiality of your account</li>
-                <li>All activities that occur under your account</li>
-                <li>Providing accurate and complete information</li>
-                <li>Notifying us immediately of any unauthorized use</li>
-              </ul>
-            </section>
-            
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">4. User Conduct</h2>
-              <p className="text-gray-700 mb-4">
-                You agree not to:
-              </p>
-              <ul className="list-disc pl-6 text-gray-700 space-y-2">
+
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. User Conduct</h2>
+              <p className="text-gray-700 mb-4">You agree not to:</p>
+              <ul className="list-disc pl-6 text-gray-700 space-y-2 mb-4">
                 <li>Use the service for any unlawful purpose</li>
-                <li>Impersonate any person or entity</li>
                 <li>Interfere with or disrupt the service</li>
-                <li>Attempt to gain unauthorized access to any part of the service</li>
-                <li>Use automated systems to access the service</li>
+                <li>Violate any applicable laws or regulations</li>
               </ul>
-            </section>
-            
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">5. Payment Terms</h2>
+
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. Contact Information</h2>
               <p className="text-gray-700 mb-4">
-                All payments are processed securely through our payment partners. You agree to pay all charges 
-                incurred in connection with your use of the service.
-              </p>
-            </section>
-            
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">6. Intellectual Property</h2>
-              <p className="text-gray-700 mb-4">
-                The service and its original content, features, and functionality are owned by Navikko and 
-                are protected by international copyright, trademark, patent, trade secret, and other 
-                intellectual property laws.
-              </p>
-            </section>
-            
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">7. Privacy</h2>
-              <p className="text-gray-700 mb-4">
-                Your privacy is important to us. Please review our Privacy Policy, which also governs your 
-                use of the service.
-              </p>
-            </section>
-            
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Termination</h2>
-              <p className="text-gray-700 mb-4">
-                We may terminate or suspend your account and access to the service immediately, without 
-                prior notice, for any reason, including breach of these Terms of Service.
-              </p>
-            </section>
-            
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">9. Limitation of Liability</h2>
-              <p className="text-gray-700 mb-4">
-                In no event shall Navikko be liable for any indirect, incidental, special, consequential, 
-                or punitive damages arising out of or relating to your use of the service.
-              </p>
-            </section>
-            
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">10. Changes to Terms</h2>
-              <p className="text-gray-700 mb-4">
-                We reserve the right to modify these terms at any time. We will notify users of any material 
-                changes by posting the new terms on this page.
-              </p>
-            </section>
-            
-            <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">11. Contact Information</h2>
-              <p className="text-gray-700 mb-4">
-                If you have any questions about these Terms of Service, please contact us at:
+                If you have any questions about these Terms of Service, please contact us:
               </p>
               <p className="text-gray-700">
-                Email: legal@navikko.com<br />
-                Address: [Your Business Address]
+                Email: info@wasando.com<br/>
+                WhatsApp: <a href="https://wa.me/817037822505" className="text-navikko-primary hover:underline">Contact us</a>
               </p>
-            </section>
+            </div>
           </div>
         </div>
       </div>
@@ -138,4 +90,4 @@ const TermsOfService: React.FC = () => {
   );
 };
 
-export default TermsOfService; 
+export default TermsOfService;
