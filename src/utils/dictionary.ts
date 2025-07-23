@@ -19,7 +19,29 @@ export const dictionary = {
     closed: 'Closed',
     openingHours: 'Hours',
     'n/a': 'N/A',
+
+       // Features
+    'features.multilingual': 'Multilingual Support',
+    'features.multilingual_desc': 'Access restaurant information and menus in multiple languages',
+    'features.restaurants': 'Restaurant Discovery', 
+    'features.restaurants_desc': 'Find and explore restaurants with detailed information',
+    'features.location': 'Location Services',
+    'features.location_desc': 'Discover nearby restaurants with location services',
     
+    // Languages
+    'languages.supported': 'Supported Languages',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
+
     // Actions
     search: 'Search restaurants...',
     viewMenu: 'View Menu',
@@ -27,7 +49,7 @@ export const dictionary = {
     reserveTable: 'Reserve Table',
     addToCart: 'Add to Cart',
     'reservation.external_button': 'Reserve Table',
-    
+
     // Search and Filters
     'search.placeholder': 'Search restaurants...',
     'search.results': '{{count}} restaurants found',
