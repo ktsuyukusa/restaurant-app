@@ -294,6 +294,28 @@ export const dictionary = {
     closed: '閉店',
     openingHours: '営業時間',
     'n/a': '該当なし',
+
+       // Features
+    'features.multilingual': '多言語サポート',
+    'features.multilingual_desc': '複数の言語でレストラン情報とメニューにアクセス',
+    'features.restaurants': 'レストラン発見', 
+    'features.restaurants_desc': '詳細情報付きでレストランを見つけて探索',
+    'features.location': '位置情報サービス',
+    'features.location_desc': '位置情報サービスで近くのレストランを発見',
+    
+    // Languages
+    'languages.supported': '対応言語',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
     
     // Actions
     search: 'レストランを検索...',
@@ -301,7 +323,6 @@ export const dictionary = {
     reserve: 'テーブル予約',
     reserveTable: 'テーブル予約',
     addToCart: 'カートに追加',
-
     
     // Search and Filters
     'search.placeholder': 'レストランを検索...',
@@ -547,6 +568,28 @@ export const dictionary = {
     closed: '已关闭',
     openingHours: '营业时间',
     'n/a': '无',
+
+    // Features
+    'features.multilingual': '多语言支持',
+    'features.multilingual_desc': '以多种语言访问餐厅信息和菜单',
+    'features.restaurants': '餐厅发现', 
+    'features.restaurants_desc': '查找和探索带有详细信息的餐厅',
+    'features.location': '位置服务',
+    'features.location_desc': '通过位置服务发现附近的餐厅',
+    
+    // Languages
+    'languages.supported': '支持的语言',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
     
     // Actions
     search: '搜索餐厅...',
@@ -554,7 +597,6 @@ export const dictionary = {
     reserve: '预订餐桌',
     reserveTable: '预订',
     addToCart: '添加到购物车',
-
     
     // Search and Filters
     'search.placeholder': '搜索餐厅...',
@@ -798,6 +840,28 @@ export const dictionary = {
     closed: '폐점',
     openingHours: '영업시간',
     'n/a': '해당없음',
+
+    // Features
+    'features.multilingual': '다국어 지원',
+    'features.multilingual_desc': '여러 언어로 레스토랑 정보 및 메뉴에 액세스',
+    'features.restaurants': '레스토랑 발견', 
+    'features.restaurants_desc': '상세 정보와 함께 레스토랑을 찾고 탐색',
+    'features.location': '위치 서비스',
+    'features.location_desc': '위치 서비스로 근처 레스토랑 발견',
+    
+    // Languages
+    'languages.supported': '지원 언어',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
     
     // Actions
     search: '레스토랑 검색...',
@@ -805,7 +869,6 @@ export const dictionary = {
     reserve: '테이블 예약',
     reserveTable: '테이블 예약',
     addToCart: '장바구니에 추가',
-
     
     // Search and Filters
     'search.placeholder': '레스토랑 검색...',
@@ -1046,6 +1109,28 @@ export const dictionary = {
     closed: 'Zamknięte',
     openingHours: 'Godziny otwarcia',
     'n/a': 'Brak',
+
+      // Features
+    'features.multilingual': 'Obsługa wielojęzyczna',
+    'features.multilingual_desc': 'Dostęp do informacji o restauracjach i menu w wielu językach',
+    'features.restaurants': 'Odkrywanie restauracji', 
+    'features.restaurants_desc': 'Znajdź i eksploruj restauracje ze szczegółowymi informacjami',
+    'features.location': 'Usługi lokalizacji',
+    'features.location_desc': 'Odkryj pobliskie restauracje dzięki usługom lokalizacji',
+    
+    // Languages
+    'languages.supported': 'Obsługiwane języki',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
     
     // Actions
     search: 'Szukaj restauracji...',
@@ -1294,6 +1379,28 @@ export const dictionary = {
     closed: 'ปิดแล้ว',
     openingHours: 'เวลาทำการ',
     'n/a': 'ไม่มี',
+
+     // Features
+    'features.multilingual': 'การสนับสนุนหลายภาษา',
+    'features.multilingual_desc': 'เข้าถึงข้อมูลร้านอาหารและเมนูในหลายภาษา',
+    'features.restaurants': 'การค้นหาร้านอาหาร', 
+    'features.restaurants_desc': 'ค้นหาและสำรวจร้านอาหารพร้อมข้อมูลโดยละเอียด',
+    'features.location': 'บริการตำแหน่งที่ตั้ง',
+    'features.location_desc': 'ค้นหาร้านอาหารใกล้เคียงด้วยบริการตำแหน่งที่ตั้ง',
+    
+    // Languages
+    'languages.supported': 'ภาษาที่รองรับ',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
     
     // Actions
     search: 'ค้นหาร้านอาหาร...',
@@ -1580,6 +1687,28 @@ export const dictionary = {
     'auth.enter_admin_code': 'Masukkan kod pengesahan pentadbir',
     'auth.admin_code_desc': 'Kod pentadbir diperlukan untuk akses pentadbir sistem',
     'common.close': 'Tutup'
+
+     // Features
+    'features.multilingual': 'Sokongan Pelbagai Bahasa',
+    'features.multilingual_desc': 'Akses maklumat restoran dan menu dalam pelbagai bahasa',
+    'features.restaurants': 'Penemuan Restoran', 
+    'features.restaurants_desc': 'Cari dan terokai restoran dengan maklumat terperinci',
+    'features.location': 'Perkhidmatan Lokasi',
+    'features.location_desc': 'Temui restoran berdekatan dengan perkhidmatan lokasi',
+    
+    // Languages
+    'languages.supported': 'Bahasa yang Disokong',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
   },
   id: {
     // Basic translations for Indonesian
@@ -1638,6 +1767,28 @@ export const dictionary = {
     'auth.enter_admin_code': 'Masukkan kode verifikasi administrator',
     'auth.admin_code_desc': 'Kode administrator diperlukan untuk akses administrator sistem',
     'common.close': 'Tutup'
+
+    // Features
+    'features.multilingual': 'Dukungan Multibahasa',
+    'features.multilingual_desc': 'Akses informasi restoran dan menu dalam berbagai bahasa',
+    'features.restaurants': 'Penemuan Restoran', 
+    'features.restaurants_desc': 'Temukan dan jelajahi restoran dengan informasi detail',
+    'features.location': 'Layanan Lokasi',
+    'features.location_desc': 'Temukan restoran terdekat dengan layanan lokasi',
+    
+    // Languages
+    'languages.supported': 'Bahasa yang Didukung',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
   },
   es: {
     // Basic translations for Spanish
@@ -1696,7 +1847,112 @@ export const dictionary = {
     'auth.enter_admin_code': 'Ingresa el código de verificación de administrador',
     'auth.admin_code_desc': 'Código de administrador requerido para acceso de administrador del sistema',
     'common.close': 'Cerrar'
+
+       // Features
+    'features.multilingual': 'Soporte Multiidioma',
+    'features.multilingual_desc': 'Accede a información de restaurantes y menús en múltiples idiomas',
+    'features.restaurants': 'Descubrimiento de Restaurantes', 
+    'features.restaurants_desc': 'Encuentra y explora restaurantes con información detallada',
+    'features.location': 'Servicios de Ubicación',
+    'features.location_desc': 'Descubre restaurantes cercanos con servicios de ubicación',
+    
+    // Languages
+    'languages.supported': 'Idiomas Compatibles',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
+
+ },
+  vi: {
+    // Basic translations for Vietnamese
+    'welcome.title': 'Chào mừng đến với Navikko',
+    'welcome.subtitle': 'Người bạn đồng hành ẩm thực đa ngôn ngữ cho trải nghiệm nhà hàng li완mless',
+    'welcome.signup_message': 'Vui lòng đăng ký hoặc đăng nhập để tiếp tục',
+    'welcome.get_started': 'Bắt đầu',
+    'welcome.for_customers': 'Dành cho Khách hàng',
+    'welcome.for_customers_desc': 'Khám phá nhà hàng, đặt món và tận hưởng trải nghiệm ẩm thực liền mạch',
+    'welcome.for_owners': 'Dành cho Chủ nhà hàng',
+    'welcome.for_owners_desc': 'Quản lý nhà hàng, đơn hàng và thực đơn của bạn bằng các công cụ mạnh mẽ',
+    'welcome.for_admins': 'Dành cho Quản trị viên',
+    'welcome.for_admins_desc': 'Truy cập hệ thống đầy đủ và khả năng quản lý toàn diện',
+    
+    // Features
+    'features.multilingual': 'Hỗ trợ Đa ngôn ngữ',
+    'features.multilingual_desc': 'Truy cập thông tin nhà hàng và thực đơn bằng nhiều ngôn ngữ',
+    'features.restaurants': 'Khám phá Nhà hàng', 
+    'features.restaurants_desc': 'Tìm kiếm và khám phá nhà hàng với thông tin chi tiết',
+    'features.location': 'Dịch vụ Vị trí',
+    'features.location_desc': 'Khám phá nhà hàng gần đây với dịch vụ vị trí',
+    
+    // Languages
+    'languages.supported': 'Ngôn ngữ được Hỗ trợ',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
+    
+    // Auth Modal  
+    'auth.welcome': 'Chào mừng đến với Navikko',
+    'auth.login': 'Đăng nhập',
+    'auth.signup': 'Đăng ký',
+    'common.close': 'Đóng'
   }
+ },
+  ro: {
+    // Basic translations for Romanian
+    'welcome.title': 'Bun venit la Navikko',
+    'welcome.subtitle': 'Companionul tău culinar multilingv pentru o experiență de restaurant fără întreruperi',
+    'welcome.signup_message': 'Vă rugăm să vă înregistrați sau să vă conectați pentru a continua',
+    'welcome.get_started': 'Începe',
+    'welcome.for_customers': 'Pentru Clienți',
+    'welcome.for_customers_desc': 'Explorați restaurante, faceți comenzi și bucurați-vă de o experiență culinară fără întreruperi',
+    'welcome.for_owners': 'Pentru Proprietarii de Restaurante',
+    'welcome.for_owners_desc': 'Gestionați-vă restaurantul, comenzile și meniurile cu instrumente puternice',
+    'welcome.for_admins': 'Pentru Administratori',
+    'welcome.for_admins_desc': 'Acces complet la sistem și capacități de management cuprinzătoare',
+    
+    // Features
+    'features.multilingual': 'Suport Multilingv',
+    'features.multilingual_desc': 'Accesează informații despre restaurante și meniuri în mai multe limbi',
+    'features.restaurants': 'Descoperirea Restaurantelor', 
+    'features.restaurants_desc': 'Găsește și explorează restaurante cu informații detaliate',
+    'features.location': 'Servicii de Localizare',
+    'features.location_desc': 'Descoperă restaurante din apropiere cu servicii de localizare',
+    
+    // Languages
+    'languages.supported': 'Limbi Suportate',
+    'languages.en': 'English',
+    'languages.ja': '日本語',
+    'languages.pl': 'Polski',
+    'languages.zh': '中文',
+    'languages.ko': '한국어',
+    'languages.ms': 'Bahasa Melayu',
+    'languages.id': 'Bahasa Indonesia',
+    'languages.vi': 'Tiếng Việt',
+    'languages.th': 'ไทย',
+    'languages.es': 'Español',
+    'languages.ro': 'Română',
+    
+    // Auth Modal
+    'auth.welcome': 'Bun venit la Navikko',
+    'auth.login': 'Conectare',
+    'auth.signup': 'Înregistrare',
+    'common.close': 'Închide'
 };
 
 // Cuisine labels for different languages
