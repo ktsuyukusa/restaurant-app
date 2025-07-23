@@ -1951,6 +1951,7 @@ export const dictionary = {
     'auth.login': 'Conectare',
     'auth.signup': 'Înregistrare',
     'common.close': 'Închide',
+  }
 };
 
 // Cuisine labels for different languages
