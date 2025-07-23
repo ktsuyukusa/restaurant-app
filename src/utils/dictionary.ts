@@ -1686,8 +1686,8 @@ export const dictionary = {
     'auth.admin_code': 'Kod Pentadbir',
     'auth.enter_admin_code': 'Masukkan kod pengesahan pentadbir',
     'auth.admin_code_desc': 'Kod pentadbir diperlukan untuk akses pentadbir sistem',
-    'common.close': 'Tutup'
-  }
+    'common.close': 'Tutup',
+  
          // Features
     'features.multilingual': 'Sokongan Pelbagai Bahasa',
     'features.multilingual_desc': 'Akses maklumat restoran dan menu dalam pelbagai bahasa',
