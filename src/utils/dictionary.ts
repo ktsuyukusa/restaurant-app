@@ -1687,7 +1687,7 @@ export const dictionary = {
     'auth.enter_admin_code': 'Masukkan kod pengesahan pentadbir',
     'auth.admin_code_desc': 'Kod pentadbir diperlukan untuk akses pentadbir sistem',
     'common.close': 'Tutup'
-
+  
      // Features
     'features.multilingual': 'Sokongan Pelbagai Bahasa',
     'features.multilingual_desc': 'Akses maklumat restoran dan menu dalam pelbagai bahasa',
@@ -1869,7 +1869,6 @@ export const dictionary = {
     'languages.th': 'ไทย',
     'languages.es': 'Español',
     'languages.ro': 'Română',
-
  },
   vi: {
     // Basic translations for Vietnamese
@@ -1911,7 +1910,6 @@ export const dictionary = {
     'auth.login': 'Đăng nhập',
     'auth.signup': 'Đăng ký',
     'common.close': 'Đóng'
-  }
  },
   ro: {
     // Basic translations for Romanian
