@@ -63,9 +63,12 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant, onViewDetai
         <div className="space-y-3">
           {/* Header with name and rating */}
           <div className="flex justify-between items-start">
-            <h3 className="text-lg font-bold text-gray-900 line-clamp-1">
-              {name}
-            </h3>
+            <h3 
+              className="text-lg font-bold text-gray-900 line-clamp-1 cursor-pointer hover:text-navikko-primary transition-colors"
+               onClick={() => onViewDetails(restaurant.id)}
+                >
+                {name}
+           </h3>
             <div className="flex items-center gap-1 text-yellow-500">
               <Star className="h-4 w-4 fill-current" />
               <span className="text-sm font-semibold">{restaurant.rating}</span>
