@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { validateAdminCode, getAdminLevel } from '@/config/adminCodes';
 import { getSupabaseClient } from '@/lib/supabase';
 import { ADMIN_CODES } from '@/config/adminCodes';
+import { generateTOTPSecret, verifyTOTPCode, TOTP } from '@/utils/totp';
 
 // Types for authentication
 export interface User {
@@ -48,6 +49,8 @@ export interface AdminAccess {
   level: 'super_admin' | 'admin' | 'moderator';
   permissions: string[];
   accessCode: string;
+  twoFactorSecret?: string; // TOTP secret for 2FA
+  twoFactorEnabled?: boolean; // Whether 2FA is enabled
 }
 
 export interface SignupData {
@@ -1098,6 +1101,87 @@ class AuthService {
       console.error('Get session error:', error);
       return { data: null, error };
     }
+  }
+
+  // 2FA Methods
+  async setup2FA(userId: string): Promise<{ secret: string; qrCodeUrl: string }> {
+    const user = this.getCurrentUser();
+    if (!user || user.id !== userId) {
+      throw new Error('User not found');
+    }
+
+    if (user.userType !== 'admin') {
+      throw new Error('2FA is only available for admin accounts');
+    }
+
+    const secret = generateTOTPSecret();
+    const totp = new TOTP({ secret });
+    const qrCodeUrl = totp.getQRCodeURL(user.email, 'Navikko Admin');
+
+    // Update user's 2FA secret (but don't enable yet)
+    if (user.adminAccess) {
+      user.adminAccess.twoFactorSecret = secret;
+      this.saveUserToStorage(user);
+    }
+
+    return { secret, qrCodeUrl };
+  }
+
+  async verifyAndEnable2FA(userId: string, code: string): Promise<boolean> {
+    const user = this.getCurrentUser();
+    if (!user || user.id !== userId) {
+      throw new Error('User not found');
+    }
+
+    if (user.userType !== 'admin' || !user.adminAccess?.twoFactorSecret) {
+      throw new Error('2FA not available for this account');
+    }
+
+    const isValid = verifyTOTPCode(user.adminAccess.twoFactorSecret, code);
+    
+    if (isValid) {
+      // Enable 2FA
+      user.adminAccess.twoFactorEnabled = true;
+      this.saveUserToStorage(user);
+      
+      // Update in mock storage
+      mockUsers.set(user.email, user);
+      localStorage.setItem('navikko_users', JSON.stringify(Array.from(mockUsers.entries())));
+      
+      console.log('✅ 2FA enabled for admin:', user.email);
+    }
+
+    return isValid;
+  }
+
+  async verify2FACode(userId: string, code: string): Promise<boolean> {
+    const user = this.getCurrentUser();
+    if (!user || user.id !== userId) {
+      throw new Error('User not found');
+    }
+
+    if (user.userType !== 'admin' || !user.adminAccess?.twoFactorSecret) {
+      throw new Error('2FA not available for this account');
+    }
+
+    return verifyTOTPCode(user.adminAccess.twoFactorSecret, code);
+  }
+
+  is2FAEnabled(userId: string): boolean {
+    const user = this.getCurrentUser();
+    return user?.id === userId && user?.adminAccess?.twoFactorEnabled === true;
+  }
+
+  get2FAStatus(userId: string): { enabled: boolean; secret?: string } {
+    const user = this.getCurrentUser();
+    if (user?.id !== userId) {
+      return { enabled: false };
+    }
+
+    return {
+      enabled: user.adminAccess?.twoFactorEnabled || false,
+      secret: user.adminAccess?.twoFactorSecret
+    };
   }
 }
 

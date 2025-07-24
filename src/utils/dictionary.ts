@@ -281,6 +281,20 @@ export const dictionary = {
     'auth.phone': 'Phone Number',
     'auth.create_account': 'Create Your Account',
     'auth.creating_account': 'Creating account...',
+    
+    // Two-Factor Authentication
+    '2fa.setup_title': 'Set Up Two-Factor Authentication',
+    '2fa.setup_description': 'Scan the QR code with your authenticator app to set up 2FA for enhanced security.',
+    '2fa.verify_title': 'Two-Factor Authentication',
+    '2fa.verify_description': 'Enter the 6-digit code from your authenticator app to continue.',
+    '2fa.verification_code': 'Verification Code',
+    '2fa.setup_success': '2FA setup successful!',
+    '2fa.verify_success': 'Verification successful!',
+    '2fa.invalid_code': 'Invalid verification code. Please try again.',
+    '2fa.verification_failed': 'Verification failed. Please try again.',
+    '2fa.secret_copied': 'Secret copied to clipboard!',
+    '2fa.new_secret_generated': 'New secret generated!',
+    
     'common.close': 'Close',
   },
   ja: {
@@ -493,6 +507,19 @@ export const dictionary = {
     'auth.phone': '電話番号',
     'auth.create_account': 'アカウントを作成',
     'auth.creating_account': 'アカウント作成中...',
+    
+    // Two-Factor Authentication
+    '2fa.setup_title': '二要素認証の設定',
+    '2fa.setup_description': 'QRコードを認証アプリでスキャンして、セキュリティを強化する2FAを設定してください。',
+    '2fa.verify_title': '二要素認証',
+    '2fa.verify_description': '認証アプリの6桁のコードを入力して続行してください。',
+    '2fa.verification_code': '認証コード',
+    '2fa.setup_success': '2FA設定が完了しました！',
+    '2fa.verify_success': '認証が成功しました！',
+    '2fa.invalid_code': '無効な認証コードです。もう一度お試しください。',
+    '2fa.verification_failed': '認証に失敗しました。もう一度お試しください。',
+    '2fa.secret_copied': 'シークレットをクリップボードにコピーしました！',
+    '2fa.new_secret_generated': '新しいシークレットが生成されました！',
     
     // Confirmations
     'confirm.delete': 'この項目を削除してもよろしいですか？',
