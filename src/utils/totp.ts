@@ -1,7 +1,8 @@
 // TOTP (Time-based One-Time Password) implementation for mobile 2FA
 // Similar to GitHub's 2FA system
 
-import { createHmac } from 'crypto';
+// Browser-compatible crypto implementation
+const crypto = window.crypto;
 
 export interface TOTPConfig {
   secret: string;
@@ -33,20 +34,34 @@ export class TOTP {
   }
 
   // Generate current TOTP code
-  generateCode(): string {
+  async generateCode(): Promise<string> {
     const counter = Math.floor(Date.now() / 1000 / this.config.period);
     return this.generateCodeForCounter(counter);
   }
 
   // Generate TOTP code for a specific counter
-  generateCodeForCounter(counter: number): string {
-    const buffer = Buffer.alloc(8);
-    buffer.writeBigUInt64BE(BigInt(counter), 0);
+  async generateCodeForCounter(counter: number): Promise<string> {
+    // Convert counter to 8-byte buffer
+    const buffer = new ArrayBuffer(8);
+    const view = new DataView(buffer);
+    view.setBigUint64(0, BigInt(counter), false); // false = big-endian
 
-    const hmac = createHmac(this.config.algorithm, this.config.secret);
-    hmac.update(buffer);
-    const hash = hmac.digest();
+    // Convert secret to Uint8Array
+    const secretBytes = new TextEncoder().encode(this.config.secret);
 
+    // Generate HMAC-SHA1
+    const key = await crypto.subtle.importKey(
+      'raw',
+      secretBytes,
+      { name: 'HMAC', hash: 'SHA-1' },
+      false,
+      ['sign']
+    );
+
+    const signature = await crypto.subtle.sign('HMAC', key, buffer);
+    const hash = new Uint8Array(signature);
+
+    // Generate 6-digit code
     const offset = hash[hash.length - 1] & 0xf;
     const code = ((hash[offset] & 0x7f) << 24) |
                  ((hash[offset + 1] & 0xff) << 16) |
@@ -58,11 +73,11 @@ export class TOTP {
   }
 
   // Verify a TOTP code
-  verifyCode(code: string, window: number = 1): boolean {
+  async verifyCode(code: string, window: number = 1): Promise<boolean> {
     const counter = Math.floor(Date.now() / 1000 / this.config.period);
     
     for (let i = -window; i <= window; i++) {
-      const expectedCode = this.generateCodeForCounter(counter + i);
+      const expectedCode = await this.generateCodeForCounter(counter + i);
       if (code === expectedCode) {
         return true;
       }
@@ -97,12 +112,12 @@ export const generateTOTPSecret = (): string => {
   return totp.generateSecret();
 };
 
-export const verifyTOTPCode = (secret: string, code: string, window: number = 1): boolean => {
+export const verifyTOTPCode = async (secret: string, code: string, window: number = 1): Promise<boolean> => {
   const totp = new TOTP({ secret });
   return totp.verifyCode(code, window);
 };
 
-export const generateTOTPCode = (secret: string): string => {
+export const generateTOTPCode = async (secret: string): Promise<string> => {
   const totp = new TOTP({ secret });
   return totp.generateCode();
 }; 

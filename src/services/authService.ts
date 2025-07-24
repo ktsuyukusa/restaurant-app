@@ -98,9 +98,11 @@ const SECURITY_CONFIG = {
   MAX_LOGIN_ATTEMPTS: 5, // Reduced for admin security
   LOCKOUT_DURATION: 60 * 60 * 1000, // 1 hour lockout for admin
   ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [
-    '133.204.210.193', // Home IPv4
-    '2404:7a82:72c1:7110:3872:75ff:fe5d:4fd4' // Mobile IPv6
-  ], // Home + Mobile IPs (office IP to be added)
+    '133.204.210.193', // Home/Office IPv4
+    '2404:7a82:72c1:7110:b006:86bc:7983:356e', // Home IPv6
+    '2404:7a82:72c1:7110:3872:75ff:fe5d:4fd4', // Mobile IPv6
+    '2404:7a82:72c1:7110:b44c:1f5d:dc80:f9e5' // Office IPv6
+  ], // Complete IP set: Home + Mobile + Office
   REQUIRE_2FA_FOR_ADMIN: true,
   SESSION_TIMEOUT: 4 * 60 * 60 * 1000, // 4 hours for admin sessions
   ADMIN_2FA_TIMEOUT: 5 * 60 * 1000, // 5 minutes for 2FA codes
@@ -1137,7 +1139,7 @@ class AuthService {
       throw new Error('2FA not available for this account');
     }
 
-    const isValid = verifyTOTPCode(user.adminAccess.twoFactorSecret, code);
+    const isValid = await verifyTOTPCode(user.adminAccess.twoFactorSecret, code);
     
     if (isValid) {
       // Enable 2FA
@@ -1164,7 +1166,7 @@ class AuthService {
       throw new Error('2FA not available for this account');
     }
 
-    return verifyTOTPCode(user.adminAccess.twoFactorSecret, code);
+    return await verifyTOTPCode(user.adminAccess.twoFactorSecret, code);
   }
 
   is2FAEnabled(userId: string): boolean {
