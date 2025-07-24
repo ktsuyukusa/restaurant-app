@@ -92,11 +92,12 @@ const mockSubscriptions = new Map();
 
 // Security configuration
 const SECURITY_CONFIG = {
-  MAX_LOGIN_ATTEMPTS: 10,
-  LOCKOUT_DURATION: 30 * 60 * 1000, // 30 minutes in milliseconds
-  ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [],
+  MAX_LOGIN_ATTEMPTS: 5, // Reduced for admin security
+  LOCKOUT_DURATION: 60 * 60 * 1000, // 1 hour lockout for admin
+  ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || ['133.204.210.193'], // Your current IP + others
   REQUIRE_2FA_FOR_ADMIN: true,
-  SESSION_TIMEOUT: 24 * 60 * 60 * 1000, // 24 hours
+  SESSION_TIMEOUT: 4 * 60 * 60 * 1000, // 4 hours for admin sessions
+  ADMIN_2FA_TIMEOUT: 5 * 60 * 1000, // 5 minutes for 2FA codes
 };
 
 // Login attempt tracking
@@ -192,11 +193,20 @@ class AuthService {
 
   // Check if IP is allowed for admin access
   private isIPAllowedForAdmin(): boolean {
+    // Always require IP restrictions for admin access
     if (SECURITY_CONFIG.ALLOWED_ADMIN_IPS.length === 0) {
-      return true; // No restrictions if no IPs configured
+      console.warn('No admin IPs configured - admin access blocked for security');
+      return false; // Block admin access if no IPs configured
     }
+    
     const clientIP = this.getClientIP();
-    return SECURITY_CONFIG.ALLOWED_ADMIN_IPS.includes(clientIP);
+    const isAllowed = SECURITY_CONFIG.ALLOWED_ADMIN_IPS.includes(clientIP);
+    
+    if (!isAllowed) {
+      console.warn(`Admin access blocked from IP: ${clientIP}. Allowed IPs: ${SECURITY_CONFIG.ALLOWED_ADMIN_IPS.join(', ')}`);
+    }
+    
+    return isAllowed;
   }
 
   // Track login attempts
