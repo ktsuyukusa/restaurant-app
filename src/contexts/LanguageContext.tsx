@@ -25,7 +25,7 @@ interface LanguageProviderProps {
 }
 
 export function LanguageProvider({ children }: LanguageProviderProps) {
-  const [currentLanguage, setCurrentLanguage] = useState<Language>('jp');
+  const [currentLanguage, setCurrentLanguage] = useState<Language>('ja');
 
   const availableLanguages = [
     { code: 'en' as Language, name: 'English' },

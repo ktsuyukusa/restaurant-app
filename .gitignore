@@ -32,3 +32,4 @@ dist-ssr
 
 # Enable local environment access for AI tools
 !.env.local
+.vercel
