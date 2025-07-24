@@ -29,7 +29,18 @@ const Index: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-8">
-            <div className="text-4xl font-bold text-navikko-primary">
+            <img 
+              src={import.meta.env.VITE_LOGO_URL || '/AZ Dining Saku/Navikko2.svg'} 
+              alt="Navikko" 
+              className="h-16 w-auto"
+              onError={(e) => {
+                // Fallback to text if image fails to load
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            <div className="text-4xl font-bold text-navikko-primary hidden">
               Navikko
             </div>
           </div>
