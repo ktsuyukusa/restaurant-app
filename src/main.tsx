@@ -40,9 +40,5 @@ window.onunhandledrejection = function(event) {
 console.log('🔧 App starting...');
 
 createRoot(document.getElementById("root")!).render(
-  <LanguageProvider>
-    <AppProvider>
-      <App />
-    </AppProvider>
-  </LanguageProvider>
+  <App />
 );

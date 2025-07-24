@@ -21,8 +21,9 @@ export const ADMIN_CODES = {
 
 // Get admin codes based on environment
 export const getAdminCodes = () => {
-  const isProduction = import.meta.env.PROD;
-  return isProduction ? ADMIN_CODES.production : ADMIN_CODES.development;
+  // For now, use development codes in all environments
+  // TODO: Set up proper production environment variables
+  return ADMIN_CODES.development;
 };
 
 // Validate admin code

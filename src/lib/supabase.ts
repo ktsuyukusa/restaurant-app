@@ -26,9 +26,18 @@ export const isSupabaseAvailable = () => {
 export const mockSupabase = {
   from: (table: string) => ({
     select: () => Promise.resolve({ data: [], error: null }),
-    insert: (data: unknown) => Promise.resolve({ data: data, error: null }),
-    update: (data: unknown) => Promise.resolve({ data: data, error: null }),
-    delete: () => Promise.resolve({ data: null, error: null }),
+    insert: (data: unknown) => ({
+      select: () => Promise.resolve({ data: data, error: null }),
+      then: (callback: unknown) => Promise.resolve({ data: data, error: null }).then(callback)
+    }),
+    update: (data: unknown) => ({
+      select: () => Promise.resolve({ data: data, error: null }),
+      then: (callback: unknown) => Promise.resolve({ data: data, error: null }).then(callback)
+    }),
+    delete: () => ({
+      select: () => Promise.resolve({ data: null, error: null }),
+      then: (callback: unknown) => Promise.resolve({ data: null, error: null }).then(callback)
+    }),
     rpc: (func: string, params: unknown) => Promise.resolve({ data: null, error: null })
   }),
   auth: {

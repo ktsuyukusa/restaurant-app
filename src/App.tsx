@@ -9,7 +9,7 @@ import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
 import OrderSuccess from '@/pages/OrderSuccess';
 import OrderCancel from '@/pages/OrderCancel';
-import CommercialTransactionAct from '@/components/CommercialTransactionAct';
+import CommercialTransactionAct from '@/pages/CommercialTransactionAct';
 import './App.css';
 
 function App() {
