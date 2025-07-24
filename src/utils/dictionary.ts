@@ -273,6 +273,10 @@ export const dictionary = {
     'auth.terms_of_service': 'Terms of Service',
     'auth.agree_to_terms': 'I agree to the Terms of Service and Privacy Policy',
     'auth.terms_required': 'You must agree to the Terms of Service and Privacy Policy',
+    'auth.login_title': 'Login to Your Account',
+    'auth.or_login_with': 'Or login with',
+    'auth.or_signup_with': 'Or sign up with',
+    'auth.or': 'Or',
     'common.close': 'Close',
   },
   ja: {
@@ -477,6 +481,10 @@ export const dictionary = {
     'auth.terms_of_service': '利用規約',
     'auth.agree_to_terms': '利用規約とプライバシーポリシーに同意します',
     'auth.terms_required': '利用規約とプライバシーポリシーに同意する必要があります',
+    'auth.login_title': 'アカウントにログイン',
+    'auth.or_login_with': 'または以下でログイン',
+    'auth.or_signup_with': 'または以下でサインアップ',
+    'auth.or': 'または',
     
     // Confirmations
     'confirm.delete': 'この項目を削除してもよろしいですか？',

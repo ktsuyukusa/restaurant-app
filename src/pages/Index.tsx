@@ -30,7 +30,7 @@ const Index: React.FC = () => {
         <div className="text-center mb-12">
           <div className="flex justify-center mb-8">
             <img 
-              src={import.meta.env.VITE_LOGO_URL || '/AZ Dining Saku/Navikko2.svg'} 
+              src={import.meta.env.VITE_LOGO_URL || '/logo/Navikko2.svg'} 
               alt="Navikko" 
               className="h-16 w-auto"
               onError={(e) => {
