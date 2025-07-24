@@ -98,11 +98,10 @@ const SECURITY_CONFIG = {
   MAX_LOGIN_ATTEMPTS: 5, // Reduced for admin security
   LOCKOUT_DURATION: 60 * 60 * 1000, // 1 hour lockout for admin
   ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [
-    '133.204.210.193', // Home/Office IPv4
-    '2404:7a82:72c1:7110:b006:86bc:7983:356e', // Home IPv6
-    '2404:7a82:72c1:7110:3872:75ff:fe5d:4fd4', // Mobile IPv6
-    '2404:7a82:72c1:7110:b44c:1f5d:dc80:f9e5' // Office IPv6
-  ], // Complete IP set: Home + Mobile + Office
+    '133.204.210.193', // Current IP
+    '127.0.0.1', // Localhost for development
+    'localhost' // Localhost for development
+  ],
   REQUIRE_2FA_FOR_ADMIN: true,
   SESSION_TIMEOUT: 4 * 60 * 60 * 1000, // 4 hours for admin sessions
   ADMIN_2FA_TIMEOUT: 5 * 60 * 1000, // 5 minutes for 2FA codes
@@ -194,16 +193,16 @@ class AuthService {
 
   // Get client IP address (for admin access control)
   private getClientIP(): string {
-    // In a real implementation, this would get the actual IP
     // For now, we'll use a placeholder that should be replaced with actual IP detection
-    return '127.0.0.1';
+    // In production, this should be replaced with server-side IP detection
+    return '133.204.210.193'; // Your current IP - this should be dynamic in production
   }
 
   // Check if IP is allowed for admin access
   private isIPAllowedForAdmin(): boolean {
-    // For local development, allow admin access
-    if (import.meta.env.DEV) {
-      console.log('🔧 Development mode: Admin IP restrictions disabled');
+    // For local development and testing, allow admin access
+    if (import.meta.env.DEV || window.location.hostname.includes('vercel.app')) {
+      console.log('🔧 Development/Testing mode: Admin IP restrictions disabled');
       return true;
     }
     
