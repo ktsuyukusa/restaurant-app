@@ -95,7 +95,6 @@ const mockSubscriptions = new Map();
 
 // Security configuration
 const SECURITY_CONFIG = {
-<<<<<<< HEAD
   MAX_LOGIN_ATTEMPTS: 10,
   LOCKOUT_DURATION: 30 * 60 * 1000, // 30 minutes in milliseconds
   ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [
@@ -103,19 +102,8 @@ const SECURITY_CONFIG = {
     '127.0.0.1', // Localhost for development
     'localhost' // Localhost for development
   ],
-=======
-  MAX_LOGIN_ATTEMPTS: 5, // Reduced for admin security
-  LOCKOUT_DURATION: 60 * 60 * 1000, // 1 hour lockout for admin
-  ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [
-    '133.204.210.193', // Home/Office IPv4
-    '2404:7a82:72c1:7110:b006:86bc:7983:356e', // Home IPv6
-    '2404:7a82:72c1:7110:3872:75ff:fe5d:4fd4', // Mobile IPv6
-    '2404:7a82:72c1:7110:b44c:1f5d:dc80:f9e5' // Office IPv6
-  ], // Complete IP set: Home + Mobile + Office
->>>>>>> fd1bd99600b654681c8381d675b69fc9b1c8b288
   REQUIRE_2FA_FOR_ADMIN: true,
-  SESSION_TIMEOUT: 4 * 60 * 60 * 1000, // 4 hours for admin sessions
-  ADMIN_2FA_TIMEOUT: 5 * 60 * 1000, // 5 minutes for 2FA codes
+  SESSION_TIMEOUT: 24 * 60 * 60 * 1000, // 24 hours
 };
 
 // Login attempt tracking
