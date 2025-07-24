@@ -94,7 +94,10 @@ const mockSubscriptions = new Map();
 const SECURITY_CONFIG = {
   MAX_LOGIN_ATTEMPTS: 5, // Reduced for admin security
   LOCKOUT_DURATION: 60 * 60 * 1000, // 1 hour lockout for admin
-  ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || ['133.204.210.193'], // Your current IP + others
+  ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [
+    '133.204.210.193', // Home IPv4
+    '2404:7a82:72c1:7110:3872:75ff:fe5d:4fd4' // Mobile IPv6
+  ], // Home + Mobile IPs (office IP to be added)
   REQUIRE_2FA_FOR_ADMIN: true,
   SESSION_TIMEOUT: 4 * 60 * 60 * 1000, // 4 hours for admin sessions
   ADMIN_2FA_TIMEOUT: 5 * 60 * 1000, // 5 minutes for 2FA codes
