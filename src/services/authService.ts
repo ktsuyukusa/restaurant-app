@@ -201,7 +201,13 @@ class AuthService {
 
   // Check if IP is allowed for admin access
   private isIPAllowedForAdmin(): boolean {
-    // Always require IP restrictions for admin access
+    // For local development, allow admin access
+    if (import.meta.env.DEV) {
+      console.log('🔧 Development mode: Admin IP restrictions disabled');
+      return true;
+    }
+    
+    // Always require IP restrictions for admin access in production
     if (SECURITY_CONFIG.ALLOWED_ADMIN_IPS.length === 0) {
       console.warn('No admin IPs configured - admin access blocked for security');
       return false; // Block admin access if no IPs configured

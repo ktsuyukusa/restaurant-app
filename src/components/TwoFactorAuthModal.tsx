@@ -141,14 +141,14 @@ export default function TwoFactorAuthModal({
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              🔐 {t('2fa.setup_title', 'Set Up Two-Factor Authentication')}
+              🔐 {t('2fa.setup_title') || 'Set Up Two-Factor Authentication'}
             </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
             <Alert>
               <AlertDescription>
-                {t('2fa.setup_description', 'Scan the QR code with your authenticator app to set up 2FA for enhanced security.')}
+                {t('2fa.setup_description') || 'Scan the QR code with your authenticator app to set up 2FA for enhanced security.'}
               </AlertDescription>
             </Alert>
 
@@ -234,7 +234,7 @@ export default function TwoFactorAuthModal({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="verification-code">
-                  {t('2fa.verification_code', 'Verification Code')}
+                  {t('2fa.verification_code') || 'Verification Code'}
                 </Label>
                 <Input
                   id="verification-code"
@@ -291,20 +291,20 @@ export default function TwoFactorAuthModal({
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            🔐 {t('2fa.verify_title', 'Two-Factor Authentication')}
+            🔐 {t('2fa.verify_title', { defaultValue: 'Two-Factor Authentication' })}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           <Alert>
             <AlertDescription>
-              {t('2fa.verify_description', 'Enter the 6-digit code from your authenticator app to continue.')}
+              {t('2fa.verify_description', { defaultValue: 'Enter the 6-digit code from your authenticator app to continue.' })}
             </AlertDescription>
           </Alert>
 
           <div className="space-y-2">
             <Label htmlFor="verify-code">
-              {t('2fa.verification_code', 'Verification Code')}
+              {t('2fa.verification_code', { defaultValue: 'Verification Code' })}
             </Label>
             <Input
               id="verify-code"
