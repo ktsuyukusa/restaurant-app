@@ -4,7 +4,6 @@ import { Toaster } from '@/components/ui/toaster';
 import { AppProvider } from '@/contexts/AppContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import AppLayout from '@/components/AppLayout';
-import Index from '@/pages/Index';
 import NotFound from '@/pages/NotFound';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import TermsOfService from '@/pages/TermsOfService';
@@ -20,7 +19,7 @@ function App() {
         <Router>
           <div className="App">
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<AppLayout />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/commercial-transaction-act" element={<CommercialTransactionAct />} />

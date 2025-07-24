@@ -94,7 +94,11 @@ const mockSubscriptions = new Map();
 const SECURITY_CONFIG = {
   MAX_LOGIN_ATTEMPTS: 10,
   LOCKOUT_DURATION: 30 * 60 * 1000, // 30 minutes in milliseconds
-  ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [],
+  ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [
+    '133.204.210.193', // Current IP
+    '127.0.0.1', // Localhost for development
+    'localhost' // Localhost for development
+  ],
   REQUIRE_2FA_FOR_ADMIN: true,
   SESSION_TIMEOUT: 24 * 60 * 60 * 1000, // 24 hours
 };
@@ -185,18 +189,33 @@ class AuthService {
 
   // Get client IP address (for admin access control)
   private getClientIP(): string {
-    // In a real implementation, this would get the actual IP
     // For now, we'll use a placeholder that should be replaced with actual IP detection
-    return '127.0.0.1';
+    // In production, this should be replaced with server-side IP detection
+    return '133.204.210.193'; // Your current IP - this should be dynamic in production
   }
 
   // Check if IP is allowed for admin access
   private isIPAllowedForAdmin(): boolean {
-    if (SECURITY_CONFIG.ALLOWED_ADMIN_IPS.length === 0) {
-      return true; // No restrictions if no IPs configured
+    // For local development and testing, allow admin access
+    if (import.meta.env.DEV || window.location.hostname.includes('vercel.app')) {
+      console.log('🔧 Development/Testing mode: Admin IP restrictions disabled');
+      return true;
     }
+    
+    // Always require IP restrictions for admin access in production
+    if (SECURITY_CONFIG.ALLOWED_ADMIN_IPS.length === 0) {
+      console.warn('No admin IPs configured - admin access blocked for security');
+      return false; // Block admin access if no IPs configured
+    }
+    
     const clientIP = this.getClientIP();
-    return SECURITY_CONFIG.ALLOWED_ADMIN_IPS.includes(clientIP);
+    const isAllowed = SECURITY_CONFIG.ALLOWED_ADMIN_IPS.includes(clientIP);
+    
+    if (!isAllowed) {
+      console.warn(`Admin access blocked from IP: ${clientIP}. Allowed IPs: ${SECURITY_CONFIG.ALLOWED_ADMIN_IPS.join(', ')}`);
+    }
+    
+    return isAllowed;
   }
 
   // Track login attempts
