@@ -490,7 +490,7 @@ class AuthService {
     }
 
     // Validate admin code
-    const adminLevel = validateAdminCode(data.adminCode);
+    const adminLevel = getAdminLevel(data.adminCode);
     if (!adminLevel) {
       throw new Error('Invalid admin code');
     }

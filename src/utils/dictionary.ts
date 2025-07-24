@@ -277,6 +277,10 @@ export const dictionary = {
     'auth.or_login_with': 'Or login with',
     'auth.or_signup_with': 'Or sign up with',
     'auth.or': 'Or',
+    'auth.name': 'Full Name',
+    'auth.phone': 'Phone Number',
+    'auth.create_account': 'Create Your Account',
+    'auth.creating_account': 'Creating account...',
     'common.close': 'Close',
   },
   ja: {
@@ -485,6 +489,10 @@ export const dictionary = {
     'auth.or_login_with': 'または以下でログイン',
     'auth.or_signup_with': 'または以下でサインアップ',
     'auth.or': 'または',
+    'auth.name': '氏名',
+    'auth.phone': '電話番号',
+    'auth.create_account': 'アカウントを作成',
+    'auth.creating_account': 'アカウント作成中...',
     
     // Confirmations
     'confirm.delete': 'この項目を削除してもよろしいですか？',
