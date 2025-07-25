@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { 
   User, 
   Store, 
@@ -21,12 +23,10 @@ import {
   EyeOff,
   Shield
 } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { useAppContext } from '@/contexts/AppContext';
-import authService, { SignupData as AuthSignupData, LoginData as AuthLoginData } from '@/services/authService';
+import authService, { LoginData as AuthLoginData } from '@/services/authService';
+import { SignupData } from '@/utils/types';
 import { validateAdminCode } from '@/config/adminCodes';
-import SubscriptionPurchase from './SubscriptionPurchase';
-import PaymentMethodRegistration from './PaymentMethodRegistration';
 import GoogleSignIn from './GoogleSignIn';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 import TermsOfServiceModal from './TermsOfServiceModal';
@@ -37,22 +37,8 @@ interface AuthModalProps {
   onClose: () => void;
 }
 
-interface SignupFormData {
-  email: string;
-  password: string;
+interface SignupFormData extends SignupData {
   confirmPassword: string;
-  name: string;
-  phone: string;
-  userType: 'customer' | 'restaurant_owner' | 'admin';
-  // Customer specific fields
-  locationConsent?: boolean;
-  // Restaurant owner specific fields
-  restaurantName?: string;
-  restaurantAddress?: string;
-  restaurantPhone?: string;
-  cuisine?: string;
-  // Admin specific fields
-  adminCode?: string;
 }
 
 interface LoginFormData {
@@ -61,7 +47,7 @@ interface LoginFormData {
 }
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
-  const { t, currentLanguage } = useLanguage();
+  const { t } = useLanguage();
   const { login, signup } = useAppContext();
   const [activeTab, setActiveTab] = useState('login');
   const [isLoading, setIsLoading] = useState(false);
@@ -81,7 +67,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   });
 
   // Signup form state
-  const [signupData, setSignupData] = useState<AuthSignupData>({
+  const [signupData, setSignupData] = useState<SignupData>({
     email: '',
     password: '',
     confirmPassword: '',
@@ -132,7 +118,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     setError(null);
   };
 
-  const updateSignupField = (field: keyof AuthSignupData, value: string | boolean) => {
+  const updateSignupField = (field: keyof SignupData, value: string | boolean) => {
     setSignupData(prev => ({ ...prev, [field]: value }));
     setError(null);
   };
@@ -333,7 +319,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                       <p className="text-sm text-gray-600">
                         {t('auth.or_login_with', 'Or login with')}
                       </p>
-                      <GoogleSignIn onSuccess={onClose} />
+                      <GoogleSignIn onSuccess={onClose} userType="customer" />
                     </div>
                   </form>
                 </CardContent>
@@ -488,12 +474,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                         
                         <div className="space-y-2">
                           <div className="flex items-center space-x-2">
-                            <input
-                              type="checkbox"
+                            <Checkbox
                               id="location-consent"
                               checked={signupData.locationConsent}
-                              onChange={(e) => updateSignupField('locationConsent', e.target.checked)}
-                              className="rounded"
+                              onCheckedChange={(checked: boolean) => updateSignupField('locationConsent', checked)}
                             />
                             <Label htmlFor="location-consent" className="text-sm">
                               {t('auth.location_consent', 'Allow location access')}
@@ -583,12 +567,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                     {/* Terms and Privacy Policy Agreement */}
                     <div className="space-y-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
                       <div className="flex items-start space-x-2">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           id="agree-terms"
                           checked={agreeToTerms}
-                          onChange={(e) => setAgreeToTerms(e.target.checked)}
-                          className="mt-1 rounded"
+                          onCheckedChange={(checked: boolean) => setAgreeToTerms(checked)}
                           required
                         />
                         <Label htmlFor="agree-terms" className="text-sm">
@@ -630,7 +612,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                       <p className="text-sm text-gray-600">
                         {t('auth.or_signup_with', 'Or sign up with')}
                       </p>
-                      <GoogleSignIn onSuccess={onClose} />
+                      <GoogleSignIn onSuccess={onClose} userType={signupData.userType} />
                     </div>
                   </form>
                 </CardContent>

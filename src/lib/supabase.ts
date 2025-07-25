@@ -58,6 +58,4 @@ export const mockSupabase = {
 };
 
 // Export the appropriate client
-export const getSupabaseClient = () => {
-  return isSupabaseAvailable() ? supabase : mockSupabase;
-};
+export const getSupabaseClient = () => isSupabaseAvailable() ? supabase : mockSupabase;

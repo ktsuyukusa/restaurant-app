@@ -95,16 +95,15 @@ const mockSubscriptions = new Map();
 
 // Security configuration
 const SECURITY_CONFIG = {
-  MAX_LOGIN_ATTEMPTS: 5, // Reduced for admin security
-  LOCKOUT_DURATION: 60 * 60 * 1000, // 1 hour lockout for admin
+  MAX_LOGIN_ATTEMPTS: 10,
+  LOCKOUT_DURATION: 30 * 60 * 1000, // 30 minutes in milliseconds
   ALLOWED_ADMIN_IPS: import.meta.env.VITE_ALLOWED_ADMIN_IPS?.split(',') || [
     '133.204.210.193', // Current IP
     '127.0.0.1', // Localhost for development
     'localhost' // Localhost for development
   ],
   REQUIRE_2FA_FOR_ADMIN: true,
-  SESSION_TIMEOUT: 4 * 60 * 60 * 1000, // 4 hours for admin sessions
-  ADMIN_2FA_TIMEOUT: 5 * 60 * 1000, // 5 minutes for 2FA codes
+  SESSION_TIMEOUT: 24 * 60 * 60 * 1000, // 24 hours
 };
 
 // Login attempt tracking
@@ -532,6 +531,13 @@ class AuthService {
     try {
       // Create user in Supabase
       const supabase = getSupabaseClient();
+      console.log('Creating admin user with data:', {
+        email: data.email,
+        name: data.name,
+        phone: data.phone,
+        user_type: 'admin'
+      });
+      
       const { data: userData, error: userError } = await supabase
         .from('users')
         .insert({
@@ -545,25 +551,33 @@ class AuthService {
 
       if (userError) {
         console.error('Error creating admin user:', userError);
-        throw new Error('Failed to create admin account');
+        throw new Error(`Failed to create admin account: ${userError.message}`);
       }
 
+      console.log('Admin user created successfully:', userData);
+
       // Create admin access record
+      const adminAccessData = {
+        user_id: userData.id,
+        level: adminLevel,
+        permissions: this.getPermissionsForLevel(adminLevel),
+        access_code: data.adminCode
+      };
+      
+      console.log('Creating admin access with data:', adminAccessData);
+      
       const { error: adminError } = await supabase
         .from('admin_access')
-        .insert({
-          user_id: userData.id,
-          level: adminLevel,
-          permissions: this.getPermissionsForLevel(adminLevel),
-          access_code: data.adminCode
-        });
+        .insert(adminAccessData);
 
       if (adminError) {
         console.error('Error creating admin access:', adminError);
         // Clean up user if admin access creation fails
         await supabase.from('users').delete().eq('id', userData.id);
-        throw new Error('Failed to create admin access');
+        throw new Error(`Failed to create admin access: ${adminError.message}`);
       }
+
+      console.log('Admin access created successfully');
 
       const user: User = {
         id: userData.id,
@@ -1189,6 +1203,38 @@ class AuthService {
       enabled: user.adminAccess?.twoFactorEnabled || false,
       secret: user.adminAccess?.twoFactorSecret
     };
+  }
+
+  // Get permissions for admin level
+  private getPermissionsForLevel(level: 'admin' | 'super_admin' | 'moderator'): string[] {
+    switch (level) {
+      case 'super_admin':
+        return [
+          'user_management',
+          'restaurant_management', 
+          'system_settings',
+          'analytics',
+          'content_moderation',
+          'billing_management',
+          'security_settings'
+        ];
+      case 'admin':
+        return [
+          'user_management',
+          'restaurant_management',
+          'system_settings',
+          'analytics',
+          'content_moderation'
+        ];
+      case 'moderator':
+        return [
+          'content_moderation',
+          'user_management',
+          'analytics'
+        ];
+      default:
+        return [];
+    }
   }
 }
 

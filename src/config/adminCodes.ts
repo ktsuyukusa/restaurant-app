@@ -33,13 +33,14 @@ export const validateAdminCode = (code: string): boolean => {
 };
 
 // Get admin level from code
-export const getAdminLevel = (code: string): 'admin' | 'super_admin' | 'moderator' | 'support' | null => {
+export const getAdminLevel = (code: string): 'admin' | 'super_admin' | 'moderator' | null => {
   const codes = getAdminCodes();
   
   if (code === codes.superAdmin) return 'super_admin';
   if (code === codes.admin) return 'admin';
   if (code === codes.moderator) return 'moderator';
-  if (code === codes.support) return 'support';
+  // Note: 'support' level is not supported in the database schema
+  // if (code === codes.support) return 'support';
   
   return null;
 };

@@ -6,7 +6,7 @@ type Language = 'en' | 'ja' | 'pl' | 'zh' | 'ko' | 'ms' | 'id' | 'vi' | 'th' | '
 interface LanguageContextType {
   currentLanguage: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string, params?: Record<string, string>) => string;
+  t: (key: string, defaultValue?: string) => string;
   availableLanguages: { code: Language; name: string }[];
 }
 
@@ -45,17 +45,8 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     setCurrentLanguage(lang);
   };
 
-  const t = (key: string, params?: Record<string, string>): string => {
-    let translation = translate(key, currentLanguage);
-    
-    // Replace parameters if provided
-    if (params) {
-      Object.entries(params).forEach(([param, value]) => {
-        translation = translation.replace(new RegExp(`{{${param}}}`, 'g'), value);
-      });
-    }
-    
-    return translation;
+  const t = (key: string, defaultValue?: string): string => {
+    return translate(key, defaultValue, currentLanguage);
   };
 
   return (
