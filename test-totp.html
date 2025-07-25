@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TOTP Test</title>
+</head>
+<body>
+    <h1>TOTP Test</h1>
+    <div id="output"></div>
+    
+    <script type="module">
+        // Import the TOTP class
+        import { TOTP } from './src/utils/totp.ts';
+        
+        async function testTOTP() {
+            const output = document.getElementById('output');
+            
+            // Test with a known secret
+            const testSecret = 'CQ7MZG63KORNYIJV2DRNNQ';
+            const totp = new TOTP({ secret: testSecret });
+            
+            // Generate current code
+            const code = await totp.generateCode();
+            
+            // Verify the code
+            const isValid = await totp.verifyCode(code);
+            
+            output.innerHTML = `
+                <p><strong>Secret:</strong> ${testSecret}</p>
+                <p><strong>Generated Code:</strong> ${code}</p>
+                <p><strong>Verification Result:</strong> ${isValid ? 'VALID' : 'INVALID'}</p>
+                <p><strong>QR URL:</strong> ${totp.getQRCodeURL('test@example.com', 'Test App')}</p>
+            `;
+        }
+        
+        testTOTP();
+    </script>
+</body>
+</html> 
