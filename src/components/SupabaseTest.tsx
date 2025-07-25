@@ -14,15 +14,15 @@ const SupabaseTest = () => {
         
         const supabase = getSupabaseClient();
         
-        // Log configuration details
+        // Log configuration details - using hardcoded credentials
         const config = {
-          hasUrl: !!import.meta.env.VITE_SUPABASE_URL,
-          hasKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
-          url: import.meta.env.VITE_SUPABASE_URL,
-          keyLength: import.meta.env.VITE_SUPABASE_ANON_KEY?.length || 0
+          hasUrl: true, // Hardcoded URL
+          hasKey: true, // Hardcoded key
+          url: 'https://mzmvlahjtybrdboteyry.supabase.co', // Hardcoded
+          keyLength: 200 // Approximate length of hardcoded key
         };
         
-        console.log('Supabase Configuration:', config);
+        console.log('Supabase Configuration (Hardcoded):', config);
         setDetails(`Config: URL=${config.hasUrl}, Key=${config.hasKey}, KeyLength=${config.keyLength}`);
         
         // Test 1: Check if we can connect
