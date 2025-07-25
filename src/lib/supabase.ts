@@ -4,6 +4,10 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
+// Debug environment variables (remove in production)
+console.log('🔧 Supabase URL:', supabaseUrl ? 'Set' : 'Missing');
+console.log('🔧 Supabase Key:', supabaseAnonKey ? 'Set' : 'Missing');
+
 // Create Supabase client with fallback
 let supabase = null;
 
@@ -42,7 +46,11 @@ export const mockSupabase = {
     signInWithPassword: () => Promise.resolve({ data: { user: null }, error: null }),
     signOut: () => Promise.resolve({ error: null }),
     getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-    onAuthStateChange: (callback: unknown) => ({ data: { subscription: null } })
+    onAuthStateChange: (callback: unknown) => ({ data: { subscription: null } }),
+    resetPasswordForEmail: (email: string) => Promise.resolve({ 
+      data: null, 
+      error: { message: 'Mock client: Password reset not available. Please check Supabase configuration.' } 
+    })
   }
 };
 

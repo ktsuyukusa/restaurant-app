@@ -1242,10 +1242,24 @@ class AuthService {
   async resetPassword(email: string): Promise<{ error: any }> {
     try {
       const supabase = getSupabaseClient();
+      
+      // Check if Supabase is properly configured
+      if (!isSupabaseAvailable()) {
+        return { 
+          error: { 
+            message: 'Supabase is not properly configured. Please check your environment variables.' 
+          } 
+        };
+      }
+      
       const { error } = await supabase.auth.resetPasswordForEmail(email);
       return { error };
     } catch (error: any) {
-      return { error };
+      return { 
+        error: { 
+          message: `Password reset failed: ${error.message || 'Unknown error'}` 
+        } 
+      };
     }
   }
 }
