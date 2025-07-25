@@ -1,8 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get environment variables with type checking
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || import.meta.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Hardcode the correct Supabase credentials from multilingual-dining-seamless project
+// This overrides the Vercel integration which is pointing to the wrong project
+const supabaseUrl = 'https://mzmvlahjtybrdboteyry.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16bXZsYWhqdHlicmRib3RleXJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0NTY2ODEsImV4cCI6MjA2ODAzMjY4MX0.95zziILtcMnzvCwKz4HoWeeFSfqlQSbe_afdTl97VVmA';
 
 // Debug environment variables (remove in production)
 console.log('🔧 Supabase URL:', supabaseUrl ? 'Set' : 'Missing');

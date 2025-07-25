@@ -558,10 +558,10 @@ class AuthService {
 
       // Create admin access record
       const adminAccessData = {
-        user_id: userData.id,
-        level: adminLevel,
-        permissions: this.getPermissionsForLevel(adminLevel),
-        access_code: data.adminCode
+          user_id: userData.id,
+          level: adminLevel,
+          permissions: this.getPermissionsForLevel(adminLevel),
+          access_code: data.adminCode
       };
       
       console.log('Creating admin access with data:', adminAccessData);
