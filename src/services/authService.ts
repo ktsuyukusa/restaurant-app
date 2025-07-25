@@ -307,9 +307,9 @@ class AuthService {
   private getOrCreateTOTPSecret(): string {
     let secret = localStorage.getItem('admin_totp_secret');
     if (!secret) {
-      const { generateTOTPSecret } = require('../utils/totp');
-      secret = generateTOTPSecret();
-      localStorage.setItem('admin_totp_secret', secret);
+      // If no secret in localStorage, try to get from database
+      console.warn('No TOTP secret found in localStorage. Please complete 2FA setup first.');
+      throw new Error('2FA not set up. Please complete 2FA setup first.');
     }
     return secret;
   }

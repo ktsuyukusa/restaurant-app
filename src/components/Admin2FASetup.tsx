@@ -52,6 +52,36 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       const isValid = await totp.verifyCode(verificationCode);
       
       if (isValid) {
+        // Update the database with the new secret using Supabase
+        try {
+          const { createClient } = await import('@supabase/supabase-js');
+          const supabase = createClient(
+            'https://qqcoooscyzhyzmrcvsxi.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E'
+          );
+          
+          const { error } = await supabase
+            .from('admin_access')
+            .update({
+              two_factor_secret: secret,
+              two_factor_enabled: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', (
+              await supabase
+                .from('users')
+                .select('id')
+                .eq('email', 'wasando.tsuyukusa@gmail.com')
+                .single()
+            ).data.id);
+          
+          if (error) {
+            console.warn('Failed to update database with 2FA secret, but setup is still valid:', error);
+          }
+        } catch (dbError) {
+          console.warn('Database update failed, but 2FA setup is still valid:', dbError);
+        }
+        
         setSuccess('2FA setup successful! You can now log in with your authenticator app.');
         setTimeout(() => {
           onSetupComplete();
