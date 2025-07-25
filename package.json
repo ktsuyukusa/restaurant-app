@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
-    "@otplib/preset-browser": "^12.0.1",
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-aspect-ratio": "^1.1.0",
@@ -54,6 +53,7 @@
     "highlight.js": "^11.9.0",
     "i18next": "^23.15.1",
     "input-otp": "^1.2.4",
+    "jsotp": "^1.0.4",
     "lucide-react": "^0.462.0",
     "marked": "^12.0.1",
     "next-themes": "^0.3.0",
