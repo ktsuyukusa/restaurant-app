@@ -8,9 +8,9 @@ export default function Admin2FASetupPage() {
 
   const handleSetupComplete = () => {
     setIsSetupComplete(true);
-    // Redirect to admin dashboard after setup
+    // Redirect to home page which will show admin dashboard based on user role
     setTimeout(() => {
-      navigate('/admin');
+      navigate('/');
     }, 2000);
   };
 
