@@ -1,5 +1,5 @@
-// TOTP (Time-based One-Time Password) implementation using otplib
-import { authenticator } from 'otplib';
+// TOTP (Time-based One-Time Password) implementation using otplib browser preset
+import { authenticator } from '@otplib/preset-browser';
 
 export interface TOTPConfig {
   secret: string;
