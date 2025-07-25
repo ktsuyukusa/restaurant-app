@@ -1,8 +1,9 @@
-import { supabase } from '@/lib/supabase';
+import { getSupabaseClient } from '@/lib/supabase';
 import { User, SignupData } from '@/utils/types';
 
 export const auth = {
   async login(email: string, password: string) {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -26,6 +27,7 @@ export const auth = {
   },
 
   async signup(userData: SignupData) {
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase.auth.signUp({
       email: userData.email,
       password: userData.password,
@@ -59,11 +61,13 @@ export const auth = {
   },
 
   async logout() {
+    const supabase = getSupabaseClient();
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
   },
 
   async getCurrentUser() {
+    const supabase = getSupabaseClient();
     const { data: { session }, error } = await supabase.auth.getSession();
     if (error) throw error;
     if (!session) return null;
@@ -83,6 +87,7 @@ export const auth = {
   },
 
   onAuthStateChange(callback: (user: User | null) => void) {
+    const supabase = getSupabaseClient();
     return supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         const { data: profile } = await supabase
