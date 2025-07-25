@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-// COMPLETELY ISOLATED Supabase client - no environment variables at all
-// Force the correct project connection regardless of Vercel integrations
-const supabaseUrl = 'https://mzmvlahjtybrdboteyry.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16bXZsYWhqdHlicmRib3RleXJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0NTY2ODEsImV4cCI6MjA2ODAzMjY4MX0.95zziILtcMnzvCwKz4HoWeeFSfqlQSbe_afdTl97VVmA';
+// Use Vercel's automatically created environment variables
+// These are set by the Supabase integration
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qqcoooscyzhyzmrcvsxi.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E';
 
 // Force clear any environment variables that might interfere
 if (typeof window !== 'undefined') {
