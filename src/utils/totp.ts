@@ -1,5 +1,5 @@
-// TOTP (Time-based One-Time Password) implementation using jsotp
-import { TOTP as jsTOTP } from 'jsotp';
+// TOTP (Time-based One-Time Password) implementation using totp-generator
+import totp from 'totp-generator';
 
 export interface TOTPConfig {
   secret: string;
@@ -22,27 +22,35 @@ export class TOTP {
 
   // Generate a secure secret for TOTP
   generateSecret(): string {
-    return jsTOTP.genSecret();
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    let secret = '';
+    for (let i = 0; i < 32; i++) {
+      secret += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return secret;
   }
 
   // Generate current TOTP code
   async generateCode(): Promise<string> {
-    return jsTOTP.getTOTP(this.config.secret);
+    return totp(this.config.secret);
   }
 
   // Generate TOTP code for a specific counter
   async generateCodeForCounter(counter: number): Promise<string> {
-    return jsTOTP.getTOTP(this.config.secret);
+    return totp(this.config.secret);
   }
 
   // Verify a TOTP code
   async verifyCode(code: string, window: number = 1): Promise<boolean> {
-    return jsTOTP.verifyTOTP(this.config.secret, code);
+    const currentCode = await this.generateCode();
+    return code === currentCode;
   }
 
   // Get QR code URL for mobile apps
   getQRCodeURL(accountName: string, issuer: string = 'Navikko'): string {
-    return jsTOTP.getURL(this.config.secret, accountName, issuer);
+    const secret = this.config.secret;
+    const url = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=${this.config.algorithm}&digits=${this.config.digits}&period=${this.config.period}`;
+    return url;
   }
 
   // Get secret for manual entry
@@ -60,13 +68,16 @@ export class TOTP {
 
 // Utility functions
 export const generateTOTPSecret = (): string => {
-  return jsTOTP.genSecret();
+  const totp = new TOTP();
+  return totp.generateSecret();
 };
 
 export const verifyTOTPCode = async (secret: string, code: string, window: number = 1): Promise<boolean> => {
-  return jsTOTP.verifyTOTP(secret, code);
+  const totp = new TOTP({ secret });
+  return totp.verifyCode(code, window);
 };
 
 export const generateTOTPCode = async (secret: string): Promise<string> => {
-  return jsTOTP.getTOTP(secret);
+  const totp = new TOTP({ secret });
+  return totp.generateCode();
 }; 
