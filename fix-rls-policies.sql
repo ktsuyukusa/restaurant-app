@@ -45,4 +45,4 @@ CREATE POLICY "admins can insert admin_access" ON admin_access
 SELECT schemaname, tablename, policyname, permissive, roles, cmd, qual 
 FROM pg_policies 
 WHERE tablename IN ('users', 'admin_access')
-ORDER BY tablename, policyname; 
+ORDER BY tablename, policyname;
