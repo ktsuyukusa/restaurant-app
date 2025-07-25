@@ -1,27 +1,23 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Hardcode the correct Supabase credentials from multilingual-dining-seamless project
-// This overrides the Vercel integration which is pointing to the wrong project
+// This completely overrides any environment variables set by Vercel integrations
 const supabaseUrl = 'https://mzmvlahjtybrdboteyry.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16bXZsYWhqdHlicmRib3RleXJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0NTY2ODEsImV4cCI6MjA2ODAzMjY4MX0.95zziILtcMnzvCwKz4HoWeeFSfqlQSbe_afdTl97VVmA';
 
-// Debug environment variables (remove in production)
-console.log('🔧 Supabase URL:', supabaseUrl ? 'Set' : 'Missing');
-console.log('🔧 Supabase Key:', supabaseAnonKey ? 'Set' : 'Missing');
+// Debug: Log the credentials being used (remove in production)
+console.log('🔧 Using hardcoded Supabase URL:', supabaseUrl);
+console.log('🔧 Using hardcoded Supabase Key:', supabaseAnonKey ? 'Set' : 'Missing');
 
-// Create Supabase client with fallback
+// Create Supabase client with hardcoded credentials
 let supabase = null;
 
-if (supabaseUrl && supabaseAnonKey) {
-  try {
-    supabase = createClient(supabaseUrl, supabaseAnonKey);
-    console.log('✅ Supabase client initialized successfully');
-  } catch (error) {
-    console.error('❌ Error creating Supabase client:', error);
-    supabase = null;
-  }
-} else {
-  console.warn('⚠️ Missing Supabase environment variables. Using mock client.');
+try {
+  supabase = createClient(supabaseUrl, supabaseAnonKey);
+  console.log('✅ Supabase client initialized successfully with hardcoded credentials');
+} catch (error) {
+  console.error('❌ Error creating Supabase client:', error);
+  supabase = null;
 }
 
 // Mock Supabase client for development/testing
