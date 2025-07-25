@@ -1,5 +1,5 @@
-// TOTP (Time-based One-Time Password) implementation using totp-generator
-import totp from 'totp-generator';
+// TOTP (Time-based One-Time Password) implementation using browser crypto
+// RFC 6238 compliant implementation
 
 export interface TOTPConfig {
   secret: string;
@@ -32,18 +32,61 @@ export class TOTP {
 
   // Generate current TOTP code
   async generateCode(): Promise<string> {
-    return totp(this.config.secret);
+    const counter = Math.floor(Date.now() / 1000 / this.config.period);
+    return this.generateCodeForCounter(counter);
   }
 
   // Generate TOTP code for a specific counter
   async generateCodeForCounter(counter: number): Promise<string> {
-    return totp(this.config.secret);
+    // Convert counter to 8-byte buffer
+    const buffer = new ArrayBuffer(8);
+    const view = new DataView(buffer);
+    view.setBigUint64(0, BigInt(counter), false); // false = big-endian
+
+    // Convert secret to Uint8Array
+    const secretBytes = new TextEncoder().encode(this.config.secret);
+
+    // Generate HMAC-SHA1
+    const key = await crypto.subtle.importKey(
+      'raw',
+      secretBytes,
+      { name: 'HMAC', hash: 'SHA-1' },
+      false,
+      ['sign']
+    );
+
+    const signature = await crypto.subtle.sign('HMAC', key, buffer);
+    const hash = new Uint8Array(signature);
+
+    // Generate 6-digit code using RFC 6238 standard
+    const offset = hash[hash.length - 1] & 0xf;
+    
+    // Ensure we don't go out of bounds
+    if (offset + 3 >= hash.length) {
+      throw new Error('Invalid hash length for TOTP generation');
+    }
+    
+    const code = ((hash[offset] & 0x7f) << 24) |
+                 ((hash[offset + 1] & 0xff) << 16) |
+                 ((hash[offset + 2] & 0xff) << 8) |
+                 (hash[offset + 3] & 0xff);
+
+    const modulo = Math.pow(10, this.config.digits);
+    return (code % modulo).toString().padStart(this.config.digits, '0');
   }
 
   // Verify a TOTP code
   async verifyCode(code: string, window: number = 1): Promise<boolean> {
-    const currentCode = await this.generateCode();
-    return code === currentCode;
+    const counter = Math.floor(Date.now() / 1000 / this.config.period);
+    
+    for (let i = -window; i <= window; i++) {
+      const expectedCode = await this.generateCodeForCounter(counter + i);
+      if (code === expectedCode) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   // Get QR code URL for mobile apps
