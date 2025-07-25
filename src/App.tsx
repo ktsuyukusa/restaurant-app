@@ -16,21 +16,21 @@ function App() {
   return (
     <LanguageProvider>
       <AppProvider>
-        <Router>
-          <div className="App">
-            <Routes>
+    <Router>
+      <div className="App">
+        <Routes>
               <Route path="/" element={<AppLayout />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/terms-of-service" element={<TermsOfService />} />
-              <Route path="/commercial-transaction-act" element={<CommercialTransactionAct />} />
-              <Route path="/order-success" element={<OrderSuccess />} />
-              <Route path="/order-cancel" element={<OrderCancel />} />
-              <Route path="/app/*" element={<AppLayout />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-          </div>
-        </Router>
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/commercial-transaction-act" element={<CommercialTransactionAct />} />
+          <Route path="/order-success" element={<OrderSuccess />} />
+          <Route path="/order-cancel" element={<OrderCancel />} />
+          <Route path="/app/*" element={<AppLayout />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
+      </div>
+    </Router>
       </AppProvider>
     </LanguageProvider>
   );
