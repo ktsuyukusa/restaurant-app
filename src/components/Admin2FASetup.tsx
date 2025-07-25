@@ -31,12 +31,15 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       localStorage.setItem('admin_totp_secret', existingSecret);
     }
     
+    // Create TOTP instance with the exact secret
     const totp = new TOTP({ secret: existingSecret });
     const qrUrl = totp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
     
     setTotp(totp);
     setSecret(existingSecret);
     setQrCodeUrl(qrUrl);
+    
+    console.log('2FA Setup: Using secret:', existingSecret);
   }, []);
 
   const handleVerifyCode = async () => {
@@ -49,6 +52,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     setError('');
 
     try {
+      console.log('2FA Verification: Checking code:', verificationCode, 'with secret:', secret);
       const isValid = await totp.verifyCode(verificationCode);
       
       if (isValid) {
