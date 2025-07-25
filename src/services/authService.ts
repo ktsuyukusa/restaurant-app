@@ -440,13 +440,11 @@ class AuthService {
       if (restaurantError) {
         console.error('Error creating restaurant info:', restaurantError);
         // Clean up user if restaurant info creation fails
-        const supabase = getSupabaseClient();
         await supabase.from('users').delete().eq('id', userData.id);
         throw new Error('Failed to create restaurant information');
       }
 
       // Create subscription (assuming basic plan for now)
-      const supabase = getSupabaseClient();
       const subscriptionId = `sub_${Date.now()}`;
       const { error: subscriptionError } = await supabase
         .from('subscriptions')
@@ -463,7 +461,6 @@ class AuthService {
       if (subscriptionError) {
         console.error('Error creating subscription:', subscriptionError);
         // Clean up if subscription creation fails
-        const supabase = getSupabaseClient();
         await supabase.from('restaurant_info').delete().eq('user_id', userData.id);
         await supabase.from('users').delete().eq('id', userData.id);
         throw new Error('Failed to create subscription');
