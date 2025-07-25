@@ -21,17 +21,22 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
   const [success, setSuccess] = useState<string>('');
 
   useEffect(() => {
-    // Initialize TOTP with new secret
-    const newTotp = new TOTP();
-    const newSecret = newTotp.generateSecret();
-    const qrUrl = newTotp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+    // Use consistent secret - either from localStorage or generate new one
+    let existingSecret = localStorage.getItem('admin_totp_secret');
     
-    setTotp(newTotp);
-    setSecret(newSecret);
+    if (!existingSecret) {
+      // Generate new secret only if none exists
+      const newTotp = new TOTP();
+      existingSecret = newTotp.generateSecret();
+      localStorage.setItem('admin_totp_secret', existingSecret);
+    }
+    
+    const totp = new TOTP({ secret: existingSecret });
+    const qrUrl = totp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+    
+    setTotp(totp);
+    setSecret(existingSecret);
     setQrCodeUrl(qrUrl);
-    
-    // Store secret in localStorage for the auth service
-    localStorage.setItem('admin_totp_secret', newSecret);
   }, []);
 
   const handleVerifyCode = async () => {
@@ -67,6 +72,24 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     setTimeout(() => setSuccess(''), 3000);
   };
 
+  const generateNewSecret = () => {
+    // Clear old secret and generate new one
+    localStorage.removeItem('admin_totp_secret');
+    
+    const newTotp = new TOTP();
+    const newSecret = newTotp.generateSecret();
+    const qrUrl = newTotp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+    
+    setTotp(newTotp);
+    setSecret(newSecret);
+    setQrCodeUrl(qrUrl);
+    
+    localStorage.setItem('admin_totp_secret', newSecret);
+    setVerificationCode('');
+    setError('');
+    setSuccess('New secret generated! Please scan the new QR code.');
+  };
+
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
@@ -89,26 +112,34 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
               />
             </div>
             
-            <div className="text-center">
-              <Label className="text-sm font-medium">Manual Entry Secret</Label>
-              <div className="flex items-center gap-2 mt-1">
-                <Input 
-                  value={secret} 
-                  readOnly 
-                  className="font-mono text-sm"
-                />
+                          <div className="text-center">
+                <Label className="text-sm font-medium">Manual Entry Secret</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <Input 
+                    value={secret} 
+                    readOnly 
+                    className="font-mono text-sm"
+                  />
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={copySecret}
+                  >
+                    Copy
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Use this secret if you can't scan the QR code
+                </p>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={copySecret}
+                  onClick={generateNewSecret}
+                  className="mt-2"
                 >
-                  Copy
+                  Generate New Secret
                 </Button>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Use this secret if you can't scan the QR code
-              </p>
-            </div>
           </div>
         )}
 
