@@ -1,5 +1,5 @@
-// TOTP (Time-based One-Time Password) implementation using speakeasy
-import speakeasy from 'speakeasy';
+// TOTP (Time-based One-Time Password) implementation using @otplib/preset-browser
+import { authenticator } from '@otplib/preset-browser';
 
 export interface TOTPConfig {
   secret: string;
@@ -22,55 +22,31 @@ export class TOTP {
 
   // Generate a secure secret for TOTP
   generateSecret(): string {
-    return speakeasy.generateSecret({
-      length: 32,
-      name: 'Navikko',
-      issuer: 'Navikko'
-    }).base32!;
+    return authenticator.generateSecret();
   }
 
   // Generate current TOTP code
   async generateCode(): Promise<string> {
-    return speakeasy.totp({
-      secret: this.config.secret,
-      digits: this.config.digits,
-      step: this.config.period,
-      algorithm: this.config.algorithm
-    });
+    return authenticator.generate(this.config.secret);
   }
 
   // Generate TOTP code for a specific counter
   async generateCodeForCounter(counter: number): Promise<string> {
-    return speakeasy.totp({
-      secret: this.config.secret,
-      digits: this.config.digits,
-      step: this.config.period,
-      algorithm: this.config.algorithm,
-      counter: counter
-    });
+    return authenticator.generate(this.config.secret);
   }
 
   // Verify a TOTP code
   async verifyCode(code: string, window: number = 1): Promise<boolean> {
-    return speakeasy.totp.verify({
-      secret: this.config.secret,
+    return authenticator.verify({
       token: code,
-      window: window,
-      step: this.config.period,
-      algorithm: this.config.algorithm
+      secret: this.config.secret,
+      window: window
     });
   }
 
   // Get QR code URL for mobile apps
   getQRCodeURL(accountName: string, issuer: string = 'Navikko'): string {
-    return speakeasy.otpauthURL({
-      secret: this.config.secret,
-      label: accountName,
-      issuer: issuer,
-      algorithm: this.config.algorithm,
-      digits: this.config.digits,
-      period: this.config.period
-    });
+    return authenticator.keyuri(accountName, issuer, this.config.secret);
   }
 
   // Get secret for manual entry
