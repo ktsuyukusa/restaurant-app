@@ -1,0 +1,162 @@
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Alert, AlertDescription } from './ui/alert';
+import { TOTP } from '../utils/totp';
+
+interface Admin2FASetupProps {
+  onSetupComplete: () => void;
+  onCancel: () => void;
+}
+
+export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, onCancel }) => {
+  const [totp, setTotp] = useState<TOTP | null>(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+  const [secret, setSecret] = useState<string>('');
+  const [verificationCode, setVerificationCode] = useState<string>('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
+
+  useEffect(() => {
+    // Initialize TOTP with new secret
+    const newTotp = new TOTP();
+    const newSecret = newTotp.generateSecret();
+    const qrUrl = newTotp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+    
+    setTotp(newTotp);
+    setSecret(newSecret);
+    setQrCodeUrl(qrUrl);
+    
+    // Store secret in localStorage for the auth service
+    localStorage.setItem('admin_totp_secret', newSecret);
+  }, []);
+
+  const handleVerifyCode = async () => {
+    if (!totp || !verificationCode) {
+      setError('Please enter the verification code');
+      return;
+    }
+
+    setIsVerifying(true);
+    setError('');
+
+    try {
+      const isValid = await totp.verifyCode(verificationCode);
+      
+      if (isValid) {
+        setSuccess('2FA setup successful! You can now log in with your authenticator app.');
+        setTimeout(() => {
+          onSetupComplete();
+        }, 2000);
+      } else {
+        setError('Invalid verification code. Please try again.');
+      }
+    } catch (err) {
+      setError('Verification failed. Please try again.');
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const copySecret = () => {
+    navigator.clipboard.writeText(secret);
+    setSuccess('Secret copied to clipboard!');
+    setTimeout(() => setSuccess(''), 3000);
+  };
+
+  return (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          🔐 Set Up Two-Factor Authentication
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="text-sm text-gray-600">
+          Scan the QR code with your authenticator app (Google Authenticator, Authy, etc.) to set up 2FA for enhanced security.
+        </div>
+
+        {qrCodeUrl && (
+          <div className="flex flex-col items-center space-y-4">
+            <div className="bg-white p-4 rounded-lg border">
+              <img 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrCodeUrl)}`}
+                alt="2FA QR Code"
+                className="w-48 h-48"
+              />
+            </div>
+            
+            <div className="text-center">
+              <Label className="text-sm font-medium">Manual Entry Secret</Label>
+              <div className="flex items-center gap-2 mt-1">
+                <Input 
+                  value={secret} 
+                  readOnly 
+                  className="font-mono text-sm"
+                />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={copySecret}
+                >
+                  Copy
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Use this secret if you can't scan the QR code
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <Label htmlFor="verification-code">Verification Code</Label>
+          <Input
+            id="verification-code"
+            type="text"
+            placeholder="Enter 6-digit code"
+            value={verificationCode}
+            onChange={(e) => setVerificationCode(e.target.value)}
+            maxLength={6}
+            className="text-center text-lg font-mono"
+          />
+          <p className="text-xs text-gray-500">
+            Enter the 6-digit code from your authenticator app
+          </p>
+        </div>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {success && (
+          <Alert>
+            <AlertDescription>{success}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleVerifyCode} 
+            disabled={isVerifying || !verificationCode}
+            className="flex-1"
+          >
+            {isVerifying ? 'Verifying...' : 'Verify & Complete Setup'}
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={onCancel}
+            disabled={isVerifying}
+          >
+            Cancel
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}; 

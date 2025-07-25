@@ -10,6 +10,7 @@ import TermsOfService from '@/pages/TermsOfService';
 import OrderSuccess from '@/pages/OrderSuccess';
 import OrderCancel from '@/pages/OrderCancel';
 import CommercialTransactionAct from '@/pages/CommercialTransactionAct';
+import Admin2FASetup from '@/pages/Admin2FASetup';
 import './App.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route path="/commercial-transaction-act" element={<CommercialTransactionAct />} />
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/order-cancel" element={<OrderCancel />} />
+          <Route path="/admin-2fa-setup" element={<Admin2FASetup />} />
           <Route path="/app/*" element={<AppLayout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

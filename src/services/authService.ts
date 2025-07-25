@@ -289,14 +289,29 @@ class AuthService {
     return SECURITY_CONFIG.REQUIRE_2FA_FOR_ADMIN && userType === 'admin';
   }
 
-  // Generate 2FA code (simplified implementation)
-  private generate2FACode(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+  // Generate 2FA code using proper TOTP
+  private async generate2FACode(): Promise<string> {
+    const { generateTOTPCode } = await import('../utils/totp');
+    const secret = this.getOrCreateTOTPSecret();
+    return await generateTOTPCode(secret);
   }
 
-  // Validate 2FA code
-  private validate2FACode(inputCode: string, expectedCode: string): boolean {
-    return inputCode === expectedCode;
+  // Validate 2FA code using proper TOTP
+  private async validate2FACode(inputCode: string): Promise<boolean> {
+    const { verifyTOTPCode } = await import('../utils/totp');
+    const secret = this.getOrCreateTOTPSecret();
+    return await verifyTOTPCode(secret, inputCode);
+  }
+
+  // Get or create TOTP secret for admin
+  private getOrCreateTOTPSecret(): string {
+    let secret = localStorage.getItem('admin_totp_secret');
+    if (!secret) {
+      const { generateTOTPSecret } = require('../utils/totp');
+      secret = generateTOTPSecret();
+      localStorage.setItem('admin_totp_secret', secret);
+    }
+    return secret;
   }
 
   // Check if user exists in Supabase
@@ -700,22 +715,16 @@ class AuthService {
         // Check 2FA for admin users
         if (this.requires2FA(userData.user_type)) {
           if (!twoFactorCode) {
-            // Generate and send 2FA code (in real implementation, send via SMS/email)
-            const twoFACode = this.generate2FACode();
-            // Store code temporarily (in real implementation, use secure storage)
-            sessionStorage.setItem('temp_2fa_code', twoFACode);
+            // For proper TOTP, we don't generate a code - user gets it from authenticator app
             throw new Error('2FA_REQUIRED');
           }
 
-          // Validate 2FA code
-          const expectedCode = sessionStorage.getItem('temp_2fa_code');
-          if (!expectedCode || !this.validate2FACode(twoFactorCode, expectedCode)) {
+          // Validate 2FA code using TOTP
+          const isValid = await this.validate2FACode(twoFactorCode);
+          if (!isValid) {
             this.trackLoginAttempt(data.email, false);
-            sessionStorage.removeItem('temp_2fa_code');
             throw new Error('Invalid 2FA code');
           }
-
-          sessionStorage.removeItem('temp_2fa_code');
         }
 
         const { data: adminData } = await supabase

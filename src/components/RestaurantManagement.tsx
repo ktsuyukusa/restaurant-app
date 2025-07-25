@@ -14,15 +14,32 @@ import { toast } from '@/components/ui/use-toast';
 import { getSupabaseClient } from '@/lib/supabase';
 
 interface Restaurant {
-  id: string;
-  name_ja: string;
-  name_en: string;
-  description_ja: string;
-  photo: string;
-  location: string;
-  line_url: string;
-  reservation_ok: boolean;
-  type: string;
+  id?: string;
+  name: string;
+  address: string;
+  phone: string;
+  cuisine: string;
+  description?: string;
+  latitude?: number;
+  longitude?: number;
+  rating?: number;
+  price_range?: string;
+  is_active?: boolean;
+  image_url?: string;
+  opening_hours?: string;
+  phone_number?: string;
+  name_multilingual?: Record<string, string>;
+  address_multilingual?: Record<string, string>;
+  description_multilingual?: Record<string, string>;
+  external_booking_url?: string;
+  external_booking_url_en?: string;
+  notification_email?: string;
+  notification_line_id?: string;
+  komoju_merchant_id?: string;
+  payjp_merchant_id?: string;
+  menu_url?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const RestaurantManagement: React.FC = () => {
@@ -150,84 +167,160 @@ const RestaurantManagement: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="name_ja">Japanese Name</Label>
+                <Label htmlFor="name">Restaurant Name</Label>
                 <Input
-                  id="name_ja"
-                  value={formData.name_ja || ''}
-                  onChange={(e) => setFormData({...formData, name_ja: e.target.value})}
+                  id="name"
+                  value={formData.name || ''}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
                   required
                 />
               </div>
               <div>
-                <Label htmlFor="name_en">English Name</Label>
-                <Input
-                  id="name_en"
-                  value={formData.name_en || ''}
-                  onChange={(e) => setFormData({...formData, name_en: e.target.value})}
-                  required
-                />
-              </div>
-            </div>
-            
-            <div>
-              <Label htmlFor="description_ja">Description (Japanese)</Label>
-              <Textarea
-                id="description_ja"
-                value={formData.description_ja || ''}
-                onChange={(e) => setFormData({...formData, description_ja: e.target.value})}
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="photo">Photo URL</Label>
-                <Input
-                  id="photo"
-                  value={formData.photo || ''}
-                  onChange={(e) => setFormData({...formData, photo: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={formData.location || ''}
-                  onChange={(e) => setFormData({...formData, location: e.target.value})}
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="line_url">LINE URL</Label>
-                <Input
-                  id="line_url"
-                  value={formData.line_url || ''}
-                  onChange={(e) => setFormData({...formData, line_url: e.target.value})}
-                />
-              </div>
-              <div>
-                <Label htmlFor="type">Type</Label>
-                <Select value={formData.type || ''} onValueChange={(value) => setFormData({...formData, type: value})}>
+                <Label htmlFor="cuisine">Cuisine Type</Label>
+                <Select value={formData.cuisine || ''} onValueChange={(value) => setFormData({...formData, cuisine: value})}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder="Select cuisine type" />
                   </SelectTrigger>
                   <SelectContent>
-                    {restaurantTypes.map(type => (
-                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    {restaurantTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
             
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  value={formData.address || ''}
+                  onChange={(e) => setFormData({...formData, address: e.target.value})}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  value={formData.phone || ''}
+                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  required
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description || ''}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="image_url">Image URL</Label>
+                <Input
+                  id="image_url"
+                  value={formData.image_url || ''}
+                  onChange={(e) => setFormData({...formData, image_url: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="opening_hours">Opening Hours</Label>
+                <Input
+                  id="opening_hours"
+                  value={formData.opening_hours || ''}
+                  onChange={(e) => setFormData({...formData, opening_hours: e.target.value})}
+                  placeholder="e.g., 11:00 - 22:00"
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="rating">Rating</Label>
+                <Input
+                  id="rating"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max="5"
+                  value={formData.rating || ''}
+                  onChange={(e) => setFormData({...formData, rating: parseFloat(e.target.value) || 0})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="price_range">Price Range</Label>
+                <Select value={formData.price_range || '$'} onValueChange={(value) => setFormData({...formData, price_range: value})}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="$">$ (Budget)</SelectItem>
+                    <SelectItem value="$$">$$ (Moderate)</SelectItem>
+                    <SelectItem value="$$$">$$$ (Expensive)</SelectItem>
+                    <SelectItem value="$$$$">$$$$ (Very Expensive)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="latitude">Latitude</Label>
+                <Input
+                  id="latitude"
+                  type="number"
+                  step="0.000001"
+                  value={formData.latitude || ''}
+                  onChange={(e) => setFormData({...formData, latitude: parseFloat(e.target.value) || 0})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="longitude">Longitude</Label>
+                <Input
+                  id="longitude"
+                  type="number"
+                  step="0.000001"
+                  value={formData.longitude || ''}
+                  onChange={(e) => setFormData({...formData, longitude: parseFloat(e.target.value) || 0})}
+                />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="external_booking_url">External Booking URL</Label>
+                <Input
+                  id="external_booking_url"
+                  value={formData.external_booking_url || ''}
+                  onChange={(e) => setFormData({...formData, external_booking_url: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="notification_email">Notification Email</Label>
+                <Input
+                  id="notification_email"
+                  type="email"
+                  value={formData.notification_email || ''}
+                  onChange={(e) => setFormData({...formData, notification_email: e.target.value})}
+                />
+              </div>
+            </div>
+            
             <div className="flex items-center space-x-2">
               <Switch
-                id="reservation_ok"
-                checked={formData.reservation_ok || false}
-                onCheckedChange={(checked) => setFormData({...formData, reservation_ok: checked})}
+                id="is_active"
+                checked={formData.is_active !== false}
+                onCheckedChange={(checked) => setFormData({...formData, is_active: checked})}
               />
-              <Label htmlFor="reservation_ok">Reservations Available</Label>
+              <Label htmlFor="is_active">Active Restaurant</Label>
             </div>
             
             <div className="flex gap-2">
@@ -244,19 +337,22 @@ const RestaurantManagement: React.FC = () => {
             <CardContent className="p-4">
               <div className="flex justify-between items-start">
                 <div className="flex-1">
-                  <h3 className="font-semibold">{restaurant.name_en} ({restaurant.name_ja})</h3>
-                  <p className="text-sm text-gray-600 mt-1">{restaurant.description_ja}</p>
+                  <h3 className="font-semibold">{restaurant.name}</h3>
+                  <p className="text-sm text-gray-600 mt-1">{restaurant.description}</p>
                   <div className="mt-2 text-sm space-y-1">
-                    <p><strong>Type:</strong> {restaurant.type}</p>
-                    <p><strong>Location:</strong> {restaurant.location}</p>
-                    <p><strong>Reservations:</strong> {restaurant.reservation_ok ? 'Available' : 'Not Available'}</p>
+                    <p><strong>Cuisine:</strong> {restaurant.cuisine}</p>
+                    <p><strong>Address:</strong> {restaurant.address}</p>
+                    <p><strong>Phone:</strong> {restaurant.phone}</p>
+                    <p><strong>Rating:</strong> {restaurant.rating || 'N/A'}</p>
+                    <p><strong>Price Range:</strong> {restaurant.price_range || 'N/A'}</p>
+                    <p><strong>Status:</strong> {restaurant.is_active ? 'Active' : 'Inactive'}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <Button size="sm" variant="outline" onClick={() => handleEdit(restaurant)}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button size="sm" variant="destructive" onClick={() => handleDelete(restaurant.id)}>
+                  <Button size="sm" variant="destructive" onClick={() => handleDelete(restaurant.id!)}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>

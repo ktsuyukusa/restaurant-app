@@ -20,13 +20,13 @@ Add these variables one by one:
 #### 1. Supabase Configuration
 ```
 Name: VITE_SUPABASE_URL
-Value: https://mzmvlahjtybrdboteyry.supabase.co
+Value: https://qqcoooscyzhyzmrcvsxi.supabase.co
 Environment: Production, Preview, Development
 ```
 
 ```
 Name: VITE_SUPABASE_ANON_KEY
-Value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16bXZsYWhqdHlicmRib3RleXJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0NTY2ODEsImV4cCI6MjA2ODAzMjY4MX0.95zziILtcMnzvCwKz4HoWeeFSfqlQSbe_afdTl97VVmA
+Value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E
 Environment: Production, Preview, Development
 ```
 

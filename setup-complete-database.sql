@@ -1,3 +1,6 @@
+-- Complete Database Setup with 11-Language Support
+-- Run this in your Supabase SQL Editor: https://qqcoooscyzhyzmrcvsxi.supabase.co
+
 -- Enable necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
@@ -86,7 +89,7 @@ CREATE TABLE IF NOT EXISTS order_items (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create restaurants table if not exists
+-- Create restaurants table with 11-language support
 CREATE TABLE IF NOT EXISTS restaurants (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   name TEXT NOT NULL,
@@ -117,7 +120,7 @@ CREATE TABLE IF NOT EXISTS restaurants (
   menu_url TEXT
 );
 
--- Create menus table if not exists
+-- Create menus table with 11-language support
 CREATE TABLE IF NOT EXISTS menus (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   restaurant_id UUID REFERENCES restaurants(id) ON DELETE CASCADE,
@@ -137,7 +140,7 @@ CREATE TABLE IF NOT EXISTS menus (
   gluten_free BOOLEAN DEFAULT false
 );
 
--- Create reservations table if not exists
+-- Create reservations table
 CREATE TABLE IF NOT EXISTS reservations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -223,7 +226,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_restaurant_id ON orders(restaurant_id);
 CREATE INDEX IF NOT EXISTS idx_reservations_user_id ON reservations(user_id);
 CREATE INDEX IF NOT EXISTS idx_reservations_restaurant_id ON reservations(restaurant_id);
 
--- Insert sample restaurant data
+-- Insert sample restaurant data with 11-language support
 INSERT INTO restaurants (
   name, address, phone, cuisine, description, latitude, longitude, rating, price_range,
   image_url, opening_hours, phone_number, name_multilingual, address_multilingual, description_multilingual,
@@ -284,11 +287,21 @@ INSERT INTO restaurants (
   NULL
 );
 
--- Insert sample menu items
+-- Insert sample menu items with 11-language support
 INSERT INTO menus (restaurant_id, name, description, price, category, name_multilingual, description_multilingual) VALUES
 ((SELECT id FROM restaurants WHERE name = 'AZ Dining Saku' LIMIT 1), 'Carbonara', 'Classic Italian pasta with eggs, cheese, and pancetta', 1200, 'Main', '{"en": "Carbonara", "ja": "カルボナーラ", "zh": "卡邦尼拉", "ko": "카르보나라", "pl": "Carbonara", "ms": "Carbonara", "id": "Carbonara", "th": "คาร์โบนารา", "vi": "Carbonara", "es": "Carbonara", "ro": "Carbonara"}', '{"en": "Classic Italian pasta with eggs, cheese, and pancetta", "ja": "卵、チーズ、パンチェッタを使った本格的なイタリアンパスタ", "zh": "使用鸡蛋、奶酪和意式培根的经典意大利面", "ko": "계란, 치즈, 판체타를 사용한 정통 이탈리안 파스타", "pl": "Klasyczny włoski makaron z jajkami, serem i pancettą", "ms": "Pasta Itali klasik dengan telur, keju dan pancetta", "id": "Pasta Italia klasik dengan telur, keju dan pancetta", "th": "พาสต้าอิตาลีคลาสสิกกับไข่ ชีส และแพนเชตต้า", "vi": "Mì Ý cổ điển với trứng, phô mai và pancetta", "es": "Pasta italiana clásica con huevos, queso y panceta", "ro": "Paste italiene clasice cu ouă, brânză și pancetta"}'),
 ((SELECT id FROM restaurants WHERE name = 'AZ Dining Saku' LIMIT 1), 'Margherita Pizza', 'Traditional pizza with tomato and mozzarella', 1500, 'Main', '{"en": "Margherita Pizza", "ja": "マルゲリータピザ", "zh": "玛格丽特披萨", "ko": "마르게리타 피자", "pl": "Pizza Margherita", "ms": "Pizza Margherita", "id": "Pizza Margherita", "th": "พิซซ่ามาร์เกอริต้า", "vi": "Pizza Margherita", "es": "Pizza Margherita", "ro": "Pizza Margherita"}', '{"en": "Traditional pizza with tomato and mozzarella", "ja": "トマトとモッツァレラの伝統的なピザ", "zh": "使用番茄和马苏里拉奶酪的传统披萨", "ko": "토마토와 모짜렐라를 사용한 전통 피자", "pl": "Tradycyjna pizza z pomidorami i mozzarellą", "ms": "Pizza tradisional dengan tomato dan mozzarella", "id": "Pizza tradisional dengan tomat dan mozzarella", "th": "พิซซ่าแบบดั้งเดิมกับมะเขือเทศและมอสซาเรลล่า", "vi": "Pizza truyền thống với cà chua và mozzarella", "es": "Pizza tradicional con tomate y mozzarella", "ro": "Pizza tradițională cu roșii și mozzarella"}'),
 ((SELECT id FROM restaurants WHERE name = 'Sakura Sushi' LIMIT 1), 'Salmon Nigiri', 'Fresh salmon sushi', 300, 'Sushi', '{"en": "Salmon Nigiri", "ja": "サーモン握り", "zh": "三文鱼握寿司", "ko": "연어 니기리", "pl": "Nigiri z łososiem", "ms": "Nigiri Salmon", "id": "Nigiri Salmon", "th": "นิกิริแซลมอน", "vi": "Nigiri Cá hồi", "es": "Nigiri de Salmón", "ro": "Nigiri cu Somon"}', '{"en": "Fresh salmon sushi", "ja": "新鮮なサーモンの握り寿司", "zh": "新鲜三文鱼握寿司", "ko": "신선한 연어 니기리 스시", "pl": "Świeże sushi z łososiem", "ms": "Sushi salmon segar", "id": "Sushi salmon segar", "th": "ซูชิแซลมอนสด", "vi": "Sushi cá hồi tươi", "es": "Sushi de salmón fresco", "ro": "Sushi cu somon proaspăt"}'),
 ((SELECT id FROM restaurants WHERE name = 'Sakura Sushi' LIMIT 1), 'Tuna Roll', 'Spicy tuna roll', 800, 'Sushi', '{"en": "Tuna Roll", "ja": "マグロロール", "zh": "金枪鱼卷", "ko": "참치 롤", "pl": "Rolka z tuńczykiem", "ms": "Roll Tuna", "id": "Roll Tuna", "th": "โรลทูน่า", "vi": "Roll Cá ngừ", "es": "Roll de Atún", "ro": "Roll cu Ton"}', '{"en": "Spicy tuna roll", "ja": "スパイシーマグロロール", "zh": "辣味金枪鱼卷", "ko": "매운 참치 롤", "pl": "Ostra rolka z tuńczykiem", "ms": "Roll tuna pedas", "id": "Roll tuna pedas", "th": "โรลทูน่าเผ็ด", "vi": "Roll cá ngừ cay", "es": "Roll de atún picante", "ro": "Roll cu ton picant"}'),
 ((SELECT id FROM restaurants WHERE name = 'Café Europa' LIMIT 1), 'Croissant', 'Buttery French croissant', 250, 'Pastry', '{"en": "Croissant", "ja": "クロワッサン", "zh": "牛角面包", "ko": "크루아상", "pl": "Croissant", "ms": "Croissant", "id": "Croissant", "th": "ครัวซองต์", "vi": "Croissant", "es": "Croissant", "ro": "Croissant"}', '{"en": "Buttery French croissant", "ja": "バターたっぷりのフランス風クロワッサン", "zh": "黄油丰富的法式牛角面包", "ko": "버터가 풍부한 프랑스식 크루아상", "pl": "Maślany francuski croissant", "ms": "Croissant Perancis berkrim", "id": "Croissant Prancis berlemak", "th": "ครัวซองต์ฝรั่งเศสที่มีเนย", "vi": "Croissant Pháp bơ", "es": "Croissant francés con mantequilla", "ro": "Croissant francez cu unt"}'),
-((SELECT id FROM restaurants WHERE name = 'Café Europa' LIMIT 1), 'Cappuccino', 'Italian coffee with steamed milk', 400, 'Beverage', '{"en": "Cappuccino", "ja": "カプチーノ", "zh": "卡布奇诺", "ko": "카푸치노", "pl": "Cappuccino", "ms": "Cappuccino", "id": "Cappuccino", "th": "คาปูชิโน", "vi": "Cappuccino", "es": "Cappuccino", "ro": "Cappuccino"}', '{"en": "Italian coffee with steamed milk", "ja": "蒸気で温めたミルクを使ったイタリアンコーヒー", "zh": "使用蒸汽加热牛奶的意大利咖啡", "ko": "증기로 데운 우유를 사용한 이탈리안 커피", "pl": "Włoska kawa z mlekiem na parze", "ms": "Kopi Itali dengan susu kukus", "id": "Kopi Italia dengan susu kukus", "th": "กาแฟอิตาลีกับนมร้อน", "vi": "Cà phê Ý với sữa hấp", "es": "Café italiano con leche al vapor", "ro": "Cafea italiană cu lapte aburit"}'); 
+((SELECT id FROM restaurants WHERE name = 'Café Europa' LIMIT 1), 'Cappuccino', 'Italian coffee with steamed milk', 400, 'Beverage', '{"en": "Cappuccino", "ja": "カプチーノ", "zh": "卡布奇诺", "ko": "카푸치노", "pl": "Cappuccino", "ms": "Cappuccino", "id": "Cappuccino", "th": "คาปูชิโน", "vi": "Cappuccino", "es": "Cappuccino", "ro": "Cappuccino"}', '{"en": "Italian coffee with steamed milk", "ja": "蒸気で温めたミルクを使ったイタリアンコーヒー", "zh": "使用蒸汽加热牛奶的意大利咖啡", "ko": "증기로 데운 우유를 사용한 이탈리안 커피", "pl": "Włoska kawa z mlekiem na parze", "ms": "Kopi Itali dengan susu kukus", "id": "Kopi Italia dengan susu kukus", "th": "กาแฟอิตาลีกับนมร้อน", "vi": "Cà phê Ý với sữa hấp", "es": "Café italiano con leche al vapor", "ro": "Cafea italiană cu lapte aburit"}');
+
+-- Verify the setup
+SELECT 'Database setup completed successfully!' as status;
+SELECT 'Restaurants with 11-language support:' as info;
+SELECT name, name_multilingual, address_multilingual, description_multilingual 
+FROM restaurants;
+
+SELECT 'Menus with 11-language support:' as info;
+SELECT name, name_multilingual, description_multilingual 
+FROM menus; 
