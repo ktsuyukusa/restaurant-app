@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Admin2FASetup } from '../components/Admin2FASetup';
+import { Admin2FASetup } from '@/components/Admin2FASetup';
 import { useNavigate } from 'react-router-dom';
 
 export default function Admin2FASetupPage() {
