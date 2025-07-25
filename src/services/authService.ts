@@ -1237,6 +1237,17 @@ class AuthService {
         return [];
     }
   }
+
+  // Reset password method
+  async resetPassword(email: string): Promise<{ error: any }> {
+    try {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      return { error };
+    } catch (error: any) {
+      return { error };
+    }
+  }
 }
 
 export default AuthService.getInstance(); 

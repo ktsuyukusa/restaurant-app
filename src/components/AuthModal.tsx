@@ -155,6 +155,28 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     onClose();
   };
 
+  const handleResetPassword = async () => {
+    if (!loginData.email) {
+      setError('Please enter your email address first');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const { error } = await authService.resetPassword(loginData.email);
+      if (error) {
+        setError(`Failed to send reset email: ${error.message}`);
+      } else {
+        setError(null);
+        alert('Password reset email sent! Please check your inbox.');
+      }
+    } catch (error: any) {
+      setError(`Failed to send reset email: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -297,6 +319,17 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                           ) : (
                             <Eye className="h-4 w-4" />
                           )}
+                        </Button>
+                      </div>
+                      <div className="text-right mt-1">
+                        <Button
+                          type="button"
+                          variant="link"
+                          size="sm"
+                          className="text-blue-600 hover:text-blue-800 p-0 h-auto"
+                          onClick={handleResetPassword}
+                        >
+                          {t('auth.forgot_password', 'Forgot password?')}
                         </Button>
                       </div>
                     </div>
