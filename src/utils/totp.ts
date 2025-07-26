@@ -89,10 +89,10 @@ export class TOTP {
       throw new Error('Invalid hash length for TOTP generation');
     }
     
-    const code = ((hash[offset] & 0xff) << 24) |
-                 ((hash[offset + 1] & 0xff) << 16) |
-                 ((hash[offset + 2] & 0xff) << 8) |
-                 (hash[offset + 3] & 0xff);
+                    const code = ((hash[offset + 3] & 0xff) << 24) |
+                             ((hash[offset + 2] & 0xff) << 16) |
+                             ((hash[offset + 1] & 0xff) << 8) |
+                             (hash[offset] & 0xff);
 
     // Clear the high bit (RFC 6238 requirement)
     const maskedCode = code & 0x7fffffff;
