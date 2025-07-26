@@ -135,6 +135,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
       if (errorMessage === '2FA_REQUIRED') {
+        console.log('🔍 AuthModal: 2FA_REQUIRED detected, showing 2FA modal');
         setPendingLoginData(loginData);
         setShowTwoFactorAuth(true);
       } else {
@@ -146,8 +147,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   };
 
   const handle2FAVerification = async (code: string) => {
-    if (!pendingLoginData) return;
+    console.log('🔍 AuthModal: 2FA verification called with code:', code);
+    if (!pendingLoginData) {
+      console.log('🔍 AuthModal: No pending login data found');
+      return;
+    }
 
+    console.log('🔍 AuthModal: Calling authService.login with 2FA code');
     const user = await authService.login(pendingLoginData, code);
     login(pendingLoginData.email, pendingLoginData.password);
     setShowTwoFactorAuth(false);
