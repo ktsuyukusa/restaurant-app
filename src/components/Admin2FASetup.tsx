@@ -240,7 +240,11 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
                     value={secret} 
                     readOnly 
                     className="font-mono text-sm"
+                    style={{ minWidth: '300px' }}
                   />
+                  <div className="text-xs text-gray-500 mt-1">
+                    Secret length: {secret?.length || 0} characters
+                  </div>
                   <Button 
                     variant="outline" 
                     size="sm" 
