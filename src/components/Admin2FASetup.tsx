@@ -170,28 +170,26 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     setError('');
     setSuccess('New secret generated! Please scan the new QR code.');
     
-    // Also clear the database secret to force a fresh setup
+    // Update the database with the new secret
     try {
       const supabase = getSupabaseClient();
-      
       const { data: userData } = await supabase
         .from('users')
         .select('id')
         .eq('email', 'wasando.tsuyukusa@gmail.com')
         .single();
-      
       if (userData) {
         await supabase
           .from('admin_access')
           .update({
-            two_factor_secret: null,
+            two_factor_secret: newSecret,
             two_factor_enabled: false,
             updated_at: new Date().toISOString()
           })
           .eq('user_id', userData.id);
       }
     } catch (error) {
-      console.warn('Could not clear database secret:', error);
+      console.warn('Could not update database with new secret:', error);
     }
   };
 
