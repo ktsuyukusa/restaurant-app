@@ -8,7 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { TOTP } from 'jsotp';
+import { TOTPService, generateTOTPSecret } from '@/utils/totpService';
+import { TOTPQRCode } from '@/components/TOTPQRCode';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TwoFactorAuthModalProps {
@@ -40,11 +41,11 @@ export default function TwoFactorAuthModal({
   // Generate new secret when setup mode opens
   useEffect(() => {
     if (mode === 'setup' && isOpen && !secret) {
-      const newSecret = TOTP.generateSecret();
+      const newSecret = generateTOTPSecret();
       setSecret(newSecret);
       
-      const totp = new TOTP(newSecret);
-      const qrUrl = `otpauth://totp/Navikko%20Admin:${userEmail || 'admin@navikko.com'}?secret=${newSecret}&issuer=Navikko%20Admin`;
+      const totpService = new TOTPService({ secret: newSecret });
+      const qrUrl = totpService.generateQRCodeURL(userEmail || 'admin@navikko.com', 'Navikko Admin');
       setQrCodeUrl(qrUrl);
     }
   }, [mode, isOpen, secret, userEmail]);
@@ -53,8 +54,8 @@ export default function TwoFactorAuthModal({
   useEffect(() => {
     if (mode === 'verify' && isOpen) {
       const interval = setInterval(() => {
-        const totp = new TOTP(secret);
-        setRemainingTime(totp.getRemainingTime());
+        const totpService = new TOTPService({ secret });
+        setRemainingTime(totpService.getRemainingTime());
       }, 1000);
 
       return () => clearInterval(interval);
@@ -71,8 +72,8 @@ export default function TwoFactorAuthModal({
     setError('');
 
     try {
-      const totp = new TOTP(secret);
-      const isValid = totp.verify(verificationCode);
+      const totpService = new TOTPService({ secret });
+      const isValid = totpService.verifyCode(verificationCode);
       
       if (isValid) {
         setSuccess('2FA setup successful!');

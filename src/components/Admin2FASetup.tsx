@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { TOTP } from 'jsotp';
+import { TOTPService, generateTOTPSecret } from '@/utils/totpService';
+import { TOTPQRCode } from '@/components/TOTPQRCode';
 import { getSupabaseClient } from '@/lib/supabase';
 
 interface Admin2FASetupProps {
@@ -13,7 +14,7 @@ interface Admin2FASetupProps {
 }
 
 export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, onCancel }) => {
-  const [totp, setTotp] = useState<TOTP | null>(null);
+  const [totpService, setTotpService] = useState<TOTPService | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [secret, setSecret] = useState<string>('');
   const [verificationCode, setVerificationCode] = useState<string>('');
@@ -46,10 +47,10 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
             // Use existing secret from database
             console.log('2FA Setup: Using existing secret from database:', adminData.two_factor_secret);
             
-            const totp = new TOTP({ secret: adminData.two_factor_secret });
-            const qrUrl = `otpauth://totp/Navikko%20Admin:wasando.tsuyukusa@gmail.com?secret=${secret}&issuer=Navikko%20Admin`;
+            const totpService = new TOTPService({ secret: adminData.two_factor_secret });
+            const qrUrl = totpService.generateQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
             
-            setTotp(totp);
+            setTotpService(totpService);
             setSecret(adminData.two_factor_secret);
             setQrCodeUrl(qrUrl);
             
@@ -67,16 +68,16 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       let existingSecret = localStorage.getItem('admin_totp_secret');
       
       if (!existingSecret) {
-        // Generate new secret only if none exists anywhere
-        existingSecret = new TOTP().generateSecret();
+            // Generate new secret only if none exists anywhere
+    existingSecret = generateTOTPSecret();
         localStorage.setItem('admin_totp_secret', existingSecret);
       }
       
-      // Create TOTP instance with the exact secret
-      const totp = new TOTP({ secret: existingSecret });
-              const qrUrl = `otpauth://totp/Navikko%20Admin:wasando.tsuyukusa@gmail.com?secret=${secret}&issuer=Navikko%20Admin`;
+      // Create TOTP service with the exact secret
+      const totpService = new TOTPService({ secret: existingSecret });
+      const qrUrl = totpService.generateQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
       
-      setTotp(totp);
+      setTotpService(totpService);
       setSecret(existingSecret);
       setQrCodeUrl(qrUrl);
       
@@ -88,7 +89,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
   }, []);
 
   const handleVerifyCode = async () => {
-    if (!totp || !verificationCode) {
+    if (!totpService || !verificationCode) {
       setError('Please enter the verification code');
       return;
     }
@@ -98,9 +99,9 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
 
     try {
       console.log('2FA Verification: Checking code:', verificationCode, 'with secret:', secret);
-      console.log('2FA Verification: TOTP instance secret:', totp.getSecret());
+      console.log('2FA Verification: TOTP service secret:', totpService.getSecret());
       console.log('2FA Verification: UI secret state:', secret);
-      const isValid = totp.verify(verificationCode);
+      const isValid = totpService.verifyCode(verificationCode);
       
       if (isValid) {
         // Update the database with the new secret using Supabase
@@ -157,11 +158,11 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     // Clear old secret and generate new one
     localStorage.removeItem('admin_totp_secret');
     
-            const newSecret = TOTP.generateSecret();
-        const newTotp = new TOTP(newSecret);
-    const qrUrl = `otpauth://totp/Navikko%20Admin:wasando.tsuyukusa@gmail.com?secret=${newSecret}&issuer=Navikko%20Admin`;
+            const newSecret = generateTOTPSecret();
+    const newTotpService = new TOTPService({ secret: newSecret });
+    const qrUrl = newTotpService.generateQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
     
-    setTotp(newTotp);
+    setTotpService(newTotpService);
     setSecret(newSecret);
     setQrCodeUrl(qrUrl);
     
@@ -208,10 +209,11 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
         {qrCodeUrl && (
           <div className="flex flex-col items-center space-y-4">
             <div className="bg-white p-4 rounded-lg border">
-              <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrCodeUrl)}`}
-                alt="2FA QR Code"
-                className="w-48 h-48"
+              <TOTPQRCode 
+                secret={secret}
+                accountName="wasando.tsuyukusa@gmail.com"
+                issuer="Navikko Admin"
+                size={200}
               />
             </div>
             

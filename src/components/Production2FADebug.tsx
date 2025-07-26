@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { TOTP } from '@/utils/totp';
+import { TOTPService, generateTOTPCode } from '@/utils/totpService';
 
 interface Production2FADebugProps {
   isVisible?: boolean;
@@ -31,8 +31,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
 
     // Check 1: TOTP Implementation
     try {
-      const totp = new TOTP({ secret: DATABASE_SECRET });
-      const currentCode = await totp.generateCode();
+      const currentCode = generateTOTPCode(DATABASE_SECRET);
       setGeneratedCode(currentCode);
       addDebugInfo(`✅ TOTP implementation working. Current code: ${currentCode}`, 'success');
     } catch (error) {
@@ -48,9 +47,8 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
 
     // Check 3: Base32 decoding
     try {
-      const totp = new TOTP({ secret: DATABASE_SECRET });
       // Test base32 decoding by generating a code
-      await totp.generateCode();
+      generateTOTPCode(DATABASE_SECRET);
       addDebugInfo('✅ Base32 decoding working correctly', 'success');
     } catch (error) {
       addDebugInfo(`❌ Base32 decoding failed: ${error}`, 'error');
@@ -103,8 +101,8 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
     addDebugInfo(`🧪 Testing code: ${testCode}`, 'info');
 
     try {
-      const totp = new TOTP({ secret: DATABASE_SECRET });
-      const isValid = await totp.verifyCode(testCode);
+      const totpService = new TOTPService({ secret: DATABASE_SECRET });
+      const isValid = totpService.verifyCode(testCode);
       
       if (isValid) {
         addDebugInfo(`✅ Code ${testCode} is VALID!`, 'success');
@@ -112,8 +110,8 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
         addDebugInfo(`❌ Code ${testCode} is INVALID`, 'error');
         
         // Generate expected codes for comparison
-        const currentCode = await totp.generateCode();
-        const remaining = totp.getRemainingTime();
+        const currentCode = totpService.generateCode();
+        const remaining = totpService.getRemainingTime();
         addDebugInfo(`📱 Expected current code: ${currentCode} (expires in ${remaining}s)`, 'info');
       }
     } catch (error) {
@@ -125,9 +123,9 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
 
   const generateCurrentCode = async () => {
     try {
-      const totp = new TOTP({ secret: DATABASE_SECRET });
-      const code = await totp.generateCode();
-      const remaining = totp.getRemainingTime();
+      const totpService = new TOTPService({ secret: DATABASE_SECRET });
+      const code = totpService.generateCode();
+      const remaining = totpService.getRemainingTime();
       
       setGeneratedCode(code);
       setTestCode(code);
@@ -141,8 +139,8 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
   useEffect(() => {
     if (isVisible) {
       const interval = setInterval(() => {
-        const totp = new TOTP({ secret: DATABASE_SECRET });
-        setRemainingTime(totp.getRemainingTime());
+        const totpService = new TOTPService({ secret: DATABASE_SECRET });
+        setRemainingTime(totpService.getRemainingTime());
       }, 1000);
 
       return () => clearInterval(interval);

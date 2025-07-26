@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { validateAdminCode, getAdminLevel } from '@/config/adminCodes';
 import { getSupabaseClient } from '@/lib/supabase';
 import { ADMIN_CODES } from '@/config/adminCodes';
-import { TOTP } from 'jsotp';
+import { TOTPService, verifyTOTPCode } from '@/utils/totpService';
 import { authenticator } from 'otplib';
 
 // Types for authentication
@@ -732,9 +732,8 @@ class AuthService {
 
           console.log('🔍 Login 2FA Debug: Using secret from database:', user.adminAccess.twoFactorSecret);
           
-          // Use battle-tested jsotp library for verification
-          const totp = new TOTP(user.adminAccess.twoFactorSecret);
-          const isValid = totp.verify(twoFactorCode);
+          // Use speakeasy for reliable TOTP verification
+          const isValid = verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode);
           
           if (!isValid) {
             this.trackLoginAttempt(data.email, false);
@@ -1147,8 +1146,8 @@ class AuthService {
     }
 
     const secret = generateTOTPSecret();
-    const totp = new TOTP({ secret });
-          const qrCodeUrl = `otpauth://totp/Navikko%20Admin:${user.email}?secret=${secret}&issuer=Navikko%20Admin`;
+    const totpService = new TOTPService({ secret });
+    const qrCodeUrl = totpService.generateQRCodeURL(user.email, 'Navikko Admin');
 
     // Update user's 2FA secret (but don't enable yet)
     if (user.adminAccess) {
@@ -1196,7 +1195,7 @@ class AuthService {
       throw new Error('2FA not available for this account');
     }
 
-    return await verifyTOTPCode(user.adminAccess.twoFactorSecret, code);
+    return verifyTOTPCode(user.adminAccess.twoFactorSecret, code);
   }
 
   is2FAEnabled(userId: string): boolean {
