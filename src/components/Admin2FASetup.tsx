@@ -43,33 +43,19 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
             .single();
           
           if (adminData?.two_factor_secret) {
-            // Force generate new secret - old one was from different algorithm
-            console.log('2FA Setup: Clearing old secret and generating new one');
+            // Use existing secret from database
+            console.log('2FA Setup: Using existing secret from database:', adminData.two_factor_secret);
             
-            // Generate new secret and update database
-            const newSecret = new TOTP().generateSecret();
-            
-            // Update database with new secret
-            await supabase
-              .from('admin_access')
-              .update({
-                two_factor_secret: newSecret,
-                two_factor_enabled: false, // Reset to false until verified
-                updated_at: new Date().toISOString()
-              })
-              .eq('user_id', userData.id);
-            
-            const totp = new TOTP({ secret: newSecret });
+            const totp = new TOTP({ secret: adminData.two_factor_secret });
             const qrUrl = totp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
             
             setTotp(totp);
-            setSecret(newSecret);
+            setSecret(adminData.two_factor_secret);
             setQrCodeUrl(qrUrl);
             
-            localStorage.setItem('admin_totp_secret', newSecret);
+            localStorage.setItem('admin_totp_secret', adminData.two_factor_secret);
             
-            console.log('2FA Setup: Generated new secret:', newSecret);
-            console.log('2FA Setup: Set UI secret to:', newSecret);
+            console.log('2FA Setup: Set UI secret to:', adminData.two_factor_secret);
             return;
           }
         }
