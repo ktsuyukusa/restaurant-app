@@ -1,4 +1,4 @@
-import { TOTP as JSTOTP } from 'jsotp';
+import speakeasy from 'speakeasy';
 
 export interface TOTPConfig {
   secret: string;
@@ -9,7 +9,6 @@ export interface TOTPConfig {
 
 export class TOTP {
   private config: TOTPConfig;
-  private jsotp: JSTOTP;
 
   constructor(config: Partial<TOTPConfig> = {}) {
     this.config = {
@@ -18,38 +17,57 @@ export class TOTP {
       period: config.period || 30,
       algorithm: config.algorithm || 'SHA1'
     };
-    
-    this.jsotp = new JSTOTP(this.config.secret, {
-      digits: this.config.digits,
-      period: this.config.period,
-      algorithm: this.config.algorithm
-    });
   }
 
   generateSecret(): string {
-    return JSTOTP.generateSecret();
+    return speakeasy.generateSecret({
+      length: 32,
+      name: 'Navikko Admin'
+    }).base32;
   }
 
   // Generate current TOTP code
   async generateCode(): Promise<string> {
-    return this.jsotp.getToken();
+    return speakeasy.totp({
+      secret: this.config.secret,
+      digits: this.config.digits,
+      step: this.config.period,
+      algorithm: this.config.algorithm
+    });
   }
 
   // Generate TOTP code for a specific counter
   async generateCodeForCounter(counter: number): Promise<string> {
-    return this.jsotp.getToken(counter);
+    return speakeasy.totp({
+      secret: this.config.secret,
+      digits: this.config.digits,
+      step: this.config.period,
+      algorithm: this.config.algorithm,
+      counter: counter
+    });
   }
 
   // Verify a TOTP code
   async verifyCode(code: string, window: number = 1): Promise<boolean> {
-    return this.jsotp.verifyToken(code, window);
+    return speakeasy.totp.verify({
+      secret: this.config.secret,
+      token: code,
+      window: window,
+      step: this.config.period,
+      algorithm: this.config.algorithm
+    });
   }
 
   // Get QR code URL for mobile apps
   getQRCodeURL(accountName: string, issuer: string = 'Navikko'): string {
-    const secret = this.config.secret;
-    const url = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=${this.config.algorithm}&digits=${this.config.digits}&period=${this.config.period}`;
-    return url;
+    return speakeasy.otpauthURL({
+      secret: this.config.secret,
+      label: accountName,
+      issuer: issuer,
+      algorithm: this.config.algorithm,
+      digits: this.config.digits,
+      period: this.config.period
+    });
   }
 
   // Get secret for manual entry
@@ -59,21 +77,35 @@ export class TOTP {
 
   // Get remaining time for current code
   getRemainingTime(): number {
-    return this.jsotp.getRemainingTime();
+    const now = Math.floor(Date.now() / 1000);
+    const period = this.config.period;
+    return period - (now % period);
   }
 }
 
 // Utility functions
 export const generateTOTPSecret = (): string => {
-  return JSTOTP.generateSecret();
+  return speakeasy.generateSecret({
+    length: 32,
+    name: 'Navikko Admin'
+  }).base32;
 };
 
 export const verifyTOTPCode = async (secret: string, code: string, window: number = 1): Promise<boolean> => {
-  const totp = new JSTOTP(secret);
-  return totp.verifyToken(code, window);
+  return speakeasy.totp.verify({
+    secret: secret,
+    token: code,
+    window: window,
+    step: 30,
+    algorithm: 'SHA1'
+  });
 };
 
 export const generateTOTPCode = async (secret: string): Promise<string> => {
-  const totp = new JSTOTP(secret);
-  return totp.getToken();
+  return speakeasy.totp({
+    secret: secret,
+    digits: 6,
+    step: 30,
+    algorithm: 'SHA1'
+  });
 }; 
