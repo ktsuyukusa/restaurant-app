@@ -199,9 +199,12 @@ class AuthService {
 
   // Check if IP is allowed for admin access
   private isIPAllowedForAdmin(): boolean {
-    // For local development and testing, allow admin access
-    if (import.meta.env.DEV || window.location.hostname.includes('vercel.app')) {
-      console.log('🔧 Development/Testing mode: Admin IP restrictions disabled');
+    // For local development, testing, and production domains, allow admin access
+    if (import.meta.env.DEV || 
+        window.location.hostname.includes('vercel.app') ||
+        window.location.hostname === 'www.navikko.com' ||
+        window.location.hostname === 'navikko.com') {
+      console.log('🔧 Development/Testing/Production mode: Admin IP restrictions disabled');
       return true;
     }
     

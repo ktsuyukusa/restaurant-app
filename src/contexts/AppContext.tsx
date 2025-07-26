@@ -150,9 +150,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       const isLocalhost = window.location.hostname === 'localhost' || 
                          window.location.hostname === '127.0.0.1';
       const isVercel = window.location.hostname.includes('vercel.app');
+      const isProduction = window.location.hostname === 'www.navikko.com' || 
+                          window.location.hostname === 'navikko.com';
       
-      // For development, allow localhost and Vercel
-      if (!isLocalhost && !isVercel) {
+      // Allow localhost, Vercel, and production domains
+      if (!isLocalhost && !isVercel && !isProduction) {
         console.warn('Admin access attempted from non-authorized domain');
         return false;
       }
