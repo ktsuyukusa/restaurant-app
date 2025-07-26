@@ -18,7 +18,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
   const [isTesting, setIsTesting] = useState(false);
 
   // Database secret from your SQL files
-  const DATABASE_SECRET = 'GKHHSSHCMFWWFU3Q3NDBAMWJCSVV730Y';
+  const DATABASE_SECRET = 'PKKHZPR2QBZC54PTPEA7SVZ6ZNGE3MHI';
 
   const addDebugInfo = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
     const timestamp = new Date().toLocaleTimeString();
@@ -110,7 +110,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
         addDebugInfo(`❌ Code ${testCode} is INVALID`, 'error');
         
         // Generate expected codes for comparison
-        const currentCode = totpService.generateCode();
+        const currentCode = await totpService.generateCode();
         const remaining = totpService.getRemainingTime();
         addDebugInfo(`📱 Expected current code: ${currentCode} (expires in ${remaining}s)`, 'info');
       }
