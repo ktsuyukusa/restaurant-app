@@ -721,12 +721,17 @@ class AuthService {
       }
 
       if (userData.user_type === 'admin') {
-        // Load admin data first
-        const { data: adminData } = await supabase
+        // Load admin data first - force fresh data
+        console.log('🔍 Login Debug: Querying admin_access for user_id:', userData.id);
+        const { data: adminData, error: adminError } = await supabase
           .from('admin_access')
           .select('*')
           .eq('user_id', userData.id)
           .single();
+        
+        if (adminError) {
+          console.error('🔍 Login Debug: Admin data query error:', adminError);
+        }
 
         if (adminData) {
           user.adminAccess = {
@@ -736,6 +741,8 @@ class AuthService {
             twoFactorSecret: adminData.two_factor_secret,
             twoFactorEnabled: adminData.two_factor_enabled
           };
+          console.log('🔍 Login Debug: Admin data loaded for user ID:', userData.id);
+          console.log('🔍 Login Debug: Admin data:', adminData);
         }
 
         // Check 2FA for admin users
