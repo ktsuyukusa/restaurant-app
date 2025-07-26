@@ -101,17 +101,20 @@ export default function TwoFactorAuthModal({
     setError('');
 
     try {
+      console.log('🔍 TwoFactorAuthModal: Verifying code:', verificationCode);
       const isValid = await onVerify(verificationCode);
       
       if (isValid) {
+        console.log('🔍 TwoFactorAuthModal: Verification successful, closing modal');
         setSuccess('Verification successful!');
-        setTimeout(() => {
-          onClose();
-        }, 1500);
+        // Don't auto-close - let the parent component handle the flow
+        // The parent will close the modal after successful login
       } else {
+        console.log('🔍 TwoFactorAuthModal: Verification failed');
         setError('Invalid verification code. Please try again.');
       }
     } catch (err) {
+      console.log('🔍 TwoFactorAuthModal: Verification error:', err);
       setError('Verification failed. Please try again.');
     } finally {
       setIsVerifying(false);

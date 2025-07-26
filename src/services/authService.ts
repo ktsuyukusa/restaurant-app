@@ -171,7 +171,17 @@ class AuthService {
     const userData = localStorage.getItem('navikko_user_data');
     if (userData) {
       try {
-        this.currentUser = JSON.parse(userData);
+        const parsedUser = JSON.parse(userData);
+        
+        // SECURITY: Prevent admin users from being loaded without proper authentication
+        if (parsedUser.userType === 'admin') {
+          console.log('🔒 Admin user detected in storage - clearing for security');
+          this.clearStorage();
+          this.currentUser = null;
+          return;
+        }
+        
+        this.currentUser = parsedUser;
       } catch (error) {
         console.error('Error loading user data:', error);
         this.logout();
@@ -200,18 +210,15 @@ class AuthService {
 
   // Check if IP is allowed for admin access
   private isIPAllowedForAdmin(): boolean {
-    // For local development, testing, and production domains, allow admin access
-    if (import.meta.env.DEV || 
-        window.location.hostname.includes('vercel.app') ||
-        window.location.hostname === 'www.navikko.com' ||
-        window.location.hostname === 'navikko.com') {
-      console.log('🔧 Development/Testing/Production mode: Admin IP restrictions disabled');
+    // Only allow IP bypass for development environment
+    if (import.meta.env.DEV) {
+      console.log('🔧 Development mode: Admin IP restrictions disabled for testing');
       return true;
     }
     
-    // Always require IP restrictions for admin access in production
+    // For production, always enforce IP restrictions
     if (SECURITY_CONFIG.ALLOWED_ADMIN_IPS.length === 0) {
-      console.warn('No admin IPs configured - admin access blocked for security');
+      console.warn('⚠️ SECURITY WARNING: No admin IPs configured - admin access blocked');
       return false; // Block admin access if no IPs configured
     }
     
@@ -219,7 +226,9 @@ class AuthService {
     const isAllowed = SECURITY_CONFIG.ALLOWED_ADMIN_IPS.includes(clientIP);
     
     if (!isAllowed) {
-      console.warn(`Admin access blocked from IP: ${clientIP}. Allowed IPs: ${SECURITY_CONFIG.ALLOWED_ADMIN_IPS.join(', ')}`);
+      console.warn(`🚫 Admin access blocked from IP: ${clientIP}. Allowed IPs: ${SECURITY_CONFIG.ALLOWED_ADMIN_IPS.join(', ')}`);
+    } else {
+      console.log(`✅ Admin access allowed from IP: ${clientIP}`);
     }
     
     return isAllowed;
@@ -788,6 +797,11 @@ class AuthService {
 
   // Check if user is authenticated
   isAuthenticated(): boolean {
+    // SECURITY: Admin users cannot be authenticated without proper 2FA verification
+    if (this.currentUser?.userType === 'admin') {
+      console.log('🔒 Admin user authentication blocked - requires fresh 2FA verification');
+      return false;
+    }
     return !!this.currentUser;
   }
 
@@ -798,7 +812,12 @@ class AuthService {
 
   // Check if user is admin
   isAdmin(): boolean {
-    return this.currentUser?.userType === 'admin';
+    // SECURITY: Admin users cannot be considered admin without proper 2FA verification
+    if (this.currentUser?.userType === 'admin') {
+      console.log('🔒 Admin access blocked - requires fresh 2FA verification');
+      return false;
+    }
+    return false;
   }
 
   // Check if user is restaurant owner

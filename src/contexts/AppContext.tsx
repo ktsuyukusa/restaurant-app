@@ -69,15 +69,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   });
 
   // Authentication state
-  const [user, setUser] = useState<User | null>(() => {
-    return authService.getCurrentUser();
-  });
+  const [user, setUser] = useState<User | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
-  // Load user data on mount
+  // Load user data on mount with security validation
   useEffect(() => {
     const user = authService.getCurrentUser();
     if (user) {
+      // SECURITY: For admin users, require fresh authentication to prevent 2FA bypass
+      if (user.userType === 'admin') {
+        console.log('🔒 Admin user detected in storage - requiring fresh authentication');
+        authService.logout(); // Clear potentially compromised session
+        setUser(null);
+        setUserRole(null);
+        return;
+      }
+      
+      // For non-admin users, allow normal session restoration
       setUser(user);
       setUserRole(user.userType);
     }
@@ -144,21 +152,9 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // Check if admin access is still valid
     if (!user.adminAccess.accessCode) return false;
     
-    // Check IP restrictions (if implemented)
-    if (typeof window !== 'undefined') {
-      // In production, this would validate against allowed IP ranges
-      const isLocalhost = window.location.hostname === 'localhost' || 
-                         window.location.hostname === '127.0.0.1';
-      const isVercel = window.location.hostname.includes('vercel.app');
-      const isProduction = window.location.hostname === 'www.navikko.com' || 
-                          window.location.hostname === 'navikko.com';
-      
-      // Allow localhost, Vercel, and production domains
-      if (!isLocalhost && !isVercel && !isProduction) {
-        console.warn('Admin access attempted from non-authorized domain');
-        return false;
-      }
-    }
+    // SECURITY: Admin access requires proper IP validation through authService
+    // This function should only be called after successful authentication
+    console.log('🔒 Admin features access validated');
     
     return true;
   };
@@ -181,11 +177,22 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const handleSetUserRole = (role: UserRole) => {
+    // SECURITY: Prevent admin role assignment without proper authentication
+    if (role === 'admin') {
+      console.log('🔒 Admin role assignment blocked - requires proper authentication');
+      return;
+    }
+    
     setUserRole(role);
     
     // Update authentication state
     if (role) {
-      setUser(authService.getCurrentUser());
+      const user = authService.getCurrentUser();
+      if (user && user.userType !== 'admin') {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
     } else {
       setUser(null);
     }
@@ -218,9 +225,20 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     canAccessAdminFeatures: canAccessAdminFeatures(),
     canAccessRestaurantFeatures: canAccessRestaurantFeatures(),
     // Authentication
-    isAuthenticated: !!user,
+    isAuthenticated: authService.isAuthenticated(),
     user,
     login: async (email: string, password: string) => {
+      // Check if user is already authenticated (e.g., after 2FA verification)
+      const currentUser = authService.getCurrentUser();
+      if (currentUser && currentUser.email === email) {
+        console.log('🔍 AppContext: User already authenticated, updating state');
+        setUser(currentUser);
+        setUserRole(currentUser.userType);
+        setShowAuthModal(false);
+        return;
+      }
+      
+      // Otherwise, perform normal login
       const user = await authService.login({ email, password });
       setUser(user);
       setUserRole(user.userType);

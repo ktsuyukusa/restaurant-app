@@ -158,10 +158,15 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     try {
       console.log('🔍 AuthModal: Calling authService.login with 2FA code');
       const user = await authService.login(pendingLoginData, code);
+      
+      console.log('🔍 AuthModal: Login successful, updating app state');
       login(pendingLoginData.email, pendingLoginData.password);
+      
+      console.log('🔍 AuthModal: Closing 2FA modal and auth modal');
       setShowTwoFactorAuth(false);
       setPendingLoginData(null);
       onClose();
+      
       return true;
     } catch (error) {
       console.log('🔍 AuthModal: 2FA verification failed:', error);
