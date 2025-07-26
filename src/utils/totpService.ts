@@ -145,8 +145,11 @@ export const generateTOTPSecret = (): string => {
 };
 
 export const verifyTOTPCode = async (secret: string, token: string, window: number = 1): Promise<boolean> => {
+  console.log('🔍 TOTP Debug: Verifying token:', token, 'with secret:', secret);
   const totp = new TOTPService({ secret });
-  return totp.verifyCode(token, window);
+  const result = await totp.verifyCode(token, window);
+  console.log('🔍 TOTP Debug: Verification result:', result);
+  return result;
 };
 
 export const generateTOTPCode = async (secret: string): Promise<string> => {

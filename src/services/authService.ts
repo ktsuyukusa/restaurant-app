@@ -731,9 +731,12 @@ class AuthService {
           }
 
           console.log('🔍 Login 2FA Debug: Using secret from database:', user.adminAccess.twoFactorSecret);
+          console.log('🔍 Login 2FA Debug: Verifying code:', twoFactorCode);
           
           // Use browser-compatible TOTP verification
           const isValid = await verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode);
+          
+          console.log('🔍 Login 2FA Debug: Verification result:', isValid);
           
           if (!isValid) {
             this.trackLoginAttempt(data.email, false);
