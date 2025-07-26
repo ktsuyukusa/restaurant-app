@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Unlock Account Now</title>
+</head>
+<body>
+    <h1>Account Unlock Tool</h1>
+    <p>This will immediately clear all lockout data from your browser.</p>
+    <button onclick="unlockNow()">Unlock Account Now</button>
+    <div id="result"></div>
+    <script>
+        function unlockNow() {
+            try {
+                // Clear all lockout-related data
+                localStorage.removeItem('navikko_login_attempts');
+                localStorage.removeItem('navikko_lockout_until');
+                localStorage.removeItem('navikko_failed_attempts');
+                localStorage.removeItem('navikko_user_data');
+                localStorage.removeItem('navikko_user_role');
+                localStorage.removeItem('navikko_user_session');
+                localStorage.removeItem('navikko_user_preferences');
+                sessionStorage.clear();
+                
+                // Clear any caches
+                if (window.caches) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) {
+                            caches.delete(name);
+                        }
+                    });
+                }
+                
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: green;">✅ Account unlocked!</p>' +
+                    '<p>All lockout data cleared from browser.</p>' +
+                    '<p><a href="https://navikko.com" target="_blank">Go to Navikko</a></p>';
+                
+                console.log('Account unlock completed');
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: red;">❌ Error: ' + error.message + '</p>';
+                console.error('Unlock error:', error);
+            }
+        }
+        
+        // Show current lockout status
+        window.onload = function() {
+            const attempts = localStorage.getItem('navikko_login_attempts');
+            const lockout = localStorage.getItem('navikko_lockout_until');
+            let status = '<h3>Current Lockout Status:</h3>';
+            status += '<p>Login attempts: ' + (attempts || 'None') + '</p>';
+            status += '<p>Lockout until: ' + (lockout || 'None') + '</p>';
+            if (lockout) {
+                const lockoutTime = new Date(parseInt(lockout));
+                const now = new Date();
+                const remaining = Math.ceil((lockoutTime - now) / 1000 / 60);
+                status += '<p>Remaining lockout: ' + (remaining > 0 ? remaining + ' minutes' : 'Expired') + '</p>';
+            }
+            document.getElementById('result').innerHTML = status;
+        };
+    </script>
+</body>
+</html> 
