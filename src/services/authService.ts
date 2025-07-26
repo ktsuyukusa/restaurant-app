@@ -615,7 +615,7 @@ class AuthService {
 
   // Enhanced login method with security measures
   async login(data: LoginData, twoFactorCode?: string): Promise<User> {
-    console.log('Login attempt for email:', data.email);
+    console.log('Login attempt for email:', data.email, 'with 2FA code:', twoFactorCode ? 'provided' : 'not provided');
 
     // Check IP restriction for admin login
     if (data.email.includes('admin') && !this.isIPAllowedForAdmin()) {
@@ -745,9 +745,8 @@ class AuthService {
         }
       }
 
-      // Track successful login
+      // Track successful login and complete the login process
       this.trackLoginAttempt(data.email, true);
-
       this.currentUser = user;
       this.saveUserToStorage(user);
       console.log('Login successful for user:', user);
