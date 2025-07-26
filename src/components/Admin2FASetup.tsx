@@ -47,8 +47,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
             console.log('2FA Setup: Clearing old secret and generating new one');
             
             // Generate new secret and update database
-            const newTotp = new TOTP();
-            const newSecret = newTotp.generateSecret();
+            const newSecret = new TOTP().generateSecret();
             
             // Update database with new secret
             await supabase
@@ -83,8 +82,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       
       if (!existingSecret) {
         // Generate new secret only if none exists anywhere
-        const newTotp = new TOTP();
-        existingSecret = newTotp.generateSecret();
+        existingSecret = new TOTP().generateSecret();
         localStorage.setItem('admin_totp_secret', existingSecret);
       }
       
@@ -173,8 +171,8 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     // Clear old secret and generate new one
     localStorage.removeItem('admin_totp_secret');
     
-    const newTotp = new TOTP();
-    const newSecret = newTotp.generateSecret();
+    const newSecret = new TOTP().generateSecret();
+    const newTotp = new TOTP({ secret: newSecret });
     const qrUrl = newTotp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
     
     setTotp(newTotp);
