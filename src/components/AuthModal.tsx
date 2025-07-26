@@ -48,7 +48,7 @@ interface LoginFormData {
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
-  const { login, signup } = useAppContext();
+  const { login, signup, updateUserAfter2FA } = useAppContext();
   const [activeTab, setActiveTab] = useState('login');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -159,8 +159,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       console.log('🔍 AuthModal: Calling authService.login with 2FA code');
       const user = await authService.login(pendingLoginData, code);
       
-      console.log('🔍 AuthModal: Login successful, updating app state');
-      login(pendingLoginData.email, pendingLoginData.password);
+      console.log('🔍 AuthModal: Login successful, user authenticated:', user);
+      
+      // Update app state with the authenticated user
+      updateUserAfter2FA(user);
       
       console.log('🔍 AuthModal: Closing 2FA modal and auth modal');
       setShowTwoFactorAuth(false);

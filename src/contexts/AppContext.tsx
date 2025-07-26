@@ -37,6 +37,7 @@ interface AppContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (userData: unknown) => Promise<void>;
   logout: () => void;
+  updateUserAfter2FA: (user: User) => void;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
   hasRole: (role: 'customer' | 'restaurant_owner' | 'admin') => boolean;
@@ -205,6 +206,13 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     setCurrentView('restaurants');
   };
 
+  // Function to update user state after successful 2FA authentication
+  const updateUserAfter2FA = (user: User) => {
+    console.log('🔍 AppContext: Updating user state after successful 2FA:', user);
+    setUser(user);
+    setUserRole(user.userType);
+  };
+
   const value: AppContextType = {
     sidebarOpen,
     toggleSidebar,
@@ -251,6 +259,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setShowAuthModal(false);
     },
     logout,
+    updateUserAfter2FA,
     showAuthModal,
     setShowAuthModal,
     hasRole,
