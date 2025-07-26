@@ -142,7 +142,11 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
             ).data.id);
           
           if (error) {
-            console.warn('Failed to update database with 2FA secret, but setup is still valid:', error);
+            console.error('Failed to update database with 2FA secret:', error);
+            setError('Database update failed. Please try again.');
+            return;
+          } else {
+            console.log('✅ Database updated successfully with new 2FA secret:', secret);
           }
         } catch (dbError) {
           console.warn('Database update failed, but 2FA setup is still valid:', dbError);
