@@ -31,7 +31,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
 
     // Check 1: TOTP Implementation
     try {
-      const currentCode = generateTOTPCode(DATABASE_SECRET);
+      const currentCode = await generateTOTPCode(DATABASE_SECRET);
       setGeneratedCode(currentCode);
       addDebugInfo(`✅ TOTP implementation working. Current code: ${currentCode}`, 'success');
     } catch (error) {
@@ -102,7 +102,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
 
     try {
       const totpService = new TOTPService({ secret: DATABASE_SECRET });
-      const isValid = totpService.verifyCode(testCode);
+      const isValid = await totpService.verifyCode(testCode);
       
       if (isValid) {
         addDebugInfo(`✅ Code ${testCode} is VALID!`, 'success');
@@ -124,7 +124,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
   const generateCurrentCode = async () => {
     try {
       const totpService = new TOTPService({ secret: DATABASE_SECRET });
-      const code = totpService.generateCode();
+      const code = await totpService.generateCode();
       const remaining = totpService.getRemainingTime();
       
       setGeneratedCode(code);

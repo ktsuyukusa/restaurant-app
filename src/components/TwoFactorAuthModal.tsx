@@ -73,7 +73,7 @@ export default function TwoFactorAuthModal({
 
     try {
       const totpService = new TOTPService({ secret });
-      const isValid = totpService.verifyCode(verificationCode);
+      const isValid = await totpService.verifyCode(verificationCode);
       
       if (isValid) {
         setSuccess('2FA setup successful!');

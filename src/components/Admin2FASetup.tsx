@@ -101,7 +101,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       console.log('2FA Verification: Checking code:', verificationCode, 'with secret:', secret);
       console.log('2FA Verification: TOTP service secret:', totpService.getSecret());
       console.log('2FA Verification: UI secret state:', secret);
-      const isValid = totpService.verifyCode(verificationCode);
+      const isValid = await totpService.verifyCode(verificationCode);
       
       if (isValid) {
         // Update the database with the new secret using Supabase

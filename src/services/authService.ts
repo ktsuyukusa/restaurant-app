@@ -732,8 +732,8 @@ class AuthService {
 
           console.log('🔍 Login 2FA Debug: Using secret from database:', user.adminAccess.twoFactorSecret);
           
-          // Use speakeasy for reliable TOTP verification
-          const isValid = verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode);
+          // Use browser-compatible TOTP verification
+          const isValid = await verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode);
           
           if (!isValid) {
             this.trackLoginAttempt(data.email, false);
@@ -1195,7 +1195,7 @@ class AuthService {
       throw new Error('2FA not available for this account');
     }
 
-    return verifyTOTPCode(user.adminAccess.twoFactorSecret, code);
+    return await verifyTOTPCode(user.adminAccess.twoFactorSecret, code);
   }
 
   is2FAEnabled(userId: string): boolean {
