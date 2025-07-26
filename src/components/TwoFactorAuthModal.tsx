@@ -92,7 +92,10 @@ export default function TwoFactorAuthModal({
   };
 
   const handleVerifyCode = async () => {
+    console.log('🔍 TwoFactorAuthModal: handleVerifyCode called with code:', verificationCode);
+    
     if (!verificationCode || verificationCode.length !== 6) {
+      console.log('🔍 TwoFactorAuthModal: Invalid code length');
       setError('Please enter a 6-digit code');
       return;
     }
@@ -101,16 +104,17 @@ export default function TwoFactorAuthModal({
     setError('');
 
     try {
-      console.log('🔍 TwoFactorAuthModal: Verifying code:', verificationCode);
+      console.log('🔍 TwoFactorAuthModal: About to call onVerify with code:', verificationCode);
       const isValid = await onVerify(verificationCode);
+      console.log('🔍 TwoFactorAuthModal: onVerify returned:', isValid);
       
       if (isValid) {
-        console.log('🔍 TwoFactorAuthModal: Verification successful, closing modal');
+        console.log('🔍 TwoFactorAuthModal: Verification successful, setting success message');
         setSuccess('Verification successful!');
         // Don't auto-close - let the parent component handle the flow
         // The parent will close the modal after successful login
       } else {
-        console.log('🔍 TwoFactorAuthModal: Verification failed');
+        console.log('🔍 TwoFactorAuthModal: Verification failed, setting error');
         setError('Invalid verification code. Please try again.');
       }
     } catch (err) {
@@ -339,7 +343,10 @@ export default function TwoFactorAuthModal({
           )}
 
           <Button 
-            onClick={handleVerifyCode}
+            onClick={() => {
+              console.log('🔍 TwoFactorAuthModal: Verify Code button clicked');
+              handleVerifyCode();
+            }}
             disabled={isVerifying || verificationCode.length !== 6}
             className="w-full"
           >
