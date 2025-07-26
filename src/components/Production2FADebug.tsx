@@ -17,7 +17,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
   const [remainingTime, setRemainingTime] = useState(30);
   const [isTesting, setIsTesting] = useState(false);
 
-  // Database secret from your SQL files
+  // Database secret from your SQL files - UPDATED VERSION 2.0
   const DATABASE_SECRET = 'PKKHZPR2QBZC54PTPEA7SVZ6ZNGE3MHI';
 
   const addDebugInfo = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
@@ -27,7 +27,8 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
 
   const runDebugChecks = async () => {
     setDebugInfo([]);
-    addDebugInfo('=== Production 2FA Debug Started ===', 'info');
+    addDebugInfo('=== Production 2FA Debug Started (v2.0) ===', 'info');
+    addDebugInfo(`🔑 Using database secret: ${DATABASE_SECRET}`, 'info');
 
     // Check 1: TOTP Implementation
     try {
@@ -234,6 +235,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
           <p><strong>Database Secret:</strong> {DATABASE_SECRET}</p>
           <p><strong>Environment:</strong> {import.meta.env.MODE}</p>
           <p><strong>Deployment URL:</strong> {window.location.origin}</p>
+          <p><strong>Debug Version:</strong> 2.0 (Cache Bust)</p>
         </div>
       </CardContent>
     </Card>
