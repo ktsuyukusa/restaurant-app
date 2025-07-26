@@ -70,6 +70,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
             localStorage.setItem('admin_totp_secret', newSecret);
             
             console.log('2FA Setup: Generated new secret:', newSecret);
+            console.log('2FA Setup: Set UI secret to:', newSecret);
             return;
           }
         }
@@ -96,6 +97,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       setQrCodeUrl(qrUrl);
       
       console.log('2FA Setup: Using secret:', existingSecret);
+      console.log('2FA Setup: Set UI secret to:', existingSecret);
     };
     
     loadSecret();
@@ -112,6 +114,8 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
 
     try {
       console.log('2FA Verification: Checking code:', verificationCode, 'with secret:', secret);
+      console.log('2FA Verification: TOTP instance secret:', totp.getSecret());
+      console.log('2FA Verification: UI secret state:', secret);
       const isValid = await totp.verifyCode(verificationCode);
       
       if (isValid) {
