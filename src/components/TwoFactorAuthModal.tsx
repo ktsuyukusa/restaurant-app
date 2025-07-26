@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { generateTOTPSecret, verifyTOTPCode, TOTP } from '@/utils/totp';
+import { TOTP } from 'jsotp';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface TwoFactorAuthModalProps {
@@ -40,11 +40,11 @@ export default function TwoFactorAuthModal({
   // Generate new secret when setup mode opens
   useEffect(() => {
     if (mode === 'setup' && isOpen && !secret) {
-      const newSecret = generateTOTPSecret();
+      const newSecret = TOTP.generateSecret();
       setSecret(newSecret);
       
-      const totp = new TOTP({ secret: newSecret });
-      const qrUrl = totp.getQRCodeURL(userEmail || 'admin@navikko.com', 'Navikko Admin');
+      const totp = new TOTP(newSecret);
+      const qrUrl = `otpauth://totp/Navikko%20Admin:${userEmail || 'admin@navikko.com'}?secret=${newSecret}&issuer=Navikko%20Admin`;
       setQrCodeUrl(qrUrl);
     }
   }, [mode, isOpen, secret, userEmail]);
@@ -53,7 +53,7 @@ export default function TwoFactorAuthModal({
   useEffect(() => {
     if (mode === 'verify' && isOpen) {
       const interval = setInterval(() => {
-        const totp = new TOTP({ secret });
+        const totp = new TOTP(secret);
         setRemainingTime(totp.getRemainingTime());
       }, 1000);
 
@@ -71,7 +71,8 @@ export default function TwoFactorAuthModal({
     setError('');
 
     try {
-      const isValid = verifyTOTPCode(secret, verificationCode);
+      const totp = new TOTP(secret);
+      const isValid = totp.verify(verificationCode);
       
       if (isValid) {
         setSuccess('2FA setup successful!');
@@ -123,11 +124,11 @@ export default function TwoFactorAuthModal({
   };
 
   const generateNewSecret = () => {
-    const newSecret = generateTOTPSecret();
+    const newSecret = TOTP.generateSecret();
     setSecret(newSecret);
     
-    const totp = new TOTP({ secret: newSecret });
-    const qrUrl = totp.getQRCodeURL(userEmail || 'admin@navikko.com', 'Navikko Admin');
+    const totp = new TOTP(newSecret);
+    const qrUrl = `otpauth://totp/Navikko%20Admin:${userEmail || 'admin@navikko.com'}?secret=${newSecret}&issuer=Navikko%20Admin`;
     setQrCodeUrl(qrUrl);
     
     setVerificationCode('');

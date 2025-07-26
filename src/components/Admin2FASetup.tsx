@@ -47,7 +47,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
             console.log('2FA Setup: Using existing secret from database:', adminData.two_factor_secret);
             
             const totp = new TOTP({ secret: adminData.two_factor_secret });
-            const qrUrl = totp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+            const qrUrl = `otpauth://totp/Navikko%20Admin:wasando.tsuyukusa@gmail.com?secret=${secret}&issuer=Navikko%20Admin`;
             
             setTotp(totp);
             setSecret(adminData.two_factor_secret);
@@ -74,7 +74,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       
       // Create TOTP instance with the exact secret
       const totp = new TOTP({ secret: existingSecret });
-      const qrUrl = totp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+              const qrUrl = `otpauth://totp/Navikko%20Admin:wasando.tsuyukusa@gmail.com?secret=${secret}&issuer=Navikko%20Admin`;
       
       setTotp(totp);
       setSecret(existingSecret);
@@ -159,7 +159,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     
             const newSecret = TOTP.generateSecret();
         const newTotp = new TOTP(newSecret);
-    const qrUrl = newTotp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+    const qrUrl = `otpauth://totp/Navikko%20Admin:wasando.tsuyukusa@gmail.com?secret=${newSecret}&issuer=Navikko%20Admin`;
     
     setTotp(newTotp);
     setSecret(newSecret);

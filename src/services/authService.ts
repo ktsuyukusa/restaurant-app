@@ -1148,7 +1148,7 @@ class AuthService {
 
     const secret = generateTOTPSecret();
     const totp = new TOTP({ secret });
-    const qrCodeUrl = totp.getQRCodeURL(user.email, 'Navikko Admin');
+          const qrCodeUrl = `otpauth://totp/Navikko%20Admin:${user.email}?secret=${secret}&issuer=Navikko%20Admin`;
 
     // Update user's 2FA secret (but don't enable yet)
     if (user.adminAccess) {
