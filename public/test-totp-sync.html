@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TOTP Sync Test</title>
+</head>
+<body>
+    <h1>TOTP Time Synchronization Test</h1>
+    <p>This tests if the TOTP codes match between different implementations.</p>
+    
+    <button onclick="runTest()">Run TOTP Sync Test</button>
+    
+    <div id="result"></div>
+
+    <script>
+        // RFC 6238 TOTP implementation - exact same as the main app
+        class TOTP {
+            constructor(config = {}) {
+                this.config = {
+                    secret: config.secret || this.generateSecret(),
+                    digits: config.digits || 6,
+                    period: config.period || 30,
+                    algorithm: config.algorithm || 'SHA1'
+                };
+            }
+
+            generateSecret() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+                let secret = '';
+                for (let i = 0; i < 32; i++) {
+                    secret += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return secret;
+            }
+
+            base32ToBytes(base32) {
+                const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+                const bytes = [];
+                let bits = 0;
+                let value = 0;
+
+                for (let i = 0; i < base32.length; i++) {
+                    const char = base32[i].toUpperCase();
+                    const index = alphabet.indexOf(char);
+                    if (index === -1) continue;
+
+                    value = (value << 5) | index;
+                    bits += 5;
+
+                    if (bits >= 8) {
+                        bytes.push((value >>> (bits - 8)) & 0xFF);
+                        bits -= 8;
+                    }
+                }
+
+                return new Uint8Array(bytes);
+            }
+
+            async generateCode() {
+                const counter = Math.floor(Date.now() / 1000 / this.config.period);
+                return this.generateCodeForCounter(counter);
+            }
+
+            async generateCodeForCounter(counter) {
+                const buffer = new ArrayBuffer(8);
+                const view = new DataView(buffer);
+                view.setBigUint64(0, BigInt(counter), false);
+
+                const secretBytes = this.base32ToBytes(this.config.secret);
+
+                const key = await crypto.subtle.importKey(
+                    'raw',
+                    secretBytes,
+                    { name: 'HMAC', hash: 'SHA-1' },
+                    false,
+                    ['sign']
+                );
+
+                const signature = await crypto.subtle.sign('HMAC', key, buffer);
+                const hash = new Uint8Array(signature);
+
+                const offset = hash[hash.length - 1] & 0xf;
+                
+                if (offset + 3 >= hash.length) {
+                    throw new Error('Invalid hash length for TOTP generation');
+                }
+                
+                const code = ((hash[offset] & 0x7f) << 24) |
+                             ((hash[offset + 1] & 0xff) << 16) |
+                             ((hash[offset + 2] & 0xff) << 8) |
+                             (hash[offset + 3] & 0xff);
+
+                const modulo = Math.pow(10, this.config.digits);
+                return (code % modulo).toString().padStart(this.config.digits, '0');
+            }
+
+            async verifyCode(code, window = 1) {
+                for (let i = -window; i <= window; i++) {
+                    const counter = Math.floor(Date.now() / 1000 / this.config.period) + i;
+                    const expectedCode = await this.generateCodeForCounter(counter);
+                    if (expectedCode === code) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        async function runTest() {
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>Running test...</p>';
+
+            try {
+                const secret = 'GKHHSSHCMFWWFU3Q3NDBAMWJCSVV730Y';
+                const totp = new TOTP({ secret });
+
+                // Get current time info
+                const now = Date.now();
+                const counter = Math.floor(now / 1000 / 30);
+                const timeWindow = Math.floor(now / 1000 / 30) * 30;
+
+                // Generate codes for current and adjacent windows
+                const currentCode = await totp.generateCode();
+                const prevCode = await totp.generateCodeForCounter(counter - 1);
+                const nextCode = await totp.generateCodeForCounter(counter + 1);
+
+                let output = '<h3>Time Synchronization Test Results:</h3>';
+                output += `<p><strong>Current Time:</strong> ${new Date(now).toISOString()}</p>`;
+                output += `<p><strong>Counter:</strong> ${counter}</p>`;
+                output += `<p><strong>Time Window:</strong> ${new Date(timeWindow * 1000).toISOString()}</p>`;
+                output += `<p><strong>Current Code:</strong> ${currentCode}</p>`;
+                output += `<p><strong>Previous Code:</strong> ${prevCode}</p>`;
+                output += `<p><strong>Next Code:</strong> ${nextCode}</p>`;
+                output += `<p><strong>Secret:</strong> ${secret}</p>`;
+                output += '<p><strong>Test your Google Authenticator code against these values.</strong></p>';
+
+                result.innerHTML = output;
+
+            } catch (error) {
+                result.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 
