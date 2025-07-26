@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { TOTP } from '@/utils/totp';
+import { getSupabaseClient } from '@/lib/supabase';
 
 interface Admin2FASetupProps {
   onSetupComplete: () => void;
@@ -24,11 +25,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     // Try to get secret from database first, then localStorage, then generate new one
     const loadSecret = async () => {
       try {
-        const { createClient } = await import('@supabase/supabase-js');
-        const supabase = createClient(
-          'https://qqcoooscyzhyzmrcvsxi.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E'
-        );
+        const supabase = getSupabaseClient();
         
         // Get user ID first
         const { data: userData } = await supabase
@@ -120,11 +117,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       if (isValid) {
         // Update the database with the new secret using Supabase
         try {
-          const { createClient } = await import('@supabase/supabase-js');
-          const supabase = createClient(
-            'https://qqcoooscyzhyzmrcvsxi.supabase.co',
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E'
-          );
+          const supabase = getSupabaseClient();
           
           const { error } = await supabase
             .from('admin_access')
@@ -191,11 +184,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     
     // Also clear the database secret to force a fresh setup
     try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(
-        'https://qqcoooscyzhyzmrcvsxi.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E'
-      );
+      const supabase = getSupabaseClient();
       
       const { data: userData } = await supabase
         .from('users')

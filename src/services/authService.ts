@@ -759,7 +759,7 @@ class AuthService {
 
           console.log('🔍 Login 2FA Debug: Using secret from database:', user.adminAccess.twoFactorSecret);
           
-          const { verifyTOTPCode } = await import('../utils/totp');
+          const { verifyTOTPCode } = await import('@/utils/totp');
           const isValid = await verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode);
           
           if (!isValid) {
