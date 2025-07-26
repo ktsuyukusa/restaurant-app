@@ -1,4 +1,4 @@
-import { authenticator } from 'otplib';
+import { TOTP as JSTOTP } from 'jsotp';
 
 export interface TOTPConfig {
   secret: string;
@@ -9,6 +9,7 @@ export interface TOTPConfig {
 
 export class TOTP {
   private config: TOTPConfig;
+  private jsotp: JSTOTP;
 
   constructor(config: Partial<TOTPConfig> = {}) {
     this.config = {
@@ -17,30 +18,36 @@ export class TOTP {
       period: config.period || 30,
       algorithm: config.algorithm || 'SHA1'
     };
+    
+    this.jsotp = new JSTOTP(this.config.secret, {
+      digits: this.config.digits,
+      period: this.config.period,
+      algorithm: this.config.algorithm
+    });
   }
 
   generateSecret(): string {
-    return authenticator.generateSecret();
+    return JSTOTP.generateSecret();
   }
 
   // Generate current TOTP code
   async generateCode(): Promise<string> {
-    return authenticator.generate(this.config.secret);
+    return this.jsotp.getToken();
   }
 
   // Generate TOTP code for a specific counter
   async generateCodeForCounter(counter: number): Promise<string> {
-    return authenticator.generate(this.config.secret, { step: this.config.period, window: 0, counter });
+    return this.jsotp.getToken(counter);
   }
 
   // Verify a TOTP code
   async verifyCode(code: string, window: number = 1): Promise<boolean> {
-    return authenticator.verify({ token: code, secret: this.config.secret, window });
+    return this.jsotp.verifyToken(code, window);
   }
 
   // Get QR code URL for mobile apps
   getQRCodeURL(accountName: string, issuer: string = 'Navikko'): string {
-    return authenticator.keyuri(accountName, issuer, this.config.secret);
+    return this.jsotp.getQRCodeURL(accountName, issuer);
   }
 
   // Get secret for manual entry
@@ -50,19 +57,21 @@ export class TOTP {
 
   // Get remaining time for current code
   getRemainingTime(): number {
-    return authenticator.timeUsed(this.config.period) * this.config.period;
+    return this.jsotp.getRemainingTime();
   }
 }
 
 // Utility functions
 export const generateTOTPSecret = (): string => {
-  return authenticator.generateSecret();
+  return JSTOTP.generateSecret();
 };
 
 export const verifyTOTPCode = async (secret: string, code: string, window: number = 1): Promise<boolean> => {
-  return authenticator.verify({ token: code, secret, window });
+  const totp = new JSTOTP(secret);
+  return totp.verifyToken(code, window);
 };
 
 export const generateTOTPCode = async (secret: string): Promise<string> => {
-  return authenticator.generate(secret);
+  const totp = new JSTOTP(secret);
+  return totp.getToken();
 }; 
