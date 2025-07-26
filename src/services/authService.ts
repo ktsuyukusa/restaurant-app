@@ -154,6 +154,7 @@ class AuthService {
   private static instance: AuthService;
   private currentUser: User | null = null;
   private loginAttempts: Map<string, LoginAttempt> = new Map();
+  private admin2FAVerified: boolean = false; // Track if admin has completed 2FA
 
   private constructor() {
     this.loadUserFromStorage();
@@ -757,6 +758,13 @@ class AuthService {
       // Track successful login and complete the login process
       this.trackLoginAttempt(data.email, true);
       this.currentUser = user;
+      
+      // Mark admin as 2FA verified if they completed 2FA
+      if (user.userType === 'admin' && twoFactorCode) {
+        this.admin2FAVerified = true;
+        console.log('🔒 Admin 2FA verification completed successfully');
+      }
+      
       this.saveUserToStorage(user);
       console.log('Login successful for user:', user);
       return user;
@@ -769,6 +777,7 @@ class AuthService {
   // Logout method
   logout(): void {
     this.currentUser = null;
+    this.admin2FAVerified = false; // Reset 2FA verification on logout
     this.clearStorage();
   }
 
@@ -799,8 +808,13 @@ class AuthService {
   isAuthenticated(): boolean {
     // SECURITY: Admin users cannot be authenticated without proper 2FA verification
     if (this.currentUser?.userType === 'admin') {
-      console.log('🔒 Admin user authentication blocked - requires fresh 2FA verification');
-      return false;
+      if (this.admin2FAVerified) {
+        console.log('🔒 Admin user authenticated - 2FA verification completed');
+        return true;
+      } else {
+        console.log('🔒 Admin user authentication blocked - requires fresh 2FA verification');
+        return false;
+      }
     }
     return !!this.currentUser;
   }
@@ -814,8 +828,13 @@ class AuthService {
   isAdmin(): boolean {
     // SECURITY: Admin users cannot be considered admin without proper 2FA verification
     if (this.currentUser?.userType === 'admin') {
-      console.log('🔒 Admin access blocked - requires fresh 2FA verification');
-      return false;
+      if (this.admin2FAVerified) {
+        console.log('🔒 Admin access granted - 2FA verification completed');
+        return true;
+      } else {
+        console.log('🔒 Admin access blocked - requires fresh 2FA verification');
+        return false;
+      }
     }
     return false;
   }
