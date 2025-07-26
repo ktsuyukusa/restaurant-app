@@ -293,35 +293,7 @@ class AuthService {
   }
 
   // Generate 2FA code using proper TOTP
-  private async generate2FACode(): Promise<string> {
-    const { generateTOTPCode } = await import('../utils/totp');
-    const secret = this.getOrCreateTOTPSecret();
-    return await generateTOTPCode(secret);
-  }
-
-  // Validate 2FA code using proper TOTP
-  private async validate2FACode(inputCode: string): Promise<boolean> {
-    const { verifyTOTPCode } = await import('../utils/totp');
-    const secret = this.getOrCreateTOTPSecret();
-    return await verifyTOTPCode(secret, inputCode);
-  }
-
-  // Validate 2FA code using secret from user's admin access
-  private async validate2FACodeWithSecret(secret: string, inputCode: string): Promise<boolean> {
-    const { verifyTOTPCode } = await import('../utils/totp');
-    return await verifyTOTPCode(secret, inputCode);
-  }
-
-  // Get or create TOTP secret for admin
-  private getOrCreateTOTPSecret(): string {
-    let secret = localStorage.getItem('admin_totp_secret');
-    if (!secret) {
-      // If no secret in localStorage, try to get from database
-      console.warn('No TOTP secret found in localStorage. Please complete 2FA setup first.');
-      throw new Error('2FA not set up. Please complete 2FA setup first.');
-    }
-    return secret;
-  }
+  // Note: Old TOTP methods removed - login now uses database secret directly
 
   // Check if user exists in Supabase
   async checkUserExists(email: string): Promise<boolean> {
