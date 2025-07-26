@@ -46,51 +46,33 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
             .single();
           
           if (adminData?.two_factor_secret) {
-            // Use existing secret from database, but check if it's the right length
-            const existingSecret = adminData.two_factor_secret;
+            // Force generate new secret - old one was from different algorithm
+            console.log('2FA Setup: Clearing old secret and generating new one');
             
-            // Check if secret is properly sized (should be 32 characters for optimal security)
-            if (existingSecret.length < 32) {
-              console.log('2FA Setup: Existing secret too short, generating new one');
-              // Generate new secret and update database
-              const newTotp = new TOTP();
-              const newSecret = newTotp.generateSecret();
-              
-              // Update database with new secret
-              await supabase
-                .from('admin_access')
-                .update({
-                  two_factor_secret: newSecret,
-                  two_factor_enabled: false, // Reset to false until verified
-                  updated_at: new Date().toISOString()
-                })
-                .eq('user_id', userData.id);
-              
-              const totp = new TOTP({ secret: newSecret });
-              const qrUrl = totp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
-              
-              setTotp(totp);
-              setSecret(newSecret);
-              setQrCodeUrl(qrUrl);
-              
-              localStorage.setItem('admin_totp_secret', newSecret);
-              
-              console.log('2FA Setup: Generated new secret:', newSecret);
-              return;
-            }
+            // Generate new secret and update database
+            const newTotp = new TOTP();
+            const newSecret = newTotp.generateSecret();
             
-            // Use existing secret if it's properly sized
-            const totp = new TOTP({ secret: existingSecret });
+            // Update database with new secret
+            await supabase
+              .from('admin_access')
+              .update({
+                two_factor_secret: newSecret,
+                two_factor_enabled: false, // Reset to false until verified
+                updated_at: new Date().toISOString()
+              })
+              .eq('user_id', userData.id);
+            
+            const totp = new TOTP({ secret: newSecret });
             const qrUrl = totp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
             
             setTotp(totp);
-            setSecret(existingSecret);
+            setSecret(newSecret);
             setQrCodeUrl(qrUrl);
             
-            // Also update localStorage to keep it in sync
-            localStorage.setItem('admin_totp_secret', existingSecret);
+            localStorage.setItem('admin_totp_secret', newSecret);
             
-            console.log('2FA Setup: Using existing secret from database:', existingSecret);
+            console.log('2FA Setup: Generated new secret:', newSecret);
             return;
           }
         }
