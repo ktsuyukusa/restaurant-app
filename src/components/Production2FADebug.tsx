@@ -18,7 +18,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
   const [isTesting, setIsTesting] = useState(false);
 
   // Database secret from your SQL files
-  const DATABASE_SECRET = 'CQ7MZG63KORNYIJV2DRNNQ';
+  const DATABASE_SECRET = 'GKHHSSHCMFWWFU3Q3NDBAMWJCSVV730Y';
 
   const addDebugInfo = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
     const timestamp = new Date().toLocaleTimeString();
