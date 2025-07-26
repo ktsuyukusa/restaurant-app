@@ -138,6 +138,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         console.log('🔍 AuthModal: 2FA_REQUIRED detected, showing 2FA modal');
         setPendingLoginData(loginData);
         setShowTwoFactorAuth(true);
+        setIsLoading(false); // Stop loading when showing 2FA modal
+        return; // Don't set error, just show 2FA modal
       } else {
         setError(errorMessage);
       }
