@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Account Lockout</title>
+</head>
+<body>
+    <h1>Account Unlock Tool</h1>
+    <p>This will clear all lockout data from your browser.</p>
+    
+    <button onclick="unlockAccount()">Unlock Account</button>
+    
+    <div id="result"></div>
+
+    <script>
+        function unlockAccount() {
+            try {
+                // Clear all login attempt data
+                localStorage.removeItem('navikko_login_attempts');
+                localStorage.removeItem('navikko_user_data');
+                localStorage.removeItem('navikko_user_role');
+                localStorage.removeItem('navikko_user_session');
+                localStorage.removeItem('navikko_user_preferences');
+                
+                // Clear any session storage
+                sessionStorage.clear();
+                
+                // Clear any lockout timers
+                localStorage.removeItem('navikko_lockout_until');
+                localStorage.removeItem('navikko_failed_attempts');
+                
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: green;">✅ Account unlocked! All lockout data cleared.</p>' +
+                    '<p>You can now try logging in again.</p>';
+                
+                console.log('Account unlock completed');
+                
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: red;">❌ Error: ' + error.message + '</p>';
+                console.error('Unlock error:', error);
+            }
+        }
+        
+        // Show current lockout status
+        window.onload = function() {
+            const attempts = localStorage.getItem('navikko_login_attempts');
+            const lockout = localStorage.getItem('navikko_lockout_until');
+            
+            let status = '<h3>Current Status:</h3>';
+            status += '<p>Login attempts: ' + (attempts || 'None') + '</p>';
+            status += '<p>Lockout until: ' + (lockout || 'None') + '</p>';
+            
+            document.getElementById('result').innerHTML = status;
+        };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Force Unlock Account</title>
+</head>
+<body>
+    <h1>Force Account Unlock</h1>
+    <p>This will completely clear all lockout data and reset the login attempts.</p>
+    
+    <button onclick="forceUnlock()">Force Unlock Account</button>
+    
+    <div id="result"></div>
+
+    <script>
+        function forceUnlock() {
+            try {
+                // Clear the specific login attempts Map
+                localStorage.removeItem('navikko_login_attempts');
+                
+                // Clear all other potential lockout data
+                localStorage.removeItem('navikko_lockout_until');
+                localStorage.removeItem('navikko_failed_attempts');
+                localStorage.removeItem('navikko_user_data');
+                localStorage.removeItem('navikko_user_role');
+                localStorage.removeItem('navikko_user_session');
+                localStorage.removeItem('navikko_user_preferences');
+                localStorage.removeItem('admin_totp_secret');
+                
+                // Clear session storage
+                sessionStorage.clear();
+                
+                // Force clear any cached data
+                if (window.caches) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) {
+                            caches.delete(name);
+                        }
+                    });
+                }
+                
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: green;">✅ Account force unlocked!</p>' +
+                    '<p>All lockout data cleared. You can now try logging in again.</p>' +
+                    '<p><strong>Important:</strong> Wait 2-3 minutes for Vercel to deploy the latest changes before trying to log in.</p>';
+                
+                console.log('Force unlock completed');
+                
+            } catch (error) {
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: red;">❌ Error: ' + error.message + '</p>';
+                console.error('Force unlock error:', error);
+            }
+        }
+        
+        // Show current lockout status
+        window.onload = function() {
+            const attempts = localStorage.getItem('navikko_login_attempts');
+            const lockout = localStorage.getItem('navikko_lockout_until');
+            
+            let status = '<h3>Current Lockout Status:</h3>';
+            
+            if (attempts) {
+                try {
+                    const attemptsData = JSON.parse(attempts);
+                    status += '<p>Login attempts data: ' + JSON.stringify(attemptsData, null, 2) + '</p>';
+                } catch (e) {
+                    status += '<p>Login attempts: ' + attempts + '</p>';
+                }
+            } else {
+                status += '<p>Login attempts: None</p>';
+            }
+            
+            status += '<p>Lockout until: ' + (lockout || 'None') + '</p>';
+            
+            document.getElementById('result').innerHTML = status;
+        };
+    </script>
+</body>
+</html> 

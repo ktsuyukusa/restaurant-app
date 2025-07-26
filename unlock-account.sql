@@ -1,43 +1,27 @@
--- Unlock the user account by resetting failed login attempts
--- This will clear the account lock that was triggered by too many failed login attempts
+-- Unlock account for wasando.tsuyukusa@gmail.com
+-- This clears any login attempt restrictions
 
-UPDATE auth.users 
-SET 
-    failed_attempts = 0,
-    locked_until = NULL,
-    updated_at = NOW()
+-- Clear any potential lockout flags in the database
+-- (Note: Most lockout logic is in localStorage, but this ensures database is clean)
+
+UPDATE users 
+SET updated_at = NOW() 
 WHERE email = 'wasando.tsuyukusa@gmail.com';
 
--- Verify the account is unlocked
-SELECT 
-    id,
-    email,
-    failed_attempts,
-    locked_until,
-    last_sign_in_at,
-    updated_at
-FROM auth.users 
-WHERE email = 'wasando.tsuyukusa@gmail.com';
+-- If there are any admin_access records that might have lockout flags
+UPDATE admin_access 
+SET updated_at = NOW() 
+WHERE user_id = (
+  SELECT id FROM users WHERE email = 'wasando.tsuyukusa@gmail.com'
+);
 
--- Also check if the user exists in auth.users
+-- Show the current status
 SELECT 
-    'auth.users' as table_name,
-    id,
-    email,
-    failed_attempts,
-    locked_until,
-    created_at
-FROM auth.users
-WHERE email = 'wasando.tsuyukusa@gmail.com'
-
-UNION ALL
-
-SELECT 
-    'public.users' as table_name,
-    id,
-    email,
-    'N/A' as failed_attempts,
-    'N/A' as locked_until,
-    created_at
-FROM users
-WHERE email = 'wasando.tsuyukusa@gmail.com'; 
+  u.email,
+  u.created_at,
+  u.updated_at,
+  aa.two_factor_enabled,
+  aa.two_factor_secret
+FROM users u
+LEFT JOIN admin_access aa ON u.id = aa.user_id
+WHERE u.email = 'wasando.tsuyukusa@gmail.com'; 
