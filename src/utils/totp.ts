@@ -47,7 +47,9 @@ export class TOTP {
 
   // Get QR code URL for mobile apps
   getQRCodeURL(accountName: string, issuer: string = 'Navikko'): string {
-    return this.jsotp.getQRCodeURL(accountName, issuer);
+    const secret = this.config.secret;
+    const url = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=${this.config.algorithm}&digits=${this.config.digits}&period=${this.config.period}`;
+    return url;
   }
 
   // Get secret for manual entry
