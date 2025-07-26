@@ -21,25 +21,73 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
   const [success, setSuccess] = useState<string>('');
 
   useEffect(() => {
-    // Use consistent secret - either from localStorage or generate new one
-    let existingSecret = localStorage.getItem('admin_totp_secret');
+    // Try to get secret from database first, then localStorage, then generate new one
+    const loadSecret = async () => {
+      try {
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabase = createClient(
+          'https://qqcoooscyzhyzmrcvsxi.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E'
+        );
+        
+        // Get user ID first
+        const { data: userData } = await supabase
+          .from('users')
+          .select('id')
+          .eq('email', 'wasando.tsuyukusa@gmail.com')
+          .single();
+        
+        if (userData) {
+          // Get admin access data
+          const { data: adminData } = await supabase
+            .from('admin_access')
+            .select('two_factor_secret, two_factor_enabled')
+            .eq('user_id', userData.id)
+            .single();
+          
+          if (adminData?.two_factor_secret) {
+            // Use existing secret from database
+            const existingSecret = adminData.two_factor_secret;
+            const totp = new TOTP({ secret: existingSecret });
+            const qrUrl = totp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+            
+            setTotp(totp);
+            setSecret(existingSecret);
+            setQrCodeUrl(qrUrl);
+            
+            // Also update localStorage to keep it in sync
+            localStorage.setItem('admin_totp_secret', existingSecret);
+            
+            console.log('2FA Setup: Using existing secret from database:', existingSecret);
+            return;
+          }
+        }
+      } catch (error) {
+        console.warn('Could not load secret from database:', error);
+      }
+      
+      // Fallback to localStorage
+      let existingSecret = localStorage.getItem('admin_totp_secret');
+      
+      if (!existingSecret) {
+        // Generate new secret only if none exists anywhere
+        const newTotp = new TOTP();
+        existingSecret = newTotp.generateSecret();
+        localStorage.setItem('admin_totp_secret', existingSecret);
+      }
+      
+      // Create TOTP instance with the exact secret
+      const totp = new TOTP({ secret: existingSecret });
+      const qrUrl = totp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+      
+      setTotp(totp);
+      setSecret(existingSecret);
+      setQrCodeUrl(qrUrl);
+      
+      console.log('2FA Setup: Using secret:', existingSecret);
+    };
     
-    if (!existingSecret) {
-      // Generate new secret only if none exists
-      const newTotp = new TOTP();
-      existingSecret = newTotp.generateSecret();
-      localStorage.setItem('admin_totp_secret', existingSecret);
-    }
-    
-    // Create TOTP instance with the exact secret
-    const totp = new TOTP({ secret: existingSecret });
-    const qrUrl = totp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
-    
-    setTotp(totp);
-    setSecret(existingSecret);
-    setQrCodeUrl(qrUrl);
-    
-    console.log('2FA Setup: Using secret:', existingSecret);
+    loadSecret();
   }, []);
 
   const handleVerifyCode = async () => {
@@ -106,7 +154,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     setTimeout(() => setSuccess(''), 3000);
   };
 
-  const generateNewSecret = () => {
+  const generateNewSecret = async () => {
     // Clear old secret and generate new one
     localStorage.removeItem('admin_totp_secret');
     
@@ -122,6 +170,34 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     setVerificationCode('');
     setError('');
     setSuccess('New secret generated! Please scan the new QR code.');
+    
+    // Also clear the database secret to force a fresh setup
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(
+        'https://qqcoooscyzhyzmrcvsxi.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E'
+      );
+      
+      const { data: userData } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', 'wasando.tsuyukusa@gmail.com')
+        .single();
+      
+      if (userData) {
+        await supabase
+          .from('admin_access')
+          .update({
+            two_factor_secret: null,
+            two_factor_enabled: false,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userData.id);
+      }
+    } catch (error) {
+      console.warn('Could not clear database secret:', error);
+    }
   };
 
   return (

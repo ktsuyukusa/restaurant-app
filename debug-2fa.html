@@ -3,31 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOTP Test</title>
+    <title>2FA Debug</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
-        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .debug-info { margin: 10px 0; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
         .success { background-color: #d4edda; color: #155724; }
         .error { background-color: #f8d7da; color: #721c24; }
         .info { background-color: #d1ecf1; color: #0c5460; }
-        input, button { margin: 5px; padding: 5px; }
+        button { margin: 5px; padding: 8px 16px; }
+        input { margin: 5px; padding: 5px; width: 300px; }
     </style>
 </head>
 <body>
-    <h1>TOTP Implementation Test</h1>
+    <h1>2FA Debug Information</h1>
     
-    <div id="results"></div>
+    <div id="debugOutput"></div>
     
     <div>
-        <h3>Test with your secret:</h3>
-        <input type="text" id="secretInput" placeholder="Enter your TOTP secret" style="width: 300px;">
-        <input type="text" id="codeInput" placeholder="Enter 6-digit code" maxlength="6">
+        <h3>Test 2FA Code:</h3>
+        <input type="text" id="codeInput" placeholder="Enter 6-digit code from your authenticator app" maxlength="6">
         <button onclick="testCode()">Test Code</button>
         <button onclick="generateCode()">Generate Current Code</button>
     </div>
 
     <script type="module">
-        // TOTP implementation
+        // TOTP implementation (same as fixed version)
         class TOTP {
             constructor(config = {}) {
                 this.config = {
@@ -128,81 +128,115 @@
             }
         }
 
+        function addDebugInfo(message, type = 'info') {
+            const output = document.getElementById('debugOutput');
+            const div = document.createElement('div');
+            div.className = `debug-info ${type}`;
+            div.textContent = message;
+            output.appendChild(div);
+        }
+
+        // Check localStorage
+        function checkLocalStorage() {
+            addDebugInfo('=== LocalStorage Debug ===', 'info');
+            
+            const localSecret = localStorage.getItem('admin_totp_secret');
+            if (localSecret) {
+                addDebugInfo(`✅ Found secret in localStorage: ${localSecret}`, 'success');
+            } else {
+                addDebugInfo('❌ No secret found in localStorage', 'error');
+            }
+            
+            const userData = localStorage.getItem('navikko_user_data');
+            if (userData) {
+                try {
+                    const user = JSON.parse(userData);
+                    addDebugInfo(`✅ User data found: ${user.email} (${user.userType})`, 'success');
+                    if (user.adminAccess) {
+                        addDebugInfo(`✅ Admin access: ${user.adminAccess.level}`, 'success');
+                        if (user.adminAccess.twoFactorSecret) {
+                            addDebugInfo(`✅ 2FA secret in user data: ${user.adminAccess.twoFactorSecret}`, 'success');
+                        } else {
+                            addDebugInfo('❌ No 2FA secret in user data', 'error');
+                        }
+                    }
+                } catch (e) {
+                    addDebugInfo(`❌ Error parsing user data: ${e.message}`, 'error');
+                }
+            } else {
+                addDebugInfo('❌ No user data found in localStorage', 'error');
+            }
+        }
+
+        // Check database (simulated)
+        async function checkDatabase() {
+            addDebugInfo('=== Database Debug ===', 'info');
+            
+            // Known database secret from the SQL file
+            const dbSecret = 'CQ7MZG63KORNYIJV2DRNNQ';
+            addDebugInfo(`📋 Database secret (from SQL): ${dbSecret}`, 'info');
+            
+            // Check if localStorage secret matches database
+            const localSecret = localStorage.getItem('admin_totp_secret');
+            if (localSecret === dbSecret) {
+                addDebugInfo('✅ localStorage secret matches database secret', 'success');
+            } else if (localSecret) {
+                addDebugInfo(`❌ localStorage secret (${localSecret}) does NOT match database secret (${dbSecret})`, 'error');
+            } else {
+                addDebugInfo('❌ No localStorage secret to compare', 'error');
+            }
+        }
+
         // Test functions
         window.testCode = async function() {
-            const secret = document.getElementById('secretInput').value.trim();
             const code = document.getElementById('codeInput').value.trim();
             
-            if (!secret || !code) {
-                addResult('Please enter both secret and code', 'error');
+            if (!code) {
+                addDebugInfo('Please enter a code to test', 'error');
                 return;
             }
 
+            // Test with database secret
+            const dbSecret = 'CQ7MZG63KORNYIJV2DRNNQ';
+            const totp = new TOTP({ secret: dbSecret });
+            
             try {
-                const totp = new TOTP({ secret });
                 const isValid = await totp.verifyCode(code);
                 
                 if (isValid) {
-                    addResult(`✅ Code ${code} is VALID for secret: ${secret}`, 'success');
+                    addDebugInfo(`✅ Code ${code} is VALID with database secret`, 'success');
                 } else {
-                    addResult(`❌ Code ${code} is INVALID for secret: ${secret}`, 'error');
+                    addDebugInfo(`❌ Code ${code} is INVALID with database secret`, 'error');
                 }
             } catch (error) {
-                addResult(`Error: ${error.message}`, 'error');
+                addDebugInfo(`Error testing code: ${error.message}`, 'error');
             }
         };
 
         window.generateCode = async function() {
-            const secret = document.getElementById('secretInput').value.trim();
+            const dbSecret = 'CQ7MZG63KORNYIJV2DRNNQ';
+            const totp = new TOTP({ secret: dbSecret });
             
-            if (!secret) {
-                addResult('Please enter a secret first', 'error');
-                return;
-            }
-
             try {
-                const totp = new TOTP({ secret });
                 const code = await totp.generateCode();
                 const remaining = totp.getRemainingTime();
                 
-                addResult(`Current code for secret ${secret}: ${code} (expires in ${remaining}s)`, 'info');
+                addDebugInfo(`📱 Current code for database secret: ${code} (expires in ${remaining}s)`, 'info');
                 document.getElementById('codeInput').value = code;
             } catch (error) {
-                addResult(`Error generating code: ${error.message}`, 'error');
+                addDebugInfo(`Error generating code: ${error.message}`, 'error');
             }
         };
 
-        function addResult(message, type) {
-            const results = document.getElementById('results');
-            const div = document.createElement('div');
-            div.className = `test-result ${type}`;
-            div.textContent = message;
-            results.appendChild(div);
-        }
-
-        // Auto-test with a known secret
-        async function runAutoTest() {
-            addResult('Running automatic tests...', 'info');
-            
-            const testSecret = 'JBSWY3DPEHPK3PXP';
-            
-            try {
-                const totp = new TOTP({ secret: testSecret });
-                const code = await totp.generateCode();
-                const isValid = await totp.verifyCode(code);
-                
-                if (isValid) {
-                    addResult(`✅ Auto-test PASSED: Generated code ${code} is valid`, 'success');
-                } else {
-                    addResult(`❌ Auto-test FAILED: Generated code ${code} is invalid`, 'error');
-                }
-            } catch (error) {
-                addResult(`❌ Auto-test ERROR: ${error.message}`, 'error');
-            }
-        }
-
-        // Run auto-test when page loads
-        runAutoTest();
+        // Run debug checks
+        checkLocalStorage();
+        checkDatabase();
+        
+        addDebugInfo('=== Instructions ===', 'info');
+        addDebugInfo('1. Check if localStorage secret matches database secret above', 'info');
+        addDebugInfo('2. If they don\'t match, the 2FA setup needs to be redone', 'info');
+        addDebugInfo('3. Use the "Generate Current Code" button to get the expected code', 'info');
+        addDebugInfo('4. Compare it with your authenticator app code', 'info');
     </script>
 </body>
 </html> 

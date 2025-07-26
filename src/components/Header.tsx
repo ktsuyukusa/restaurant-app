@@ -1,11 +1,12 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Menu, ShoppingCart, User, Bell, LogIn, LogOut, Settings, Crown } from 'lucide-react';
+import { Menu, ShoppingCart, User, Bell, LogIn, LogOut, Settings, Crown, Bug } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAppContext } from '@/contexts/AppContext';
 import AuthModal from './AuthModal';
+import { Link } from 'react-router-dom';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -155,6 +156,20 @@ const Header: React.FC<HeaderProps> = ({
               >
                 <Crown className="h-5 w-5" />
               </Button>
+            )}
+            
+            {/* Debug Tool (Admin Only) */}
+            {isAdmin && (
+              <Link to="/2fa-debug">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-gray-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                  title="2FA Debug Tool"
+                >
+                  <Bug className="h-5 w-5" />
+                </Button>
+              </Link>
             )}
           </div>
         </div>

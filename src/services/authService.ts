@@ -303,6 +303,12 @@ class AuthService {
     return await verifyTOTPCode(secret, inputCode);
   }
 
+  // Validate 2FA code using secret from user's admin access
+  private async validate2FACodeWithSecret(secret: string, inputCode: string): Promise<boolean> {
+    const { verifyTOTPCode } = await import('../utils/totp');
+    return await verifyTOTPCode(secret, inputCode);
+  }
+
   // Get or create TOTP secret for admin
   private getOrCreateTOTPSecret(): string {
     let secret = localStorage.getItem('admin_totp_secret');
@@ -712,21 +718,7 @@ class AuthService {
       }
 
       if (userData.user_type === 'admin') {
-        // Check 2FA for admin users
-        if (this.requires2FA(userData.user_type)) {
-          if (!twoFactorCode) {
-            // For proper TOTP, we don't generate a code - user gets it from authenticator app
-            throw new Error('2FA_REQUIRED');
-          }
-
-          // Validate 2FA code using TOTP
-          const isValid = await this.validate2FACode(twoFactorCode);
-          if (!isValid) {
-            this.trackLoginAttempt(data.email, false);
-            throw new Error('Invalid 2FA code');
-          }
-        }
-
+        // Load admin data first
         const { data: adminData } = await supabase
           .from('admin_access')
           .select('*')
@@ -737,8 +729,31 @@ class AuthService {
           user.adminAccess = {
             level: adminData.level,
             permissions: adminData.permissions,
-            accessCode: adminData.access_code
+            accessCode: adminData.access_code,
+            twoFactorSecret: adminData.two_factor_secret,
+            twoFactorEnabled: adminData.two_factor_enabled
           };
+        }
+
+        // Check 2FA for admin users
+        if (this.requires2FA(userData.user_type)) {
+          if (!twoFactorCode) {
+            // For proper TOTP, we don't generate a code - user gets it from authenticator app
+            throw new Error('2FA_REQUIRED');
+          }
+
+          // Validate 2FA code using TOTP with secret from database
+          if (!user.adminAccess?.twoFactorSecret) {
+            throw new Error('2FA not set up. Please complete 2FA setup first.');
+          }
+
+          const { verifyTOTPCode } = await import('../utils/totp');
+          const isValid = await verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode);
+          
+          if (!isValid) {
+            this.trackLoginAttempt(data.email, false);
+            throw new Error('Invalid 2FA code');
+          }
         }
       }
 

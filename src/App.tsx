@@ -11,6 +11,7 @@ import OrderSuccess from '@/pages/OrderSuccess';
 import OrderCancel from '@/pages/OrderCancel';
 import CommercialTransactionAct from '@/pages/CommercialTransactionAct';
 import Admin2FASetup from '@/pages/Admin2FASetup';
+import { Production2FADebug } from '@/components/Production2FADebug';
 import './App.css';
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/order-cancel" element={<OrderCancel />} />
           <Route path="/admin-2fa-setup" element={<Admin2FASetup />} />
+          <Route path="/2fa-debug" element={<Production2FADebug isVisible={true} />} />
           <Route path="/app/*" element={<AppLayout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
