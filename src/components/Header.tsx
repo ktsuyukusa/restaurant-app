@@ -32,7 +32,8 @@ const Header: React.FC<HeaderProps> = ({
     user, 
     logout, 
     showAuthModal, 
-    setShowAuthModal 
+    setShowAuthModal,
+    isAdmin
   } = useAppContext();
 
   return (
