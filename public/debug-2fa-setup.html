@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>2FA Setup Debug</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsotp@2.0.0/dist/jsotp.min.js"></script>
+</head>
+<body>
+    <h1>2FA Setup Debug</h1>
+    
+    <div id="output"></div>
+    
+    <script>
+        const output = document.getElementById('output');
+        
+        try {
+            // Test jsotp library
+            const secret = TOTP.generateSecret();
+            output.innerHTML += `<p><strong>Generated Secret:</strong> ${secret}</p>`;
+            
+            const totp = new TOTP(secret);
+            output.innerHTML += `<p><strong>TOTP Instance:</strong> ${totp ? 'Created successfully' : 'Failed'}</p>`;
+            
+            // Generate QR URL
+            const qrUrl = `otpauth://totp/Navikko%20Admin:wasando.tsuyukusa@gmail.com?secret=${secret}&issuer=Navikko%20Admin`;
+            output.innerHTML += `<p><strong>QR URL:</strong> ${qrUrl}</p>`;
+            
+            // Generate current code
+            const currentCode = totp.getCode();
+            output.innerHTML += `<p><strong>Current Code:</strong> ${currentCode}</p>`;
+            
+            // Test verification
+            const isValid = totp.verify(currentCode);
+            output.innerHTML += `<p><strong>Verification Test:</strong> ${isValid ? 'PASS' : 'FAIL'}</p>`;
+            
+            // Show QR code
+            const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrUrl)}`;
+            output.innerHTML += `<p><strong>QR Code:</strong></p><img src="${qrImageUrl}" alt="QR Code" />`;
+            
+        } catch (error) {
+            output.innerHTML += `<p style="color: red;"><strong>Error:</strong> ${error.message}</p>`;
+        }
+    </script>
+</body>
+</html> 
