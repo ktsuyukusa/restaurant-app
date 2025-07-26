@@ -148,19 +148,25 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handle2FAVerification = async (code: string) => {
+  const handle2FAVerification = async (code: string): Promise<boolean> => {
     console.log('🔍 AuthModal: 2FA verification called with code:', code);
     if (!pendingLoginData) {
       console.log('🔍 AuthModal: No pending login data found');
-      return;
+      return false;
     }
 
-    console.log('🔍 AuthModal: Calling authService.login with 2FA code');
-    const user = await authService.login(pendingLoginData, code);
-    login(pendingLoginData.email, pendingLoginData.password);
-    setShowTwoFactorAuth(false);
-    setPendingLoginData(null);
-    onClose();
+    try {
+      console.log('🔍 AuthModal: Calling authService.login with 2FA code');
+      const user = await authService.login(pendingLoginData, code);
+      login(pendingLoginData.email, pendingLoginData.password);
+      setShowTwoFactorAuth(false);
+      setPendingLoginData(null);
+      onClose();
+      return true;
+    } catch (error) {
+      console.log('🔍 AuthModal: 2FA verification failed:', error);
+      return false;
+    }
   };
 
   const handleResetPassword = async () => {
