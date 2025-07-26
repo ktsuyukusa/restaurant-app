@@ -2,7 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { validateAdminCode, getAdminLevel } from '@/config/adminCodes';
 import { getSupabaseClient } from '@/lib/supabase';
 import { ADMIN_CODES } from '@/config/adminCodes';
-import { generateTOTPSecret, verifyTOTPCode, TOTP } from '@/utils/totp';
+import { TOTP } from 'jsotp';
+import { authenticator } from 'otplib';
 
 // Types for authentication
 export interface User {
@@ -731,8 +732,9 @@ class AuthService {
 
           console.log('🔍 Login 2FA Debug: Using secret from database:', user.adminAccess.twoFactorSecret);
           
-          const { verifyTOTPCode } = await import('@/utils/totp');
-          const isValid = await verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode);
+          // Use battle-tested jsotp library for verification
+          const totp = new TOTP(user.adminAccess.twoFactorSecret);
+          const isValid = totp.verify(twoFactorCode);
           
           if (!isValid) {
             this.trackLoginAttempt(data.email, false);

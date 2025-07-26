@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { TOTP } from '@/utils/totp';
+import { TOTP } from 'jsotp';
 import { getSupabaseClient } from '@/lib/supabase';
 
 interface Admin2FASetupProps {
@@ -100,7 +100,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       console.log('2FA Verification: Checking code:', verificationCode, 'with secret:', secret);
       console.log('2FA Verification: TOTP instance secret:', totp.getSecret());
       console.log('2FA Verification: UI secret state:', secret);
-      const isValid = await totp.verifyCode(verificationCode);
+      const isValid = totp.verify(verificationCode);
       
       if (isValid) {
         // Update the database with the new secret using Supabase
@@ -157,8 +157,8 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
     // Clear old secret and generate new one
     localStorage.removeItem('admin_totp_secret');
     
-    const newSecret = new TOTP().generateSecret();
-    const newTotp = new TOTP({ secret: newSecret });
+            const newSecret = TOTP.generateSecret();
+        const newTotp = new TOTP(newSecret);
     const qrUrl = newTotp.getQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
     
     setTotp(newTotp);
