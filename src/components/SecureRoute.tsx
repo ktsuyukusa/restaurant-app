@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/contexts/AppContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ const SecureRoute: React.FC<SecureRouteProps> = ({
 }) => {
   const { hasRole, isAuthenticated, canAccessAdminFeatures, canAccessRestaurantFeatures, logout } = useAppContext();
   const { t } = useLanguage();
+  const navigate = useNavigate();
 
   // Check if user has the required role
   const hasRequiredRole = hasRole(requiredRole);
@@ -51,7 +53,7 @@ const SecureRoute: React.FC<SecureRouteProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <Button onClick={() => window.location.href = '/'}>
+          <Button onClick={() => navigate('/')}>
             {t('auth.goToLogin')}
           </Button>
         </CardContent>
@@ -70,7 +72,7 @@ const SecureRoute: React.FC<SecureRouteProps> = ({
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">
-          <Button onClick={() => window.location.href = '/'}>
+          <Button onClick={() => navigate('/')}>
             {t('auth.backToHome')}
           </Button>
         </CardContent>
@@ -95,7 +97,7 @@ const SecureRoute: React.FC<SecureRouteProps> = ({
             {requiredRole === 'restaurant_owner' && t('auth.subscriptionExpiredMessage')}
           </p>
           <div className="space-x-2">
-            <Button variant="outline" onClick={() => window.location.href = '/'}>
+            <Button variant="outline" onClick={() => navigate('/')}>
               {t('auth.backToHome')}
             </Button>
             <Button variant="destructive" onClick={logout}>

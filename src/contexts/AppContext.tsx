@@ -20,8 +20,6 @@ interface AppContextType {
   removeFromCart: (itemId: string) => void;
   updateCartQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
-  currentView: 'restaurants' | 'restaurant-details' | 'cart' | 'profile' | 'users' | 'menus' | 'reservations' | 'dashboard' | 'orders' | 'menu-management' | 'role-switcher' | 'subscription';
-  setCurrentView: (view: 'restaurants' | 'restaurant-details' | 'cart' | 'profile' | 'users' | 'menus' | 'reservations' | 'dashboard' | 'orders' | 'menu-management' | 'role-switcher' | 'subscription') => void;
   selectedRestaurantId: string | null;
   setSelectedRestaurantId: (id: string | null) => void;
   userRole: UserRole;
@@ -60,7 +58,6 @@ interface AppProviderProps {
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [currentView, setCurrentView] = useState<'restaurants' | 'restaurant-details' | 'cart' | 'profile' | 'users' | 'menus' | 'reservations' | 'dashboard' | 'orders' | 'menu-management' | 'role-switcher' | 'subscription'>('restaurants');
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string | null>(null);
   
   // Load user role from localStorage or default to null
@@ -203,7 +200,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     authService.logout();
     setUser(null);
     setUserRole(null);
-    setCurrentView('restaurants');
   };
 
   // Function to update user state after successful 2FA authentication
@@ -221,8 +217,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     removeFromCart,
     updateCartQuantity,
     clearCart,
-    currentView,
-    setCurrentView,
     selectedRestaurantId,
     setSelectedRestaurantId,
     userRole,

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAppContext } from '@/contexts/AppContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from 'react-router-dom';
+import authService from '@/services/authService';
 import Header from './Header';
 import Navigation from './Navigation';
 import RestaurantList from './RestaurantList';
@@ -25,8 +27,6 @@ const AppLayout: React.FC = () => {
     sidebarOpen, 
     toggleSidebar,
     cartItems,
-    currentView,
-    setCurrentView,
     selectedRestaurantId,
     setSelectedRestaurantId,
     userRole,
@@ -40,131 +40,141 @@ const AppLayout: React.FC = () => {
   
   const { t } = useLanguage();
   const isMobile = useIsMobile();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams();
+
+  // Extract current view from URL path
+  const getCurrentViewFromPath = (pathname: string) => {
+    const path = pathname.split('/')[1] || 'restaurants';
+    return path;
+  };
+
+  const currentView = getCurrentViewFromPath(location.pathname);
+
+  // Handle restaurant selection from URL
+  useEffect(() => {
+    if (location.pathname.startsWith('/restaurant/') && params.id) {
+      setSelectedRestaurantId(params.id);
+    } else if (location.pathname === '/restaurants') {
+      setSelectedRestaurantId(null);
+    }
+  }, [location.pathname, params.id, setSelectedRestaurantId]);
 
   const handleRestaurantSelect = (id: string) => {
     setSelectedRestaurantId(id);
-    setCurrentView('restaurant-details');
+    navigate(`/restaurant/${id}`);
   };
 
   const handleBackToRestaurants = () => {
     setSelectedRestaurantId(null);
-    setCurrentView('restaurants');
+    navigate('/restaurants');
   };
 
   const handleCartClick = () => {
-    setCurrentView('cart');
+    navigate('/cart');
   };
 
   const handleProfileClick = () => {
-    setCurrentView('profile');
+    navigate('/profile');
   };
 
   const handleAdminClick = () => {
-    setCurrentView('menu-management');
+    navigate('/menu-management');
   };
 
   const handleRoleSwitcherClick = () => {
-    setCurrentView('role-switcher');
+    navigate('/role-switcher');
   };
 
   const handleNavigate = (section: string) => {
-    setCurrentView(section as 'dashboard' | 'orders' | 'menu-management' | 'restaurants' | 'subscription' | 'users' | 'reservations' | 'restaurant-details' | 'cart' | 'profile' | 'menus' | 'role-switcher');
+    navigate(`/${section}`);
   };
 
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   const renderCurrentView = () => {
+    // Debug information (remove in production)
+    const debugInfo = {
+      isAuthenticated,
+      userRole,
+      currentView,
+      pathname: location.pathname,
+      user: user ? { id: user.id, email: user.email, userType: user.userType } : null,
+      authService: {
+        currentUser: authService.getCurrentUser() ? { 
+          id: authService.getCurrentUser()?.id, 
+          email: authService.getCurrentUser()?.email, 
+          userType: authService.getCurrentUser()?.userType 
+        } : null,
+        isAuthenticated: authService.isAuthenticated(),
+        isAdmin: authService.isAdmin(),
+        isRestaurantOwner: authService.isRestaurantOwner(),
+        isCustomer: authService.isCustomer()
+      }
+    };
+    
+    console.log('🔍 AppLayout Debug:', debugInfo);
+
     // Show welcome screen for unauthenticated users
     if (!isAuthenticated) {
+      console.log('🚫 User not authenticated, showing welcome screen');
       return (
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="flex justify-center mb-8">
-              <div className="w-20 h-20 bg-navikko-primary rounded-full flex items-center justify-center shadow-lg">
-                <img 
-                  src="/AZ Dining Saku/Navikko2.svg"
-                  alt="Navikko" 
-                  className="h-12 w-12 object-contain"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.style.display = 'none';
-                  }}
-                />
-              </div>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              {t('welcome.title')}
-            </h1>
-            <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-              {t('welcome.subtitle')}
-            </p>
-          </div>
-
-          {/* Features */}
-          <div className="grid md:grid-cols-3 gap-8 mb-12">
-            <div className="text-center p-8 bg-white rounded-xl border border-gray-200 shadow-sm">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Users className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">{t('features.multilingual')}</h3>
-              <p className="text-gray-600 leading-relaxed">{t('features.multilingual_desc')}</p>
-            </div>
-
-            <div className="text-center p-8 bg-white rounded-xl border border-gray-200 shadow-sm">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Store className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">{t('features.restaurants')}</h3>
-              <p className="text-gray-600 leading-relaxed">{t('features.restaurants_desc')}</p>
-            </div>
-
-            <div className="text-center p-8 bg-white rounded-xl border border-gray-200 shadow-sm">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <MapPin className="h-8 w-8 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">{t('features.location')}</h3>
-              <p className="text-gray-600 leading-relaxed">{t('features.location_desc')}</p>
-            </div>
-          </div>
-          
-          <div className="text-center">
-            <p className="text-gray-700 mb-8 text-lg">
-              {t('welcome.signup_message')}
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-              <button 
-                onClick={() => setShowAuthModal(true)}
-                className="px-8 py-4 bg-navikko-primary text-white rounded-lg hover:bg-navikko-primary/90 transition-colors font-semibold text-lg shadow-sm"
-              >
-                {t('welcome.get_started')}
-              </button>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center max-w-2xl mx-auto px-4">
+            <div className="mb-8">
+              <img 
+                src="/logo/NAVIkko Green.webp" 
+                alt="NAVIkko" 
+                className="h-16 sm:h-20 mx-auto mb-6"
+              />
+              <h1 className="text-3xl sm:text-4xl font-bold text-navikko-secondary mb-4">
+                {t('welcome.title')}
+              </h1>
+              <p className="text-lg sm:text-xl text-navikko-secondary/80 mb-6">
+                {t('welcome.subtitle')}
+              </p>
             </div>
             
-            {/* Policy Links */}
-            <div className="text-center text-sm text-gray-500">
-              <p className="mb-3">By using this app, you agree to our</p>
-              <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                <Link 
-                  to="/terms-of-service" 
-                  className="text-navikko-primary hover:underline"
+            <div className="text-center">
+              <p className="text-gray-700 mb-8 text-lg">
+                {t('welcome.signup_message')}
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                <button 
+                  onClick={() => setShowAuthModal(true)}
+                  className="px-8 py-4 bg-navikko-primary text-white rounded-lg hover:bg-navikko-primary/90 transition-colors font-semibold text-lg shadow-sm"
                 >
-                  Terms of Service
-                </Link>
-                <span className="hidden sm:inline">, and</span>
-                <Link 
-                  to="/privacy-policy" 
-                  className="text-navikko-primary hover:underline"
-                >
-                  Privacy Policy
-                </Link>
-                <span className="hidden sm:inline">, and</span>
-                <Link 
-                  to="/commercial-transaction-act" 
-                  className="text-navikko-primary hover:underline"
-                >
-                  特定商取引法
-                </Link>
+                  {t('welcome.get_started')}
+                </button>
+              </div>
+              
+              {/* Policy Links */}
+              <div className="text-center text-sm text-gray-500">
+                <p className="mb-3">By using this app, you agree to our</p>
+                <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                  <Link 
+                    to="/terms-of-service" 
+                    className="text-navikko-primary hover:underline"
+                  >
+                    Terms of Service
+                  </Link>
+                  <span className="hidden sm:inline">, and</span>
+                  <Link 
+                    to="/privacy-policy" 
+                    className="text-navikko-primary hover:underline"
+                  >
+                    Privacy Policy
+                  </Link>
+                  <span className="hidden sm:inline">, and</span>
+                  <Link 
+                    to="/commercial-transaction-act" 
+                    className="text-navikko-primary hover:underline"
+                  >
+                    特定商取引法
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -172,60 +182,14 @@ const AppLayout: React.FC = () => {
       );
     }
 
-    // Default to restaurants view for authenticated users
-    if (currentView === 'restaurants' || !currentView) {
-      return <RestaurantList onViewDetails={handleRestaurantSelect} />;
-    }
+    console.log('✅ User authenticated, rendering view:', currentView);
 
+    // Route-based rendering
     switch (currentView) {
-      // Restaurant Owner Views (with SecureRoute)
-      case 'dashboard':
-        return (
-          <SecureRoute requiredRole="restaurant_owner">
-            <RestaurantOwnerDashboard />
-          </SecureRoute>
-        );
-      case 'orders':
-        return (
-          <SecureRoute requiredRole="restaurant_owner">
-            <OrdersManagement />
-          </SecureRoute>
-        );
-      case 'menu-management':
-        return (
-          <SecureRoute requiredRole="restaurant_owner">
-            <MenuManagement />
-          </SecureRoute>
-        );
       case 'restaurants':
-        return (
-          <SecureRoute requiredRole="restaurant_owner">
-            <RestaurantManagement />
-          </SecureRoute>
-        );
-      case 'subscription':
-        return (
-          <SecureRoute requiredRole="restaurant_owner">
-            <SubscriptionManagement />
-          </SecureRoute>
-        );
+        return <RestaurantList onViewDetails={handleRestaurantSelect} />;
       
-      // Admin-only Views (with SecureRoute)
-      case 'users':
-        return (
-          <SecureRoute requiredRole="admin">
-            <UserManagement />
-          </SecureRoute>
-        );
-      case 'reservations':
-        return (
-          <SecureRoute requiredRole="admin">
-            <ReservationManagement />
-          </SecureRoute>
-        );
-      
-      // Customer Views (no restrictions needed)
-      case 'restaurant-details':
+      case 'restaurant':
         return selectedRestaurantId ? (
           <RestaurantDetails 
             restaurantId={selectedRestaurantId} 
@@ -237,6 +201,7 @@ const AppLayout: React.FC = () => {
             <p className="text-navikko-secondary text-sm sm:text-base">Please select a restaurant from the list.</p>
           </div>
         );
+      
       case 'cart':
         return (
           <div className="p-4 sm:p-8 bg-white rounded-lg shadow-sm border-navikko-primary/20 border">
@@ -263,14 +228,51 @@ const AppLayout: React.FC = () => {
             )}
           </div>
         );
+      
       case 'profile':
         return <Profile />;
       
-      // Legacy views (with SecureRoute)
-      case 'menus':
+      // Restaurant Owner Views (with SecureRoute)
+      case 'dashboard':
+        return (
+          <SecureRoute requiredRole="restaurant_owner">
+            <RestaurantOwnerDashboard />
+          </SecureRoute>
+        );
+      
+      case 'orders':
+        return (
+          <SecureRoute requiredRole="restaurant_owner">
+            <OrdersManagement />
+          </SecureRoute>
+        );
+      
+      case 'menu-management':
         return (
           <SecureRoute requiredRole="restaurant_owner">
             <MenuManagement />
+          </SecureRoute>
+        );
+      
+      case 'subscription':
+        return (
+          <SecureRoute requiredRole="restaurant_owner">
+            <SubscriptionManagement />
+          </SecureRoute>
+        );
+      
+      // Admin-only Views (with SecureRoute)
+      case 'users':
+        return (
+          <SecureRoute requiredRole="admin">
+            <UserManagement />
+          </SecureRoute>
+        );
+      
+      case 'reservations':
+        return (
+          <SecureRoute requiredRole="admin">
+            <ReservationManagement />
           </SecureRoute>
         );
       
@@ -283,14 +285,8 @@ const AppLayout: React.FC = () => {
         );
       
       default:
-        // Default view based on user role with proper access control
-        if (isRestaurantOwner) {
-          return (
-            <SecureRoute requiredRole="restaurant_owner">
-              <RestaurantOwnerDashboard />
-            </SecureRoute>
-          );
-        }
+        // Default to restaurants view for authenticated users
+        console.log('🔄 Defaulting to restaurants view');
         return <RestaurantList onViewDetails={handleRestaurantSelect} />;
     }
   };
@@ -320,25 +316,25 @@ const AppLayout: React.FC = () => {
       </main>
       
       {/* Footer with Policy Links */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
+      <footer className="bg-white border-t border-gray-100 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
-            <div className="mb-4 sm:mb-0">
-              <p>&copy; 2024 WaSanDo 和讃堂. All rights reserved.</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link 
-                to="/privacy-policy" 
-                className="text-navikko-primary hover:underline"
-              >
-                Privacy Policy
-              </Link>
+          <div className="text-center text-sm text-gray-500">
+            <p className="mb-3">© 2024 NAVIkko. All rights reserved.</p>
+            <div className="flex flex-col sm:flex-row gap-2 justify-center">
               <Link 
                 to="/terms-of-service" 
                 className="text-navikko-primary hover:underline"
               >
                 Terms of Service
               </Link>
+              <span className="hidden sm:inline">•</span>
+              <Link 
+                to="/privacy-policy" 
+                className="text-navikko-primary hover:underline"
+              >
+                Privacy Policy
+              </Link>
+              <span className="hidden sm:inline">•</span>
               <Link 
                 to="/commercial-transaction-act" 
                 className="text-navikko-primary hover:underline"

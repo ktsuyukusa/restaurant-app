@@ -157,8 +157,9 @@ class AuthService {
   private admin2FAVerified: boolean = false; // Track if admin has completed 2FA
 
   private constructor() {
-    this.loadUserFromStorage();
     this.loadLoginAttempts();
+    this.loadUserFromStorage();
+    this.loadAdmin2FAStatus();
   }
 
   public static getInstance(): AuthService {
@@ -174,11 +175,18 @@ class AuthService {
       try {
         const parsedUser = JSON.parse(userData);
         
-        // SECURITY: Prevent admin users from being loaded without proper authentication
+        // SECURITY: Allow admin users to be loaded if they have completed 2FA
         if (parsedUser.userType === 'admin') {
-          console.log('🔒 Admin user detected in storage - clearing for security');
-          this.clearStorage();
-          this.currentUser = null;
+          const admin2FAStatus = localStorage.getItem('navikko_admin_2fa_verified');
+          if (admin2FAStatus === 'true') {
+            console.log('🔒 Admin user loaded from storage - 2FA verified');
+            this.currentUser = parsedUser;
+            this.admin2FAVerified = true;
+          } else {
+            console.log('🔒 Admin user detected in storage - clearing for security (no 2FA verification)');
+            this.clearStorage();
+            this.currentUser = null;
+          }
           return;
         }
         
@@ -190,16 +198,27 @@ class AuthService {
     }
   }
 
+  private loadAdmin2FAStatus(): void {
+    // This method is now handled in loadUserFromStorage for better coordination
+    // Keeping it for backward compatibility but it's no longer needed
+  }
+
   private saveUserToStorage(user: User): void {
     console.log('Saving user to storage:', user);
     localStorage.setItem('navikko_user_data', JSON.stringify(user));
     localStorage.setItem('navikko_user_role', user.userType);
+    
+    // Save admin 2FA status if applicable
+    if (user.userType === 'admin' && this.admin2FAVerified) {
+      localStorage.setItem('navikko_admin_2fa_verified', 'true');
+    }
   }
 
   private clearStorage(): void {
     console.log('Clearing user storage');
     localStorage.removeItem('navikko_user_data');
     localStorage.removeItem('navikko_user_role');
+    localStorage.removeItem('navikko_admin_2fa_verified');
   }
 
   // Get client IP address (for admin access control)
