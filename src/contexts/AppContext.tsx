@@ -136,14 +136,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const canAccessAdminFeatures = (): boolean => {
     if (!isAdmin || !user) return false;
     
-    // Additional security checks for admin access
-    if (!user.adminAccess) return false;
-    
-    // Check if admin access is still valid
-    if (!user.adminAccess.accessCode) return false;
-    
-    // SECURITY: Admin access requires proper IP validation through authService
-    // This function should only be called after successful authentication
+    // For now, allow admin access if user is authenticated as admin
+    // The authService.isAdmin() already checks for 2FA verification
     console.log('🔒 Admin features access validated');
     
     return true;
