@@ -61,6 +61,21 @@ const AppLayout: React.FC = () => {
     }
   }, [location.pathname, params.id, setSelectedRestaurantId]);
 
+  // Handle navigation and ensure proper fallback
+  useEffect(() => {
+    // If user is authenticated but on root path, redirect to restaurants
+    if (isAuthenticated && location.pathname === '/') {
+      console.log('🔄 Redirecting authenticated user from root to restaurants');
+      navigate('/restaurants', { replace: true });
+    }
+    
+    // If user is not authenticated and not on root, redirect to root
+    if (!isAuthenticated && location.pathname !== '/') {
+      console.log('🔄 Redirecting unauthenticated user to root');
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, location.pathname, navigate]);
+
   const handleRestaurantSelect = (id: string) => {
     setSelectedRestaurantId(id);
     navigate(`/restaurant/${id}`);
@@ -187,6 +202,7 @@ const AppLayout: React.FC = () => {
     // Route-based rendering
     switch (currentView) {
       case 'restaurants':
+        console.log('🏪 Rendering RestaurantList component');
         return <RestaurantList onViewDetails={handleRestaurantSelect} />;
       
       case 'restaurant':
@@ -234,6 +250,7 @@ const AppLayout: React.FC = () => {
       
       // Restaurant Owner Views (with SecureRoute)
       case 'dashboard':
+        console.log('📊 Rendering RestaurantOwnerDashboard component');
         return (
           <SecureRoute requiredRole="restaurant_owner">
             <RestaurantOwnerDashboard />
@@ -263,6 +280,7 @@ const AppLayout: React.FC = () => {
       
       // Admin-only Views (with SecureRoute)
       case 'users':
+        console.log('👥 Rendering UserManagement component');
         return (
           <SecureRoute requiredRole="admin">
             <UserManagement />
