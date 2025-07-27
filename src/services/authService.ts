@@ -183,10 +183,9 @@ class AuthService {
             this.currentUser = parsedUser;
             this.admin2FAVerified = true;
           } else {
-            // TEMPORARY: Allow admin users to stay logged in while we fix 2FA persistence
-            console.log('🔒 Admin user detected in storage - allowing login (2FA verification will be checked on access)');
-            this.currentUser = parsedUser;
-            this.admin2FAVerified = false; // Will need 2FA verification for admin features
+            console.log('🔒 Admin user detected in storage - clearing for security (no 2FA verification)');
+            this.clearStorage();
+            this.currentUser = null;
           }
           return;
         }
@@ -783,6 +782,8 @@ class AuthService {
       if (user.userType === 'admin' && twoFactorCode) {
         this.admin2FAVerified = true;
         console.log('🔒 Admin 2FA verification completed successfully');
+        // Save 2FA status immediately
+        localStorage.setItem('navikko_admin_2fa_verified', 'true');
       }
       
       this.saveUserToStorage(user);
