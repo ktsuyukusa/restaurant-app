@@ -74,16 +74,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   useEffect(() => {
     const user = authService.getCurrentUser();
     if (user) {
-      // SECURITY: For admin users, require fresh authentication to prevent 2FA bypass
-      if (user.userType === 'admin') {
-        console.log('🔒 Admin user detected in storage - requiring fresh authentication');
-        authService.logout(); // Clear potentially compromised session
-        setUser(null);
-        setUserRole(null);
-        return;
-      }
-      
-      // For non-admin users, allow normal session restoration
+      // Allow all users to be loaded from storage (authService handles 2FA validation)
+      console.log('🔍 AppContext: Loading user from storage:', user.email, user.userType);
       setUser(user);
       setUserRole(user.userType);
     }

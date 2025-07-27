@@ -183,9 +183,10 @@ class AuthService {
             this.currentUser = parsedUser;
             this.admin2FAVerified = true;
           } else {
-            console.log('🔒 Admin user detected in storage - clearing for security (no 2FA verification)');
-            this.clearStorage();
-            this.currentUser = null;
+            // TEMPORARY: Allow admin users to stay logged in while we fix 2FA persistence
+            console.log('🔒 Admin user detected in storage - allowing login (2FA verification will be checked on access)');
+            this.currentUser = parsedUser;
+            this.admin2FAVerified = false; // Will need 2FA verification for admin features
           }
           return;
         }

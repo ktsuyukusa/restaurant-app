@@ -124,7 +124,7 @@ const AppLayout: React.FC = () => {
           <div className="text-center max-w-2xl mx-auto px-4">
             <div className="mb-8">
               <img 
-                src="/logo/NAVIkko Green.webp" 
+                src="/logo/NAVIkko Green.png" 
                 alt="NAVIkko" 
                 className="h-16 sm:h-20 mx-auto mb-6"
               />
