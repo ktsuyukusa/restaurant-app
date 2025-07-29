@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Menu, ShoppingCart, User, Bell, LogIn, LogOut, Settings, Crown, Bug } from 'lucide-react';
 import LanguageSelector from './LanguageSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/hooks/useAppContext';
 import AuthModal from './AuthModal';
 import { Link } from 'react-router-dom';
 

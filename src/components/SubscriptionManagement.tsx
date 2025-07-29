@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/hooks/useAppContext';
 import authService from '@/services/authService';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

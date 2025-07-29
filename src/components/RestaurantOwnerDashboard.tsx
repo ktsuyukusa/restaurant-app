@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  BarChart3, 
-  Calendar, 
-  DollarSign, 
-  Users, 
-  ShoppingCart, 
+import {
+  BarChart3,
+  Calendar,
+  DollarSign,
+  Users,
+  ShoppingCart,
   TrendingUp,
   Clock,
   AlertCircle
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAppContext } from '@/contexts/AppContext';
 
 interface DashboardStats {
   totalOrders: number;
@@ -24,9 +24,18 @@ interface DashboardStats {
   customerCount: number;
 }
 
+interface RecentOrder {
+  id: string;
+  customerName: string;
+  items: string;
+  total: number;
+  status: 'pending' | 'completed' | 'cancelled';
+  time: string;
+}
+
 const RestaurantOwnerDashboard: React.FC = () => {
   const { t } = useLanguage();
-  const { setCurrentView } = useAppContext();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
     pendingOrders: 0,
@@ -35,7 +44,7 @@ const RestaurantOwnerDashboard: React.FC = () => {
     averageOrderValue: 0,
     customerCount: 0
   });
-  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -81,7 +90,7 @@ const RestaurantOwnerDashboard: React.FC = () => {
     }, 1000);
   }, []);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: RecentOrder['status']) => {
     switch (status) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
@@ -94,7 +103,7 @@ const RestaurantOwnerDashboard: React.FC = () => {
     }
   };
 
-  const getStatusText = (status: string) => {
+  const getStatusText = (status: RecentOrder['status']) => {
     switch (status) {
       case 'pending':
         return 'Pending';
@@ -211,10 +220,10 @@ const RestaurantOwnerDashboard: React.FC = () => {
                 </div>
               ))}
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full mt-4"
-              onClick={() => setCurrentView('orders')}
+              onClick={() => navigate('/orders')}
             >
               View All Orders
             </Button>
@@ -245,10 +254,10 @@ const RestaurantOwnerDashboard: React.FC = () => {
                 <span className="font-medium text-yellow-600">{stats.pendingOrders}</span>
               </div>
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full mt-4"
-              onClick={() => setCurrentView('menu-management')}
+              onClick={() => navigate('/menu-management')}
             >
               Manage Menu
             </Button>
@@ -283,10 +292,10 @@ const RestaurantOwnerDashboard: React.FC = () => {
                 </p>
               </div>
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full mt-4"
-              onClick={() => setCurrentView('restaurants')}
+              onClick={() => navigate('/restaurants')}
             >
               View Restaurant
             </Button>

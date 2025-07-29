@@ -13,7 +13,7 @@ import {
   Store,
   LogOut
 } from 'lucide-react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const Profile: React.FC = () => {

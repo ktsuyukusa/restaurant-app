@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/hooks/useAppContext';
 import authService, { GoogleUser, GoogleSignInData } from '@/services/authService';
 import TwoFactorAuthModal from './TwoFactorAuthModal';
 
@@ -18,13 +18,34 @@ interface GoogleSignInProps {
   size?: 'default' | 'sm' | 'lg' | 'icon';
 }
 
+interface GoogleSignInResponse {
+  credential: string;
+}
+
+interface GoogleInitConfig {
+  client_id: string;
+  callback: (response: GoogleSignInResponse) => void;
+  auto_select?: boolean;
+  cancel_on_tap_outside?: boolean;
+}
+
+interface GoogleRenderOptions {
+  type?: string;
+  theme?: string;
+  size?: string;
+  text?: string;
+  shape?: string;
+  logo_alignment?: string;
+  width?: string;
+}
+
 declare global {
   interface Window {
     google: {
       accounts: {
         id: {
-          initialize: (config: unknown) => void;
-          renderButton: (element: HTMLElement, options: unknown) => void;
+          initialize: (config: GoogleInitConfig) => void;
+          renderButton: (element: HTMLElement, options: GoogleRenderOptions) => void;
           prompt: () => void;
         };
       };
@@ -51,92 +72,7 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
   const [showTwoFactorAuth, setShowTwoFactorAuth] = useState(false);
   const [pendingGoogleData, setPendingGoogleData] = useState<{ googleUser: GoogleUser; signInData: GoogleSignInData } | null>(null);
 
-  useEffect(() => {
-    // Load Google Identity Services script
-    const loadGoogleScript = () => {
-      if (window.google?.accounts) {
-        initializeGoogleSignIn();
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = initializeGoogleSignIn;
-      document.head.appendChild(script);
-    };
-
-    const initializeGoogleSignIn = () => {
-      if (isInitialized.current || !window.google?.accounts) return;
-
-      // Check if Google Client ID is configured
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-      if (!clientId || clientId === 'your-google-client-id-here') {
-        // Show setup instructions instead of Google button
-        if (buttonRef.current) {
-          buttonRef.current.innerHTML = `
-            <div class="p-4 border border-orange-200 bg-orange-50 rounded-lg">
-              <div class="flex items-center gap-2 mb-2">
-                <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                </svg>
-                <span class="font-medium text-orange-800">Google Sign-In Setup Required</span>
-              </div>
-              <p class="text-sm text-orange-700 mb-3">
-                To enable Google Sign-In, you need to configure your Google Client ID.
-              </p>
-              <div class="space-y-2 text-xs text-orange-600">
-                <p><strong>1.</strong> Go to <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="underline">Google Cloud Console</a></p>
-                <p><strong>2.</strong> Create OAuth 2.0 Client ID for Web application</p>
-                <p><strong>3.</strong> Add authorized origins: <code class="bg-orange-100 px-1 rounded">http://localhost:8082</code> and <code class="bg-orange-100 px-1 rounded">https://restaurant-app-xi-ashy.vercel.app</code></p>
-                <p><strong>4.</strong> Create <code class="bg-orange-100 px-1 rounded">.env</code> file with: <code class="bg-orange-100 px-1 rounded">VITE_GOOGLE_CLIENT_ID=your-client-id</code></p>
-                <p><strong>5.</strong> Add environment variable in Vercel dashboard for production</p>
-              </div>
-              <button 
-                onclick="window.open('https://console.cloud.google.com/apis/credentials', '_blank')"
-                class="mt-3 w-full bg-orange-600 text-white px-4 py-2 rounded text-sm hover:bg-orange-700 transition-colors"
-              >
-                Open Google Cloud Console
-              </button>
-            </div>
-          `;
-        }
-        return;
-      }
-
-      // Initialize Google Sign-In
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: handleGoogleSignIn,
-        auto_select: false,
-        cancel_on_tap_outside: true,
-      });
-
-      // Render the button
-      if (buttonRef.current) {
-        window.google.accounts.id.renderButton(buttonRef.current, {
-          type: 'standard',
-          theme: 'outline',
-          size: 'large',
-          text: 'signin_with',
-          shape: 'rectangular',
-          logo_alignment: 'left',
-          width: '100%',
-        });
-      }
-
-      isInitialized.current = true;
-    };
-
-    loadGoogleScript();
-
-    return () => {
-      // Cleanup if needed
-    };
-  }, []);
-
-  const handleGoogleSignIn = async (response: unknown) => {
+  const handleGoogleSignIn = useCallback(async (response: { credential: string }) => {
     try {
       // Validate admin code for admin signup
       if (userType === 'admin' && (!adminCode || adminCode.trim() === '')) {
@@ -200,9 +136,95 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
         onError(errorMessage);
       }
     }
-  };
+  }, [userType, adminCode, locationConsent, restaurantInfo, phone, setUserRole, onSuccess, onError]);
 
-  const handle2FAVerification = async (code: string) => {
+  useEffect(() => {
+    // Load Google Identity Services script
+    const loadGoogleScript = () => {
+      if (window.google?.accounts) {
+        initializeGoogleSignIn();
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+      script.onload = initializeGoogleSignIn;
+      document.head.appendChild(script);
+    };
+
+    const initializeGoogleSignIn = () => {
+      if (isInitialized.current || !window.google?.accounts) return;
+
+      // Check if Google Client ID is configured
+      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+      if (!clientId || clientId === 'your-google-client-id-here') {
+        // Show setup instructions instead of Google button
+        if (buttonRef.current) {
+          buttonRef.current.innerHTML = `
+            <div class="p-4 border border-orange-200 bg-orange-50 rounded-lg">
+              <div class="flex items-center gap-2 mb-2">
+                <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="font-medium text-orange-800">${t('auth.google_setup_required')}</span>
+              </div>
+              <p class="text-sm text-orange-700 mb-3">
+                ${t('auth.google_setup_description')}
+              </p>
+              <div class="space-y-2 text-xs text-orange-600">
+                <p><strong>1.</strong> ${t('auth.google_setup_step1')} <a href="https://console.cloud.google.com/apis/credentials" target="_blank" class="underline">Google Cloud Console</a></p>
+                <p><strong>2.</strong> ${t('auth.google_setup_step2')}</p>
+                <p><strong>3.</strong> ${t('auth.google_setup_step3')} <code class="bg-orange-100 px-1 rounded">http://localhost:8082</code> and <code class="bg-orange-100 px-1 rounded">https://restaurant-app-xi-ashy.vercel.app</code></p>
+                <p><strong>4.</strong> ${t('auth.google_setup_step4')} <code class="bg-orange-100 px-1 rounded">VITE_GOOGLE_CLIENT_ID=your-client-id</code></p>
+                <p><strong>5.</strong> ${t('auth.google_setup_step5')}</p>
+              </div>
+              <button
+                onclick="window.open('https://console.cloud.google.com/apis/credentials', '_blank')"
+                class="mt-3 w-full bg-orange-600 text-white px-4 py-2 rounded text-sm hover:bg-orange-700 transition-colors"
+              >
+                ${t('auth.google_setup_button')}
+              </button>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      // Initialize Google Sign-In
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleGoogleSignIn,
+        auto_select: false,
+        cancel_on_tap_outside: true,
+      });
+
+      // Render the button
+      if (buttonRef.current) {
+        window.google.accounts.id.renderButton(buttonRef.current, {
+          type: 'standard',
+          theme: 'outline',
+          size: 'large',
+          text: 'signin_with',
+          shape: 'rectangular',
+          logo_alignment: 'left',
+          width: '100%',
+        });
+      }
+
+      isInitialized.current = true;
+    };
+
+    loadGoogleScript();
+
+    return () => {
+      // Cleanup if needed
+    };
+  }, [handleGoogleSignIn, t]);
+
+
+  const handle2FAVerification = async (code: string): Promise<boolean> => {
     try {
       const user = await authService.completeGoogleSignInWith2FA(code);
       setUserRole(user.userType);
@@ -212,12 +234,14 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
       if (onSuccess) {
         onSuccess(user);
       }
+      return true;
     } catch (error: unknown) {
       console.error('2FA verification error:', error);
       const errorMessage = error instanceof Error ? error.message : '2FA verification failed';
       if (onError) {
         onError(errorMessage);
       }
+      return false;
     }
   };
 
@@ -249,9 +273,10 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
           setShowTwoFactorAuth(false);
           setPendingGoogleData(null);
         }}
+        onSetupComplete={() => {}}
         onVerify={handle2FAVerification}
-        email={pendingGoogleData?.googleUser.email || ''}
-        method="email"
+        mode="verify"
+        userEmail={pendingGoogleData?.googleUser.email || ''}
       />
     </>
   );

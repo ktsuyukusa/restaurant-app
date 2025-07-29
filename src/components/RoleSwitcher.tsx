@@ -3,14 +3,22 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, Store, Crown } from 'lucide-react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { UserRole } from '@/contexts/AppContextDefinition';
 
 const RoleSwitcher: React.FC = () => {
   const { userRole, setUserRole, isCustomer, isRestaurantOwner, isAdmin } = useAppContext();
   const { t } = useLanguage();
 
-  const roles = [
+  const roles: Array<{
+    id: Exclude<UserRole, null>;
+    name: string;
+    description: string;
+    icon: React.ComponentType<{ className?: string }>;
+    color: string;
+    features: string[];
+  }> = [
     {
       id: 'customer',
       name: 'Customer',
@@ -80,7 +88,7 @@ const RoleSwitcher: React.FC = () => {
               className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
                 isActive ? 'ring-2 ring-navikko-primary' : 'hover:border-navikko-primary/50'
               }`}
-              onClick={() => setUserRole(role.id as any)}
+              onClick={() => setUserRole(role.id)}
             >
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

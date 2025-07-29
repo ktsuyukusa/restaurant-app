@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart } from 'lucide-react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/hooks/useAppContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTranslation } from 'react-i18next';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -13,7 +13,7 @@ interface MenuItem {
   restaurant_id: string;
   item_name: string;
   item_name_ja?: string;
-  item_name_json?: any;
+  item_name_json?: Record<string, string>;
   price: number;
   photo?: string;
 }
@@ -23,8 +23,9 @@ interface MenuDisplayProps {
 }
 
 // Fixed getLocalized helper function with proper fallback
-const getLocalized = (field: any, lang: string) => {
-  if (!field || typeof field !== 'object') return field;
+const getLocalized = (field: Record<string, string> | string | null | undefined, lang: string): string => {
+  if (!field) return '';
+  if (typeof field !== 'object') return field;
   const fallbackLang = 'en';
   return field[lang] || field[fallbackLang] || Object.values(field)[0] || '';
 };

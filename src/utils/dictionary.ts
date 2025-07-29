@@ -287,6 +287,16 @@ export const dictionary = {
     'auth.or_signup_with': 'Or sign up with',
     'auth.or': 'Or',
     
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'Google Sign-In Setup Required',
+    'auth.google_setup_description': 'To enable Google Sign-In, you need to configure your Google Client ID.',
+    'auth.google_setup_step1': 'Go to Google Cloud Console',
+    'auth.google_setup_step2': 'Create OAuth 2.0 Client ID for Web application',
+    'auth.google_setup_step3': 'Add authorized origins:',
+    'auth.google_setup_step4': 'Create .env file with:',
+    'auth.google_setup_step5': 'Add environment variable in Vercel dashboard for production',
+    'auth.google_setup_button': 'Open Google Cloud Console',
+    
     // Two-Factor Authentication
     '2fa.setup_title': 'Set Up Two-Factor Authentication',
     '2fa.setup_description': 'Scan the QR code with your authenticator app to set up 2FA for enhanced security.',
@@ -508,6 +518,16 @@ export const dictionary = {
     'auth.or_login_with': 'または以下でログイン',
     'auth.or_signup_with': 'または以下でサインアップ',
     'auth.or': 'または',
+    
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'Google サインイン設定が必要',
+    'auth.google_setup_description': 'Google サインインを有効にするには、Google クライアント ID を設定する必要があります。',
+    'auth.google_setup_step1': 'Google Cloud Console にアクセス',
+    'auth.google_setup_step2': 'Web アプリケーション用の OAuth 2.0 クライアント ID を作成',
+    'auth.google_setup_step3': '承認済みオリジンを追加:',
+    'auth.google_setup_step4': '.env ファイルを作成:',
+    'auth.google_setup_step5': '本番環境用に Vercel ダッシュボードで環境変数を追加',
+    'auth.google_setup_button': 'Google Cloud Console を開く',
     'auth.name': '氏名',
     'auth.enter_name': '氏名を入力',
     'auth.phone': '電話番号',
@@ -881,6 +901,16 @@ export const dictionary = {
     'auth.terms_of_service': '服务条款',
     'auth.agree_to_terms': '我同意服务条款和隐私政策',
     'auth.terms_required': '您必须同意服务条款和隐私政策',
+    
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'Google 登录设置必需',
+    'auth.google_setup_description': '要启用 Google 登录，您需要配置您的 Google 客户端 ID。',
+    'auth.google_setup_step1': '前往 Google Cloud Console',
+    'auth.google_setup_step2': '为 Web 应用程序创建 OAuth 2.0 客户端 ID',
+    'auth.google_setup_step3': '添加授权来源：',
+    'auth.google_setup_step4': '创建 .env 文件：',
+    'auth.google_setup_step5': '在 Vercel 仪表板中为生产环境添加环境变量',
+    'auth.google_setup_button': '打开 Google Cloud Console',
   },
   ko: {
     // Navigation
@@ -1149,7 +1179,17 @@ export const dictionary = {
     'auth.admin_verification': '관리자 인증',
     'auth.admin_code': '관리자 코드',
     'auth.enter_admin_code': '관리자 인증 코드 입력',
-    'auth.admin_code_desc': '시스템 관리자 액세스에는 관리자 코드가 필요합니다'
+    'auth.admin_code_desc': '시스템 관리자 액세스에는 관리자 코드가 필요합니다',
+    
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'Google 로그인 설정 필요',
+    'auth.google_setup_description': 'Google 로그인을 활성화하려면 Google 클라이언트 ID를 구성해야 합니다.',
+    'auth.google_setup_step1': 'Google Cloud Console로 이동',
+    'auth.google_setup_step2': '웹 애플리케이션용 OAuth 2.0 클라이언트 ID 생성',
+    'auth.google_setup_step3': '승인된 원본 추가:',
+    'auth.google_setup_step4': '.env 파일 생성:',
+    'auth.google_setup_step5': '프로덕션용 Vercel 대시보드에서 환경 변수 추가',
+    'auth.google_setup_button': 'Google Cloud Console 열기',
   },
   pl: {
     // Navigation
@@ -1419,7 +1459,17 @@ export const dictionary = {
     'auth.admin_verification': 'Weryfikacja administratora',
     'auth.admin_code': 'Kod administratora',
     'auth.enter_admin_code': 'Wprowadź kod weryfikacji administratora',
-    'auth.admin_code_desc': 'Kod administratora wymagany dla dostępu administratora systemu'
+    'auth.admin_code_desc': 'Kod administratora wymagany dla dostępu administratora systemu',
+    
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'Wymagana konfiguracja logowania Google',
+    'auth.google_setup_description': 'Aby włączyć logowanie Google, musisz skonfigurować swój identyfikator klienta Google.',
+    'auth.google_setup_step1': 'Przejdź do Google Cloud Console',
+    'auth.google_setup_step2': 'Utwórz identyfikator klienta OAuth 2.0 dla aplikacji internetowej',
+    'auth.google_setup_step3': 'Dodaj autoryzowane źródła:',
+    'auth.google_setup_step4': 'Utwórz plik .env z:',
+    'auth.google_setup_step5': 'Dodaj zmienną środowiskową w panelu Vercel dla produkcji',
+    'auth.google_setup_button': 'Otwórz Google Cloud Console',
   },
   th: {
     // Navigation
@@ -1689,7 +1739,17 @@ export const dictionary = {
     'auth.admin_verification': 'การยืนยันผู้ดูแลระบบ',
     'auth.admin_code': 'รหัสผู้ดูแลระบบ',
     'auth.enter_admin_code': 'ป้อนรหัสยืนยันผู้ดูแลระบบ',
-    'auth.admin_code_desc': 'รหัสผู้ดูแลระบบที่จำเป็นสำหรับการเข้าถึงผู้ดูแลระบบระบบ'
+    'auth.admin_code_desc': 'รหัสผู้ดูแลระบบที่จำเป็นสำหรับการเข้าถึงผู้ดูแลระบบระบบ',
+    
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'จำเป็นต้องตั้งค่า Google Sign-In',
+    'auth.google_setup_description': 'เพื่อเปิดใช้งาน Google Sign-In คุณต้องกำหนดค่า Google Client ID ของคุณ',
+    'auth.google_setup_step1': 'ไปที่ Google Cloud Console',
+    'auth.google_setup_step2': 'สร้าง OAuth 2.0 Client ID สำหรับเว็บแอปพลิเคชัน',
+    'auth.google_setup_step3': 'เพิ่มต้นทางที่ได้รับอนุญาต:',
+    'auth.google_setup_step4': 'สร้างไฟล์ .env ด้วย:',
+    'auth.google_setup_step5': 'เพิ่มตัวแปรสภาพแวดล้อมในแดชบอร์ด Vercel สำหรับการผลิต',
+    'auth.google_setup_button': 'เปิด Google Cloud Console',
   },
   ms: {
     // Basic translations for Malay
@@ -1748,6 +1808,16 @@ export const dictionary = {
     'auth.enter_admin_code': 'Masukkan kod pengesahan pentadbir',
     'auth.admin_code_desc': 'Kod pentadbir diperlukan untuk akses pentadbir sistem',
     'common.close': 'Tutup',
+    
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'Konfigurasi Google Sign-In Diperlukan',
+    'auth.google_setup_description': 'Untuk mengaktifkan Google Sign-In, anda perlu mengkonfigurasi Google Client ID anda.',
+    'auth.google_setup_step1': 'Pergi ke Google Cloud Console',
+    'auth.google_setup_step2': 'Cipta OAuth 2.0 Client ID untuk aplikasi web',
+    'auth.google_setup_step3': 'Tambah asal yang dibenarkan:',
+    'auth.google_setup_step4': 'Cipta fail .env dengan:',
+    'auth.google_setup_step5': 'Tambah pembolehubah persekitaran dalam papan pemuka Vercel untuk pengeluaran',
+    'auth.google_setup_button': 'Buka Google Cloud Console',
   
          // Features
     'features.multilingual': 'Sokongan Pelbagai Bahasa',
@@ -1828,6 +1898,16 @@ export const dictionary = {
     'auth.enter_admin_code': 'Masukkan kode verifikasi administrator',
     'auth.admin_code_desc': 'Kode administrator diperlukan untuk akses administrator sistem',
     'common.close': 'Tutup',
+    
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'Konfigurasi Google Sign-In Diperlukan',
+    'auth.google_setup_description': 'Untuk mengaktifkan Google Sign-In, Anda perlu mengkonfigurasi Google Client ID Anda.',
+    'auth.google_setup_step1': 'Pergi ke Google Cloud Console',
+    'auth.google_setup_step2': 'Buat OAuth 2.0 Client ID untuk aplikasi web',
+    'auth.google_setup_step3': 'Tambahkan asal yang diotorisasi:',
+    'auth.google_setup_step4': 'Buat file .env dengan:',
+    'auth.google_setup_step5': 'Tambahkan variabel lingkungan di dashboard Vercel untuk produksi',
+    'auth.google_setup_button': 'Buka Google Cloud Console',
 
     // Features
     'features.multilingual': 'Dukungan Multibahasa',
@@ -1908,6 +1988,16 @@ export const dictionary = {
     'auth.enter_admin_code': 'Ingresa el código de verificación de administrador',
     'auth.admin_code_desc': 'Código de administrador requerido para acceso de administrador del sistema',
     'common.close': 'Cerrar',
+    
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'Configuración de Google Sign-In Requerida',
+    'auth.google_setup_description': 'Para habilitar Google Sign-In, necesitas configurar tu Google Client ID.',
+    'auth.google_setup_step1': 'Ve a Google Cloud Console',
+    'auth.google_setup_step2': 'Crea OAuth 2.0 Client ID para aplicación web',
+    'auth.google_setup_step3': 'Agrega orígenes autorizados:',
+    'auth.google_setup_step4': 'Crea archivo .env con:',
+    'auth.google_setup_step5': 'Agrega variable de entorno en el panel de Vercel para producción',
+    'auth.google_setup_button': 'Abrir Google Cloud Console',
 
        // Features
     'features.multilingual': 'Soporte Multiidioma',
@@ -1966,11 +2056,21 @@ export const dictionary = {
     'languages.es': 'Español',
     'languages.ro': 'Română',
     
-    // Auth Modal  
+    // Auth Modal
     'auth.welcome': 'Chào mừng đến với Navikko',
     'auth.login': 'Đăng nhập',
     'auth.signup': 'Đăng ký',
     'common.close': 'Đóng',
+    
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'Cần Thiết Lập Google Sign-In',
+    'auth.google_setup_description': 'Để kích hoạt Google Sign-In, bạn cần cấu hình Google Client ID của mình.',
+    'auth.google_setup_step1': 'Đi đến Google Cloud Console',
+    'auth.google_setup_step2': 'Tạo OAuth 2.0 Client ID cho ứng dụng web',
+    'auth.google_setup_step3': 'Thêm nguồn gốc được ủy quyền:',
+    'auth.google_setup_step4': 'Tạo tệp .env với:',
+    'auth.google_setup_step5': 'Thêm biến môi trường trong bảng điều khiển Vercel cho sản xuất',
+    'auth.google_setup_button': 'Mở Google Cloud Console',
  },
   ro: {
     // Basic translations for Romanian
@@ -2012,6 +2112,16 @@ export const dictionary = {
     'auth.login': 'Conectare',
     'auth.signup': 'Înregistrare',
     'common.close': 'Închide',
+    
+    // Google Sign-In Setup
+    'auth.google_setup_required': 'Configurarea Google Sign-In Necesară',
+    'auth.google_setup_description': 'Pentru a activa Google Sign-In, trebuie să configurați Google Client ID-ul dvs.',
+    'auth.google_setup_step1': 'Mergeți la Google Cloud Console',
+    'auth.google_setup_step2': 'Creați OAuth 2.0 Client ID pentru aplicația web',
+    'auth.google_setup_step3': 'Adăugați originile autorizate:',
+    'auth.google_setup_step4': 'Creați fișierul .env cu:',
+    'auth.google_setup_step5': 'Adăugați variabila de mediu în panoul de control Vercel pentru producție',
+    'auth.google_setup_button': 'Deschideți Google Cloud Console',
   }
 };
 

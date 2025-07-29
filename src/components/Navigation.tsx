@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Users, Store, BookOpen, Calendar, BarChart3, Settings, ShoppingCart, CreditCard } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/hooks/useAppContext';
 
 interface NavigationProps {
   onNavigate: (section: string) => void;

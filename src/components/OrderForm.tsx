@@ -9,11 +9,11 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Clock, MapPin, CreditCard, ShoppingCart, Plus, Minus, Trash2, Smartphone } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/hooks/useAppContext';
 import { getSupabaseClient } from '@/lib/supabase';
 import paymentService from '@/services/paymentService';
 import PaymentMethodRegistration from './PaymentMethodRegistration';
-import authService from '@/services/authService';
+import authService, { type PaymentMethod } from '@/services/authService';
 import { toast } from '@/components/ui/use-toast';
 
 interface MenuItem {
@@ -46,10 +46,30 @@ interface Restaurant {
   stripe_account_id?: string;
 }
 
+interface OrderData {
+  id: string;
+  restaurant_id: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  pickup_time: string;
+  notes: string;
+  total_amount: number;
+  status: string;
+  payment_method: string;
+  items: Array<{
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+  }>;
+  created_at?: string;
+}
+
 interface OrderFormProps {
   restaurant: Restaurant;
   menuItems: MenuItem[];
-  onOrderComplete?: (orderId: string, orderData?: any) => void;
+  onOrderComplete?: (orderId: string, orderData?: OrderData) => void;
   onClose?: () => void;
 }
 

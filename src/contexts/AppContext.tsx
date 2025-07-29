@@ -1,55 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect, ReactNode } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import authService, { User, SignupData } from '@/services/authService';
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  restaurantId: string;
-}
-
-type UserRole = 'customer' | 'restaurant_owner' | 'admin' | null;
-
-interface AppContextType {
-  sidebarOpen: boolean;
-  toggleSidebar: () => void;
-  cartItems: CartItem[];
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
-  removeFromCart: (itemId: string) => void;
-  updateCartQuantity: (itemId: string, quantity: number) => void;
-  clearCart: () => void;
-  selectedRestaurantId: string | null;
-  setSelectedRestaurantId: (id: string | null) => void;
-  userRole: UserRole;
-  setUserRole: (role: UserRole) => void;
-  isRestaurantOwner: boolean;
-  isAdmin: boolean;
-  isCustomer: boolean;
-  canAccessAdminFeatures: boolean;
-  canAccessRestaurantFeatures: boolean;
-  // Authentication
-  isAuthenticated: boolean;
-  user: unknown | null;
-  login: (email: string, password: string) => Promise<void>;
-  signup: (userData: SignupData) => Promise<void>;
-  logout: () => void;
-  updateUserAfter2FA: (user: User) => void;
-  showAuthModal: boolean;
-  setShowAuthModal: (show: boolean) => void;
-  hasRole: (role: 'customer' | 'restaurant_owner' | 'admin') => boolean;
-}
-
-const AppContext = createContext<AppContextType | undefined>(undefined);
-
-export const useAppContext = () => {
-  const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error('useAppContext must be used within an AppProvider');
-  }
-  return context;
-};
+import { AppContext, AppContextType, CartItem, UserRole } from './AppContextDefinition';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -262,6 +214,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // Authentication
     isAuthenticated: authService.isAuthenticated(),
     user,
+    setUser,
     login: async (email: string, password: string) => {
       // Check if user is already authenticated (e.g., after 2FA verification)
       const currentUser = authService.getCurrentUser();

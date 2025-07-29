@@ -23,7 +23,7 @@ import {
   EyeOff,
   Shield
 } from 'lucide-react';
-import { useAppContext } from '@/contexts/AppContext';
+import { useAppContext } from '@/hooks/useAppContext';
 import authService, { LoginData as AuthLoginData } from '@/services/authService';
 import { SignupData } from '@/utils/types';
 import { validateAdminCode } from '@/config/adminCodes';
@@ -191,8 +191,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         setError(null);
         alert('Password reset email sent! Please check your inbox.');
       }
-    } catch (error: any) {
-      setError(`Failed to send reset email: ${error.message}`);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setError(`Failed to send reset email: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -684,8 +685,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           setPendingLoginData(null);
         }}
         onVerify={handle2FAVerification}
-        email={pendingLoginData?.email || ''}
-        method="email"
+        onSetupComplete={() => {}} // No-op for verify mode
+        mode="verify"
+        userEmail={pendingLoginData?.email || ''}
       />
 
       {/* Privacy Policy Modal */}
