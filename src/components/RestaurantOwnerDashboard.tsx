@@ -132,10 +132,10 @@ const RestaurantOwnerDashboard: React.FC = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-navikko-secondary mb-2">
-          Restaurant Dashboard
+          {t('dashboard.title', 'レストランダッシュボード')}
         </h1>
         <p className="text-gray-600">
-          Welcome back! Here's an overview of your restaurant's performance.
+          {t('dashboard.welcome', 'お帰りなさい！レストランのパフォーマンス概要をご覧ください。')}
         </p>
       </div>
 
@@ -143,52 +143,52 @@ const RestaurantOwnerDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.total_orders', '総注文数')}</CardTitle>
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalOrders}</div>
             <p className="text-xs text-muted-foreground">
-              +12% from last month
+              {t('dashboard.orders_growth', '先月比+12%')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.pending_orders', '保留中の注文')}</CardTitle>
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">{stats.pendingOrders}</div>
             <p className="text-xs text-muted-foreground">
-              Need attention
+              {t('dashboard.need_attention', '要対応')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.total_revenue', '総売上')}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">¥{stats.totalRevenue.toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">
-              +8% from last month
+              {t('dashboard.revenue_growth', '先月比+8%')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Customers</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('dashboard.customers', '顧客数')}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.customerCount}</div>
             <p className="text-xs text-muted-foreground">
-              +5 new this week
+              {t('dashboard.new_customers', '今週+5名の新規顧客')}
             </p>
           </CardContent>
         </Card>
@@ -200,7 +200,7 @@ const RestaurantOwnerDashboard: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              Recent Orders
+              {t('dashboard.recent_orders', '最近の注文')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -214,7 +214,7 @@ const RestaurantOwnerDashboard: React.FC = () => {
                   <div className="text-right">
                     <p className="font-medium text-sm">¥{order.total}</p>
                     <Badge className={`text-xs ${getStatusColor(order.status)}`}>
-                      {getStatusText(order.status)}
+                      {t(`dashboard.status.${order.status}`, getStatusText(order.status))}
                     </Badge>
                   </div>
                 </div>
@@ -225,7 +225,7 @@ const RestaurantOwnerDashboard: React.FC = () => {
               className="w-full mt-4"
               onClick={() => navigate('/orders')}
             >
-              View All Orders
+              {t('dashboard.view_all_orders', 'すべての注文を表示')}
             </Button>
           </CardContent>
         </Card>
@@ -234,23 +234,23 @@ const RestaurantOwnerDashboard: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
-              Performance
+              {t('dashboard.performance', 'パフォーマンス')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm">Average Order Value</span>
+                <span className="text-sm">{t('dashboard.average_order_value', '平均注文額')}</span>
                 <span className="font-medium">¥{stats.averageOrderValue}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Completion Rate</span>
+                <span className="text-sm">{t('dashboard.completion_rate', '完了率')}</span>
                 <span className="font-medium text-green-600">
                   {Math.round((stats.completedOrders / stats.totalOrders) * 100)}%
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Pending Orders</span>
+                <span className="text-sm">{t('dashboard.pending_orders', '保留中の注文')}</span>
                 <span className="font-medium text-yellow-600">{stats.pendingOrders}</span>
               </div>
             </div>
@@ -259,7 +259,7 @@ const RestaurantOwnerDashboard: React.FC = () => {
               className="w-full mt-4"
               onClick={() => navigate('/menu-management')}
             >
-              Manage Menu
+              {t('dashboard.manage_menu', 'メニュー管理')}
             </Button>
           </CardContent>
         </Card>
@@ -268,7 +268,7 @@ const RestaurantOwnerDashboard: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5" />
-              Alerts
+              {t('dashboard.alerts', 'アラート')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -276,19 +276,19 @@ const RestaurantOwnerDashboard: React.FC = () => {
               {stats.pendingOrders > 0 && (
                 <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-sm font-medium text-yellow-800">
-                    {stats.pendingOrders} orders pending
+                    {t('dashboard.orders_pending_count', `${stats.pendingOrders}件の注文が保留中`).replace('{count}', stats.pendingOrders.toString())}
                   </p>
                   <p className="text-xs text-yellow-600">
-                    Review and process orders
+                    {t('dashboard.review_process_orders', '注文を確認・処理してください')}
                   </p>
                 </div>
               )}
               <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm font-medium text-blue-800">
-                  Menu update available
+                  {t('dashboard.menu_update_available', 'メニュー更新が利用可能')}
                 </p>
                 <p className="text-xs text-blue-600">
-                  Add seasonal items
+                  {t('dashboard.add_seasonal_items', '季節のアイテムを追加')}
                 </p>
               </div>
             </div>
@@ -297,7 +297,7 @@ const RestaurantOwnerDashboard: React.FC = () => {
               className="w-full mt-4"
               onClick={() => navigate('/restaurants')}
             >
-              View Restaurant
+              {t('dashboard.view_restaurant', 'レストランを表示')}
             </Button>
           </CardContent>
         </Card>
