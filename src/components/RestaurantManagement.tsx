@@ -72,13 +72,16 @@ const RestaurantManagement: React.FC = () => {
   };
 
   // Determine which secondary language to show (if any)
+  // Default is Japanese, secondary is English or current system language
   const getSecondaryLanguage = () => {
-    if (currentLanguage === 'en') return null;
+    if (currentLanguage === 'ja') return 'en'; // Show English as secondary for Japanese users
     if (currentLanguage === 'zh') return 'ja'; // Chinese uses Japanese data
-    return currentLanguage;
+    return 'en'; // All other languages use English as secondary
   };
 
   const secondaryLang = getSecondaryLanguage();
+  const primaryLang = currentLanguage === 'zh' ? 'ja' : 'ja'; // Japanese is always primary
+  const showEnglish = currentLanguage !== 'ja'; // Show English when not Japanese
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -227,35 +230,36 @@ const RestaurantManagement: React.FC = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Restaurant Names (Simplified Language Selection) */}
+            {/* Restaurant Names (Japanese Primary) */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Restaurant Names</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="name_en">Name (English) *</Label>
+                  <Label htmlFor="name_ja">Name (Japanese) *</Label>
                   <Input
-                    id="name_en"
-                    value={formData.name_en || ''}
-                    onChange={(e) => setFormData({...formData, name_en: e.target.value, name: e.target.value})}
+                    id="name_ja"
+                    value={formData.name_ja || ''}
+                    onChange={(e) => {
+                      const updates: Partial<Restaurant> = {
+                        name_ja: e.target.value,
+                        name: e.target.value
+                      };
+                      // If Chinese is current language, also update Chinese field
+                      if (currentLanguage === 'zh') {
+                        updates.name_zh = e.target.value;
+                      }
+                      setFormData({...formData, ...updates});
+                    }}
                     required
                   />
                 </div>
-                {secondaryLang && (
+                {showEnglish && (
                   <div>
-                    <Label htmlFor={`name_${secondaryLang}`}>
-                      Name ({getLanguageDisplayName(secondaryLang)})
-                    </Label>
+                    <Label htmlFor="name_en">Name (English)</Label>
                     <Input
-                      id={`name_${secondaryLang}`}
-                      value={formData[`name_${secondaryLang}` as keyof Restaurant] as string || ''}
-                      onChange={(e) => {
-                        const updates: Partial<Restaurant> = { [`name_${secondaryLang}`]: e.target.value } as Partial<Restaurant>;
-                        // If Chinese is selected, also update Chinese field with Japanese data
-                        if (currentLanguage === 'zh' && secondaryLang === 'ja') {
-                          updates.name_zh = e.target.value;
-                        }
-                        setFormData({...formData, ...updates});
-                      }}
+                      id="name_en"
+                      value={formData.name_en || ''}
+                      onChange={(e) => setFormData({...formData, name_en: e.target.value})}
                     />
                   </div>
                 )}
@@ -278,35 +282,36 @@ const RestaurantManagement: React.FC = () => {
               </Select>
             </div>
             
-            {/* Addresses (Simplified Language Selection) */}
+            {/* Addresses (Japanese Primary) */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Addresses</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="address_en">Address (English) *</Label>
+                  <Label htmlFor="address_ja">Address (Japanese) *</Label>
                   <Input
-                    id="address_en"
-                    value={formData.address_en || ''}
-                    onChange={(e) => setFormData({...formData, address_en: e.target.value, address: e.target.value})}
+                    id="address_ja"
+                    value={formData.address_ja || ''}
+                    onChange={(e) => {
+                      const updates: Partial<Restaurant> = {
+                        address_ja: e.target.value,
+                        address: e.target.value
+                      };
+                      // If Chinese is current language, also update Chinese field
+                      if (currentLanguage === 'zh') {
+                        updates.address_zh = e.target.value;
+                      }
+                      setFormData({...formData, ...updates});
+                    }}
                     required
                   />
                 </div>
-                {secondaryLang && (
+                {showEnglish && (
                   <div>
-                    <Label htmlFor={`address_${secondaryLang}`}>
-                      Address ({getLanguageDisplayName(secondaryLang)})
-                    </Label>
+                    <Label htmlFor="address_en">Address (English)</Label>
                     <Input
-                      id={`address_${secondaryLang}`}
-                      value={formData[`address_${secondaryLang}` as keyof Restaurant] as string || ''}
-                      onChange={(e) => {
-                        const updates: Partial<Restaurant> = { [`address_${secondaryLang}`]: e.target.value } as Partial<Restaurant>;
-                        // If Chinese is selected, also update Chinese field with Japanese data
-                        if (currentLanguage === 'zh' && secondaryLang === 'ja') {
-                          updates.address_zh = e.target.value;
-                        }
-                        setFormData({...formData, ...updates});
-                      }}
+                      id="address_en"
+                      value={formData.address_en || ''}
+                      onChange={(e) => setFormData({...formData, address_en: e.target.value})}
                     />
                   </div>
                 )}
@@ -323,34 +328,35 @@ const RestaurantManagement: React.FC = () => {
               />
             </div>
             
-            {/* Descriptions (Simplified Language Selection) */}
+            {/* Descriptions (Japanese Primary) */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Descriptions</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="description_en">Description (English)</Label>
+                  <Label htmlFor="description_ja">Description (Japanese)</Label>
                   <Textarea
-                    id="description_en"
-                    value={formData.description_en || ''}
-                    onChange={(e) => setFormData({...formData, description_en: e.target.value, description: e.target.value})}
+                    id="description_ja"
+                    value={formData.description_ja || ''}
+                    onChange={(e) => {
+                      const updates: Partial<Restaurant> = {
+                        description_ja: e.target.value,
+                        description: e.target.value
+                      };
+                      // If Chinese is current language, also update Chinese field
+                      if (currentLanguage === 'zh') {
+                        updates.description_zh = e.target.value;
+                      }
+                      setFormData({...formData, ...updates});
+                    }}
                   />
                 </div>
-                {secondaryLang && (
+                {showEnglish && (
                   <div>
-                    <Label htmlFor={`description_${secondaryLang}`}>
-                      Description ({getLanguageDisplayName(secondaryLang)})
-                    </Label>
+                    <Label htmlFor="description_en">Description (English)</Label>
                     <Textarea
-                      id={`description_${secondaryLang}`}
-                      value={formData[`description_${secondaryLang}` as keyof Restaurant] as string || ''}
-                      onChange={(e) => {
-                        const updates: Partial<Restaurant> = { [`description_${secondaryLang}`]: e.target.value } as Partial<Restaurant>;
-                        // If Chinese is selected, also update Chinese field with Japanese data
-                        if (currentLanguage === 'zh' && secondaryLang === 'ja') {
-                          updates.description_zh = e.target.value;
-                        }
-                        setFormData({...formData, ...updates});
-                      }}
+                      id="description_en"
+                      value={formData.description_en || ''}
+                      onChange={(e) => setFormData({...formData, description_en: e.target.value})}
                     />
                   </div>
                 )}
