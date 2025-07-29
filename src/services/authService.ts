@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { validateAdminCode, getAdminLevel } from '@/config/adminCodes';
 import { getSupabaseClient } from '@/lib/supabase';
 import { ADMIN_CODES } from '@/config/adminCodes';
-import { TOTPService, verifyTOTPCode } from '@/utils/totpService';
-import { authenticator } from 'otplib';
+import { TOTPService, verifyTOTPCode, generateTOTPSecret } from '@/utils/totpService';
+import { isSupabaseAvailable } from '@/lib/supabase';
 
 // Types for authentication
 export interface User {
@@ -120,12 +120,12 @@ const loginAttempts = new Map<string, LoginAttempt>();
 
 // Mock authentication functions
 const mockAuth = {
-  signUp: async (userData: any) => {
+  signUp: async (userData: SignupData) => {
     const user = {
       id: `mock-user-${Date.now()}`,
       email: userData.email,
       name: userData.name,
-      user_type: userData.user_type || 'customer',
+      user_type: userData.userType || 'customer',
       subscription: null,
       created_at: new Date().toISOString()
     };
@@ -230,9 +230,10 @@ class AuthService {
 
   // Check if IP is allowed for admin access
   private isIPAllowedForAdmin(): boolean {
-    // Only allow IP bypass for development environment
-    if (import.meta.env.DEV) {
-      console.log('🔧 Development mode: Admin IP restrictions disabled for testing');
+    // SECURITY: Always enforce IP restrictions, even in development
+    // Remove this bypass for production security
+    if (import.meta.env.DEV && import.meta.env.VITE_DISABLE_IP_RESTRICTIONS === 'true') {
+      console.log('🔧 Development mode: Admin IP restrictions disabled for testing (VITE_DISABLE_IP_RESTRICTIONS=true)');
       return true;
     }
     
@@ -406,9 +407,9 @@ class AuthService {
       this.saveUserToStorage(user);
       console.log('Customer signup successful for user:', user);
       return user;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Customer signup error:', error);
-      throw new Error(error.message || 'Failed to create customer account');
+      throw new Error(error instanceof Error ? error.message : 'Failed to create customer account');
     }
   }
 
@@ -520,9 +521,9 @@ class AuthService {
       this.currentUser = user;
       this.saveUserToStorage(user);
       return user;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Restaurant owner signup error:', error);
-      throw new Error(error.message || 'Failed to create restaurant owner account');
+      throw new Error(error instanceof Error ? error.message : 'Failed to create restaurant owner account');
     }
   }
 
@@ -622,9 +623,9 @@ class AuthService {
       this.currentUser = user;
       this.saveUserToStorage(user);
       return user;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Admin signup error:', error);
-      throw new Error(error.message || 'Failed to create admin account');
+      throw new Error(error instanceof Error ? error.message : 'Failed to create admin account');
     }
   }
 
@@ -789,9 +790,9 @@ class AuthService {
       this.saveUserToStorage(user);
       console.log('Login successful for user:', user);
       return user;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      throw new Error(error.message || 'Login failed');
+      throw new Error(error instanceof Error ? error.message : 'Login failed');
     }
   }
 
@@ -1010,9 +1011,8 @@ class AuthService {
           // Check if existing user is admin and requires 2FA
           if (userData.userType === 'admin' && this.requires2FA(userData.userType)) {
             // For existing admin users, require 2FA even with Google Sign-In
-            const twoFACode = this.generate2FACode();
-            sessionStorage.setItem('temp_2fa_code', twoFACode);
-            sessionStorage.setItem('temp_google_user', JSON.stringify({ googleUser, signInData }));
+            // For Google Sign-In with existing admin users, require proper 2FA setup
+            throw new Error('Admin users must complete 2FA setup through the admin panel');
             throw new Error('2FA_REQUIRED_GOOGLE');
           }
           
@@ -1033,7 +1033,7 @@ class AuthService {
       userType: signInData.userType,
       locationConsent: signInData.locationConsent || false,
       paymentMethods: [],
-      restaurantInfo: signInData.restaurantInfo,
+      restaurantInfo: signInData.restaurantInfo as RestaurantInfo,
       adminAccess: signInData.userType === 'admin' && signInData.adminCode ? {
         level: getAdminLevel(signInData.adminCode) || 'admin',
         permissions: ['user_management', 'restaurant_management', 'system_settings', 'analytics'],
@@ -1053,10 +1053,7 @@ class AuthService {
 
     // For new admin users, require 2FA setup
     if (signInData.userType === 'admin' && this.requires2FA(signInData.userType)) {
-      const twoFACode = this.generate2FACode();
-      sessionStorage.setItem('temp_2fa_code', twoFACode);
-      sessionStorage.setItem('temp_google_user', JSON.stringify({ googleUser, signInData }));
-      throw new Error('2FA_REQUIRED_GOOGLE');
+      throw new Error('Admin users must complete 2FA setup through the admin panel');
     }
 
     console.log('Created user object via Google Sign-In:', user);
@@ -1076,7 +1073,7 @@ class AuthService {
     const { googleUser, signInData } = JSON.parse(storedData);
     const expectedCode = sessionStorage.getItem('temp_2fa_code');
 
-    if (!expectedCode || !this.validate2FACode(twoFactorCode, expectedCode)) {
+    if (!expectedCode || twoFactorCode !== expectedCode) {
       this.trackLoginAttempt(googleUser.email, false);
       sessionStorage.removeItem('temp_2fa_code');
       sessionStorage.removeItem('temp_google_user');
@@ -1139,7 +1136,7 @@ class AuthService {
   }
 
   // Sign up with email/password
-  async signUp(userData: any) {
+  async signUp(userData: SignupData) {
     try {
       const supabase = getSupabaseClient();
       const { data, error } = await supabase.auth.signUp({
@@ -1148,7 +1145,7 @@ class AuthService {
         options: {
           data: {
             name: userData.name,
-            user_type: userData.user_type || 'customer'
+            user_type: userData.userType || 'customer'
           }
         }
       });
@@ -1309,7 +1306,7 @@ class AuthService {
   }
 
   // Reset password method
-  async resetPassword(email: string): Promise<{ error: any }> {
+  async resetPassword(email: string): Promise<{ error: { message: string } | null }> {
     try {
       const supabase = getSupabaseClient();
       
@@ -1324,10 +1321,10 @@ class AuthService {
       
       const { error } = await supabase.auth.resetPasswordForEmail(email);
       return { error };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return { 
         error: { 
-          message: `Password reset failed: ${error.message || 'Unknown error'}` 
+          message: `Password reset failed: ${error instanceof Error ? error.message : 'Unknown error'}`
         } 
       };
     }

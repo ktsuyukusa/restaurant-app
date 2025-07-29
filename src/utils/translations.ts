@@ -13,7 +13,7 @@ import { authTranslations } from './authTranslations';
  * @returns The translated string
  */
 export const translate = (key: string, defaultValue?: string, lang?: string): string => {
-  lang = lang || 'en'; // Default to English if no language specified
+  lang = lang || 'ja'; // Default to Japanese if no language specified
   try {
     // Check for auth-specific translations first
     if (key.startsWith('auth.')) {
