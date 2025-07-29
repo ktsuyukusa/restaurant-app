@@ -52,7 +52,24 @@ interface Restaurant {
 }
 
 const RestaurantManagement: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, currentLanguage } = useLanguage();
+  
+  // Helper function to get language display name
+  const getLanguageDisplayName = (langCode: string): string => {
+    const languageNames: Record<string, string> = {
+      'ja': 'Japanese',
+      'zh': 'Chinese',
+      'ko': 'Korean',
+      'pl': 'Polish',
+      'ms': 'Malay',
+      'id': 'Indonesian',
+      'vi': 'Vietnamese',
+      'th': 'Thai',
+      'es': 'Spanish',
+      'ro': 'Romanian'
+    };
+    return languageNames[langCode] || langCode.toUpperCase();
+  };
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -201,7 +218,7 @@ const RestaurantManagement: React.FC = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Restaurant Names (Multilingual) */}
+            {/* Restaurant Names (Smart Language Selection) */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Restaurant Names</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -214,30 +231,18 @@ const RestaurantManagement: React.FC = () => {
                     required
                   />
                 </div>
-                <div>
-                  <Label htmlFor="name_ja">Name (Japanese)</Label>
-                  <Input
-                    id="name_ja"
-                    value={formData.name_ja || ''}
-                    onChange={(e) => setFormData({...formData, name_ja: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="name_zh">Name (Chinese)</Label>
-                  <Input
-                    id="name_zh"
-                    value={formData.name_zh || ''}
-                    onChange={(e) => setFormData({...formData, name_zh: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="name_ko">Name (Korean)</Label>
-                  <Input
-                    id="name_ko"
-                    value={formData.name_ko || ''}
-                    onChange={(e) => setFormData({...formData, name_ko: e.target.value})}
-                  />
-                </div>
+                {currentLanguage !== 'en' && (
+                  <div>
+                    <Label htmlFor={`name_${currentLanguage}`}>
+                      Name ({getLanguageDisplayName(currentLanguage)})
+                    </Label>
+                    <Input
+                      id={`name_${currentLanguage}`}
+                      value={formData[`name_${currentLanguage}` as keyof Restaurant] as string || ''}
+                      onChange={(e) => setFormData({...formData, [`name_${currentLanguage}`]: e.target.value})}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -257,7 +262,7 @@ const RestaurantManagement: React.FC = () => {
               </Select>
             </div>
             
-            {/* Addresses (Multilingual) */}
+            {/* Addresses (Smart Language Selection) */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Addresses</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -270,30 +275,18 @@ const RestaurantManagement: React.FC = () => {
                     required
                   />
                 </div>
-                <div>
-                  <Label htmlFor="address_ja">Address (Japanese)</Label>
-                  <Input
-                    id="address_ja"
-                    value={formData.address_ja || ''}
-                    onChange={(e) => setFormData({...formData, address_ja: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="address_zh">Address (Chinese)</Label>
-                  <Input
-                    id="address_zh"
-                    value={formData.address_zh || ''}
-                    onChange={(e) => setFormData({...formData, address_zh: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="address_ko">Address (Korean)</Label>
-                  <Input
-                    id="address_ko"
-                    value={formData.address_ko || ''}
-                    onChange={(e) => setFormData({...formData, address_ko: e.target.value})}
-                  />
-                </div>
+                {currentLanguage !== 'en' && (
+                  <div>
+                    <Label htmlFor={`address_${currentLanguage}`}>
+                      Address ({getLanguageDisplayName(currentLanguage)})
+                    </Label>
+                    <Input
+                      id={`address_${currentLanguage}`}
+                      value={formData[`address_${currentLanguage}` as keyof Restaurant] as string || ''}
+                      onChange={(e) => setFormData({...formData, [`address_${currentLanguage}`]: e.target.value})}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -307,7 +300,7 @@ const RestaurantManagement: React.FC = () => {
               />
             </div>
             
-            {/* Descriptions (Multilingual) */}
+            {/* Descriptions (Smart Language Selection) */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Descriptions</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -319,30 +312,18 @@ const RestaurantManagement: React.FC = () => {
                     onChange={(e) => setFormData({...formData, description_en: e.target.value, description: e.target.value})}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="description_ja">Description (Japanese)</Label>
-                  <Textarea
-                    id="description_ja"
-                    value={formData.description_ja || ''}
-                    onChange={(e) => setFormData({...formData, description_ja: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="description_zh">Description (Chinese)</Label>
-                  <Textarea
-                    id="description_zh"
-                    value={formData.description_zh || ''}
-                    onChange={(e) => setFormData({...formData, description_zh: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="description_ko">Description (Korean)</Label>
-                  <Textarea
-                    id="description_ko"
-                    value={formData.description_ko || ''}
-                    onChange={(e) => setFormData({...formData, description_ko: e.target.value})}
-                  />
-                </div>
+                {currentLanguage !== 'en' && (
+                  <div>
+                    <Label htmlFor={`description_${currentLanguage}`}>
+                      Description ({getLanguageDisplayName(currentLanguage)})
+                    </Label>
+                    <Textarea
+                      id={`description_${currentLanguage}`}
+                      value={formData[`description_${currentLanguage}` as keyof Restaurant] as string || ''}
+                      onChange={(e) => setFormData({...formData, [`description_${currentLanguage}`]: e.target.value})}
+                    />
+                  </div>
+                )}
               </div>
             </div>
             
@@ -473,6 +454,14 @@ const RestaurantManagement: React.FC = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={() => window.location.href = `/restaurant/${restaurant.id}/dashboard`}
+                    className="bg-navikko-primary hover:bg-navikko-primary/90"
+                  >
+                    Manage
+                  </Button>
                   <Button size="sm" variant="outline" onClick={() => handleEdit(restaurant)}>
                     <Edit className="h-4 w-4" />
                   </Button>
