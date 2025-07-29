@@ -195,7 +195,18 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   const handleSetUserRole = (role: UserRole) => {
-    // SECURITY: Prevent admin role assignment without proper authentication
+    console.log('🔄 Role switching to:', role);
+    
+    // For admin users, allow role switching for testing purposes
+    const currentUser = authService.getCurrentUser();
+    if (currentUser && currentUser.userType === 'admin') {
+      console.log('🔒 Admin user switching role for testing:', role);
+      setUserRole(role);
+      // Keep the admin user object but change the display role
+      return;
+    }
+    
+    // For non-admin users, prevent admin role assignment
     if (role === 'admin') {
       console.log('🔒 Admin role assignment blocked - requires proper authentication');
       return;
@@ -203,13 +214,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     
     setUserRole(role);
     
-    // Update authentication state
+    // Update authentication state for non-admin users
     if (role) {
       const user = authService.getCurrentUser();
       if (user && user.userType !== 'admin') {
         setUser(user);
-      } else {
-        setUser(null);
       }
     } else {
       setUser(null);
