@@ -342,12 +342,12 @@ const RestaurantOwnerRegistration: React.FC = () => {
           <DialogTrigger asChild>
             <Button onClick={() => setIsDialogOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Register Restaurant
+              {t('auth.register_restaurant')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Register Your Restaurant</DialogTitle>
+              <DialogTitle>{t('auth.register_your_restaurant')}</DialogTitle>
             </DialogHeader>
             
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -1017,7 +1017,7 @@ const RestaurantOwnerRegistration: React.FC = () => {
                   Cancel
                 </Button>
                 <Button type="submit" className="flex-1">
-                  Register Restaurant
+                  {t('auth.register_restaurant')}
                 </Button>
               </div>
             </form>

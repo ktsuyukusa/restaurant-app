@@ -62,7 +62,10 @@ const resources = {
       'back': 'Back',
       'error': 'Error',
       'services': 'Services',
-      'owner': 'Owner'
+      'owner': 'Owner',
+      'dashboard': 'Dashboard',
+      'orders': 'Orders',
+      'menu_management': 'Menu Management'
     }
   },
   ja: {
@@ -125,7 +128,10 @@ const resources = {
       'back': '戻る',
       'error': 'エラー',
       'services': 'サービス',
-      'owner': 'オーナー'
+      'owner': 'オーナー',
+      'dashboard': 'ダッシュボード',
+      'orders': '注文',
+      'menu_management': 'メニュー管理'
     }
   },
   pl: {
@@ -197,8 +203,15 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'en',
-    fallbackLng: 'en',
+    lng: 'ja', // Default to Japanese as primary language
+    fallbackLng: 'ja', // Fallback to Japanese
+    detection: {
+      // Auto-detect language from browser/system settings
+      order: ['navigator', 'localStorage', 'sessionStorage', 'htmlTag'],
+      lookupLocalStorage: 'i18nextLng',
+      lookupSessionStorage: 'i18nextLng',
+      caches: ['localStorage', 'sessionStorage'],
+    },
     interpolation: {
       escapeValue: false
     }

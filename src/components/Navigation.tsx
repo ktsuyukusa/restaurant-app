@@ -24,18 +24,18 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate, currentSection }) =
 
   // Restaurant owner navigation items
   const restaurantOwnerNavigationItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { id: 'orders', label: 'Orders', icon: Calendar },
-    { id: 'menu-management', label: 'Menu Management', icon: BookOpen },
+    { id: 'dashboard', label: t('dashboard'), icon: BarChart3 },
+    { id: 'orders', label: t('orders'), icon: Calendar },
+    { id: 'menu-management', label: t('menu_management'), icon: BookOpen },
     { id: 'restaurants', label: t('restaurants'), icon: Store },
     { id: 'subscription', label: 'Subscription', icon: CreditCard },
   ];
 
   // Admin navigation items (includes everything)
   const adminNavigationItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-    { id: 'orders', label: 'Orders', icon: Calendar },
-    { id: 'menu-management', label: 'Menu Management', icon: BookOpen },
+    { id: 'dashboard', label: t('dashboard'), icon: BarChart3 },
+    { id: 'orders', label: t('orders'), icon: Calendar },
+    { id: 'menu-management', label: t('menu_management'), icon: BookOpen },
     { id: 'restaurants', label: t('restaurants'), icon: Store },
     { id: 'users', label: t('users'), icon: Users },
     { id: 'reservations', label: t('reservation'), icon: Calendar },

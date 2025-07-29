@@ -34,7 +34,9 @@ export const authTranslations: Record<string, AuthTranslations> = {
     'auth.i_am_a': 'I am a:',
     'auth.customer_desc': 'Browse restaurants and place orders',
     'auth.restaurant_owner_desc': 'Manage your restaurant and orders',
-    'auth.restaurant_owner_registration': 'Restaurant Owner Registration'
+    'auth.restaurant_owner_registration': 'Restaurant Owner Registration',
+    'auth.register_restaurant': 'Register Restaurant',
+    'auth.register_your_restaurant': 'Register Your Restaurant'
   },
   ja: {
     'auth.welcome': 'Navikkoへようこそ',
@@ -66,7 +68,9 @@ export const authTranslations: Record<string, AuthTranslations> = {
     'auth.i_am_a': '私は:',
     'auth.customer_desc': 'レストランを検索して注文する',
     'auth.restaurant_owner_desc': 'レストランと注文を管理する',
-    'auth.restaurant_owner_registration': 'レストランオーナー登録'
+    'auth.restaurant_owner_registration': 'レストランオーナー登録',
+    'auth.register_restaurant': 'レストラン登録',
+    'auth.register_your_restaurant': 'レストランを登録'
   },
   pl: {
     'auth.welcome': 'Witamy w Navikko',
