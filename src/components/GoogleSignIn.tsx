@@ -5,6 +5,8 @@ import { useAppContext } from '@/hooks/useAppContext';
 import authService, { GoogleUser, GoogleSignInData } from '@/services/authService';
 import TwoFactorAuthModal from './TwoFactorAuthModal';
 
+// GoogleSignIn component with internationalization support and ESLint fixes
+
 interface GoogleSignInProps {
   userType: 'customer' | 'restaurant_owner' | 'admin';
   onSuccess?: (user: unknown) => void;
