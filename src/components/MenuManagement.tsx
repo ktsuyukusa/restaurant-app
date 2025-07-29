@@ -368,9 +368,9 @@ const MenuManagement: React.FC = () => {
                 <SelectValue placeholder="Filter by restaurant" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Restaurants ({menuItems.length} items)</SelectItem>
-                {restaurants.map((restaurant) => {
-                  const restaurantItemCount = menuItems.filter(item => item.restaurantId === restaurant.id).length;
+                <SelectItem value="all">All Restaurants ({menuItems?.length || 0} items)</SelectItem>
+                {restaurants?.map((restaurant) => {
+                  const restaurantItemCount = menuItems?.filter(item => item.restaurantId === restaurant.id)?.length || 0;
                   return (
                     <SelectItem key={restaurant.id} value={restaurant.id}>
                       {getLocalizedText({
@@ -583,11 +583,11 @@ const MenuManagement: React.FC = () => {
         <h3 className="text-lg font-semibold mb-3 text-navikko-secondary">Menu Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center p-3 bg-white rounded border">
-            <div className="text-2xl font-bold text-navikko-primary">{menuItems.length}</div>
+            <div className="text-2xl font-bold text-navikko-primary">{menuItems?.length || 0}</div>
             <div className="text-sm text-gray-600">Total Menu Items</div>
           </div>
-          {restaurants.map((restaurant) => {
-            const restaurantItemCount = menuItems.filter(item => item.restaurantId === restaurant.id).length;
+          {restaurants?.map((restaurant) => {
+            const restaurantItemCount = menuItems?.filter(item => item.restaurantId === restaurant.id)?.length || 0;
             return (
               <div key={restaurant.id} className="text-center p-3 bg-white rounded border">
                 <div className="text-lg font-semibold text-navikko-secondary">
@@ -607,7 +607,7 @@ const MenuManagement: React.FC = () => {
       </div>
 
       <div className="grid gap-4">
-        {filteredMenuItems.map((item) => (
+        {filteredMenuItems?.map((item) => (
           <Card key={item.id}>
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
