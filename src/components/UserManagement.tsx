@@ -47,6 +47,7 @@ const UserManagement: React.FC = () => {
   }, []);
 
   const createUserProfilesTable = async () => {
+    console.log('🔍 UserManagement: Creating user_profiles table if not exists...');
     const supabase = getSupabaseClient();
     const { error } = await supabase.rpc('exec_sql', {
       sql: `
@@ -62,11 +63,14 @@ const UserManagement: React.FC = () => {
     });
     
     if (error) {
-      console.error('Error creating user_profiles table:', error);
+      console.error('❌ Error creating user_profiles table:', error);
+    } else {
+      console.log('✅ user_profiles table created/verified successfully');
     }
   };
 
   const fetchUsers = async () => {
+    console.log('🔍 UserManagement: Fetching users from database...');
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('user_profiles')
@@ -74,8 +78,9 @@ const UserManagement: React.FC = () => {
       .order('created_at', { ascending: false });
     
     if (error) {
-      console.error('Error fetching users:', error);
+      console.error('❌ Error fetching users:', error);
     } else {
+      console.log('✅ Users fetched successfully:', data?.length || 0, 'users found');
       setUsers(data || []);
     }
   };
@@ -224,43 +229,59 @@ const UserManagement: React.FC = () => {
       </div>
 
       <div className="grid gap-4">
-        {users.map((user) => (
-          <Card key={user.id}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5" />
-                    {user.name}
-                  </CardTitle>
-                  <p className="text-sm text-gray-600">{user.email}</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(user)}
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDelete(user.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between items-center text-sm">
-                <span>Language: {getLanguageName(user.language)}</span>
-                <span>Created: {new Date(user.created_at).toLocaleDateString()}</span>
-              </div>
+        {users.length === 0 ? (
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <User className="h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No users found</h3>
+              <p className="text-gray-600 text-center mb-4">
+                Get started by adding your first user profile to the system.
+              </p>
+              <Button onClick={() => setIsDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add First User
+              </Button>
             </CardContent>
           </Card>
-        ))}
+        ) : (
+          users.map((user) => (
+            <Card key={user.id}>
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="h-5 w-5" />
+                      {user.name}
+                    </CardTitle>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(user)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center text-sm">
+                  <span>Language: {getLanguageName(user.language)}</span>
+                  <span>Created: {new Date(user.created_at).toLocaleDateString()}</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );
