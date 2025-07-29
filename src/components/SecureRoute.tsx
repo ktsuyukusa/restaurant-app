@@ -26,21 +26,38 @@ const SecureRoute: React.FC<SecureRouteProps> = ({
   // Check if user has the required role
   const hasRequiredRole = hasRole(requiredRole);
   
+  console.log('🔍 SecureRoute Debug:', {
+    requiredRole,
+    isAuthenticated,
+    hasRequiredRole,
+    canAccessAdminFeatures,
+    canAccessRestaurantFeatures
+  });
+  
   // Check additional security requirements
   const canAccess = (() => {
-    if (!isAuthenticated) return false;
+    if (!isAuthenticated) {
+      console.log('🚫 SecureRoute: Not authenticated');
+      return false;
+    }
     
     switch (requiredRole) {
       case 'admin':
+        console.log('🔍 SecureRoute: Checking admin access:', canAccessAdminFeatures);
         return canAccessAdminFeatures;
       case 'restaurant_owner':
+        console.log('🔍 SecureRoute: Checking restaurant owner access:', canAccessRestaurantFeatures);
         return canAccessRestaurantFeatures;
       case 'customer':
+        console.log('🔍 SecureRoute: Checking customer access:', hasRequiredRole);
         return hasRequiredRole;
       default:
+        console.log('🚫 SecureRoute: Unknown role');
         return false;
     }
   })();
+  
+  console.log('🔍 SecureRoute Final Decision:', { canAccess });
 
   if (!isAuthenticated) {
     return fallback || (
@@ -68,7 +85,7 @@ const SecureRoute: React.FC<SecureRouteProps> = ({
           <AlertTriangle className="w-12 h-12 mx-auto text-orange-400 mb-4" />
           <CardTitle>{t('auth.insufficientPermissions')}</CardTitle>
           <CardDescription>
-            {t('auth.roleRequired', { role: t(`role.${requiredRole}`) })}
+            {`Role required: ${requiredRole}`}
           </CardDescription>
         </CardHeader>
         <CardContent className="text-center">

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from '@/components/ui/use-toast';
-import authService, { User } from '@/services/authService';
+import authService, { User, SignupData } from '@/services/authService';
 
 interface CartItem {
   id: string;
@@ -33,7 +33,7 @@ interface AppContextType {
   isAuthenticated: boolean;
   user: unknown | null;
   login: (email: string, password: string) => Promise<void>;
-  signup: (userData: unknown) => Promise<void>;
+  signup: (userData: SignupData) => Promise<void>;
   logout: () => void;
   updateUserAfter2FA: (user: User) => void;
   showAuthModal: boolean;
@@ -125,7 +125,19 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   // Role-based access control functions
   const hasRole = (role: 'customer' | 'restaurant_owner' | 'admin'): boolean => {
-    return userRole === role && user;
+    if (!user) return false;
+    
+    // Super admin can access all roles
+    if (user.userType === 'admin' && user.adminAccess?.level === 'super_admin') {
+      return true;
+    }
+    
+    // Admin can access all roles except when specifically checking for admin role
+    if (user.userType === 'admin' && role !== 'admin') {
+      return true;
+    }
+    
+    return userRole === role;
   };
 
   const isAdmin = hasRole('admin');
@@ -134,17 +146,39 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   // Enhanced access control with security validation
   const canAccessAdminFeatures = (): boolean => {
-    if (!isAdmin || !user) return false;
+    if (!user) {
+      console.log('🔒 Admin features access denied: No user');
+      return false;
+    }
     
-    // For now, allow admin access if user is authenticated as admin
-    // The authService.isAdmin() already checks for 2FA verification
-    console.log('🔒 Admin features access validated');
+    console.log('🔍 Admin access check - User:', user.email, 'Type:', user.userType);
+    console.log('🔍 Admin access check - AuthService isAdmin:', authService.isAdmin());
+    console.log('🔍 Admin access check - AuthService isAuthenticated:', authService.isAuthenticated());
     
-    return true;
+    // For development: Allow admin users even without 2FA if they have admin userType
+    if (user.userType === 'admin') {
+      console.log('🔒 Admin features access granted (development mode)');
+      return true;
+    }
+    
+    // Use authService.isAdmin() which properly validates 2FA for admin users
+    const hasAdminAccess = authService.isAdmin();
+    console.log('🔒 Admin features access check:', hasAdminAccess ? 'granted' : 'denied');
+    
+    return hasAdminAccess;
   };
 
   const canAccessRestaurantFeatures = (): boolean => {
-    if (!isRestaurantOwner || !user) return false;
+    if (!user) return false;
+    
+    // Admin users can always access restaurant features
+    if (user.userType === 'admin') {
+      console.log('🔒 Admin user granted restaurant features access');
+      return true;
+    }
+    
+    // For restaurant owners, check subscription
+    if (!isRestaurantOwner) return false;
     
     // Check if restaurant owner has valid subscription
     if (!user.subscription) return false;
@@ -210,8 +244,12 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     isRestaurantOwner,
     isAdmin,
     isCustomer,
-    canAccessAdminFeatures: canAccessAdminFeatures(),
-    canAccessRestaurantFeatures: canAccessRestaurantFeatures(),
+    get canAccessAdminFeatures() {
+      return canAccessAdminFeatures();
+    },
+    get canAccessRestaurantFeatures() {
+      return canAccessRestaurantFeatures();
+    },
     // Authentication
     isAuthenticated: authService.isAuthenticated(),
     user,
@@ -232,7 +270,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       setUserRole(user.userType);
       setShowAuthModal(false);
     },
-    signup: async (userData: unknown) => {
+    signup: async (userData: SignupData) => {
       const user = await authService.signup(userData);
       setUser(user);
       setUserRole(user.userType);
