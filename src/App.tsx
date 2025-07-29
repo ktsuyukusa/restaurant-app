@@ -37,6 +37,7 @@ function App() {
               {/* Admin routes */}
               <Route path="/users" element={<AppLayout />} />
               <Route path="/reservations" element={<AppLayout />} />
+              <Route path="/role-switcher" element={<AppLayout />} />
               
               {/* Static pages */}
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
