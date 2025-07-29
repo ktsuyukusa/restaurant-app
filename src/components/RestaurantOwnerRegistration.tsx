@@ -337,7 +337,7 @@ const RestaurantOwnerRegistration: React.FC = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Restaurant Owner Registration</h1>
+        <h1 className="text-2xl font-bold">{t('auth.restaurant_owner_registration')}</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setIsDialogOpen(true)}>
