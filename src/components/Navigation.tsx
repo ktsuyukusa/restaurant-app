@@ -38,7 +38,6 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate, currentSection }) =
     { id: 'menu-management', label: t('menu_management'), icon: BookOpen },
     { id: 'restaurants', label: t('restaurants'), icon: Store },
     { id: 'users', label: t('users'), icon: Users },
-    { id: 'reservations', label: t('reservation'), icon: Calendar },
   ];
 
   // Select navigation items based on user role

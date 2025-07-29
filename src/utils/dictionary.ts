@@ -8,6 +8,9 @@ export const dictionary = {
     users: 'Users',
     cart: 'Cart',
     profile: 'Profile',
+    dashboard: 'Dashboard',
+    orders: 'Orders',
+    menu_management: 'Menu Management',
     
     // Restaurant info
     name: 'Name',
@@ -307,6 +310,9 @@ export const dictionary = {
     users: 'ユーザー',
     cart: 'カート',
     profile: 'プロフィール',
+    dashboard: 'ダッシュボード',
+    orders: '注文',
+    menu_management: 'メニュー管理',
     
     // Restaurant info
     name: '名前',
