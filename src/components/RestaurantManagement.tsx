@@ -16,10 +16,22 @@ import { getSupabaseClient } from '@/lib/supabase';
 interface Restaurant {
   id?: string;
   name: string;
+  name_en?: string;
+  name_ja?: string;
+  name_zh?: string;
+  name_ko?: string;
   address: string;
+  address_en?: string;
+  address_ja?: string;
+  address_zh?: string;
+  address_ko?: string;
   phone: string;
   cuisine: string;
   description?: string;
+  description_en?: string;
+  description_ja?: string;
+  description_zh?: string;
+  description_ko?: string;
   latitude?: number;
   longitude?: number;
   rating?: number;
@@ -28,9 +40,6 @@ interface Restaurant {
   image_url?: string;
   opening_hours?: string;
   phone_number?: string;
-  name_multilingual?: Record<string, string>;
-  address_multilingual?: Record<string, string>;
-  description_multilingual?: Record<string, string>;
   external_booking_url?: string;
   external_booking_url_en?: string;
   notification_email?: string;
@@ -47,7 +56,34 @@ const RestaurantManagement: React.FC = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<Partial<Restaurant>>({});
+  const [formData, setFormData] = useState<Partial<Restaurant>>({
+    name: '',
+    name_en: '',
+    name_ja: '',
+    name_zh: '',
+    name_ko: '',
+    address: '',
+    address_en: '',
+    address_ja: '',
+    address_zh: '',
+    address_ko: '',
+    description: '',
+    description_en: '',
+    description_ja: '',
+    description_zh: '',
+    description_ko: '',
+    phone: '',
+    cuisine: '',
+    rating: 0,
+    price_range: '$',
+    latitude: 0,
+    longitude: 0,
+    is_active: true,
+    image_url: '',
+    opening_hours: '',
+    external_booking_url: '',
+    notification_email: ''
+  });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -165,61 +201,149 @@ const RestaurantManagement: React.FC = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Restaurant Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name || ''}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="cuisine">Cuisine Type</Label>
-                <Select value={formData.cuisine || ''} onValueChange={(value) => setFormData({...formData, cuisine: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select cuisine type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {restaurantTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="address">Address</Label>
-                <Input
-                  id="address"
-                  value={formData.address || ''}
-                  onChange={(e) => setFormData({...formData, address: e.target.value})}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone">Phone Number</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone || ''}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  required
-                />
+            {/* Restaurant Names (Multilingual) */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Restaurant Names</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="name_en">Name (English) *</Label>
+                  <Input
+                    id="name_en"
+                    value={formData.name_en || ''}
+                    onChange={(e) => setFormData({...formData, name_en: e.target.value, name: e.target.value})}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="name_ja">Name (Japanese)</Label>
+                  <Input
+                    id="name_ja"
+                    value={formData.name_ja || ''}
+                    onChange={(e) => setFormData({...formData, name_ja: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="name_zh">Name (Chinese)</Label>
+                  <Input
+                    id="name_zh"
+                    value={formData.name_zh || ''}
+                    onChange={(e) => setFormData({...formData, name_zh: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="name_ko">Name (Korean)</Label>
+                  <Input
+                    id="name_ko"
+                    value={formData.name_ko || ''}
+                    onChange={(e) => setFormData({...formData, name_ko: e.target.value})}
+                  />
+                </div>
               </div>
             </div>
-            
+
             <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={formData.description || ''}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
+              <Label htmlFor="cuisine">Cuisine Type</Label>
+              <Select value={formData.cuisine || ''} onValueChange={(value) => setFormData({...formData, cuisine: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select cuisine type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {restaurantTypes.map((type) => (
+                    <SelectItem key={type} value={type}>
+                      {type}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Addresses (Multilingual) */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Addresses</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="address_en">Address (English) *</Label>
+                  <Input
+                    id="address_en"
+                    value={formData.address_en || ''}
+                    onChange={(e) => setFormData({...formData, address_en: e.target.value, address: e.target.value})}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="address_ja">Address (Japanese)</Label>
+                  <Input
+                    id="address_ja"
+                    value={formData.address_ja || ''}
+                    onChange={(e) => setFormData({...formData, address_ja: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="address_zh">Address (Chinese)</Label>
+                  <Input
+                    id="address_zh"
+                    value={formData.address_zh || ''}
+                    onChange={(e) => setFormData({...formData, address_zh: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="address_ko">Address (Korean)</Label>
+                  <Input
+                    id="address_ko"
+                    value={formData.address_ko || ''}
+                    onChange={(e) => setFormData({...formData, address_ko: e.target.value})}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                value={formData.phone || ''}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                required
               />
+            </div>
+            
+            {/* Descriptions (Multilingual) */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Descriptions</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="description_en">Description (English)</Label>
+                  <Textarea
+                    id="description_en"
+                    value={formData.description_en || ''}
+                    onChange={(e) => setFormData({...formData, description_en: e.target.value, description: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description_ja">Description (Japanese)</Label>
+                  <Textarea
+                    id="description_ja"
+                    value={formData.description_ja || ''}
+                    onChange={(e) => setFormData({...formData, description_ja: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description_zh">Description (Chinese)</Label>
+                  <Textarea
+                    id="description_zh"
+                    value={formData.description_zh || ''}
+                    onChange={(e) => setFormData({...formData, description_zh: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="description_ko">Description (Korean)</Label>
+                  <Textarea
+                    id="description_ko"
+                    value={formData.description_ko || ''}
+                    onChange={(e) => setFormData({...formData, description_ko: e.target.value})}
+                  />
+                </div>
+              </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

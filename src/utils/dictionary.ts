@@ -49,6 +49,12 @@ export const dictionary = {
     reserveTable: 'Reserve Table',
     addToCart: 'Add to Cart',
     'reservation.external_button': 'Reserve Table',
+    
+    // Missing auth translations
+    'auth.roleRequired': 'Role selection required',
+    'auth.backToHome': 'Back to Home',
+    'auth.forgotPassword': 'Forgot Password',
+    'auth.rememberMe': 'Remember Me',
 
     // Search and Filters
     'search.placeholder': 'Search restaurants...',
@@ -590,6 +596,13 @@ export const dictionary = {
     'reservation.contact_placeholder': '電話番号またはメールアドレス',
     'reservation.notes_placeholder': 'ご要望や食事制限など',
     'reservation.external_message': 'このレストランは外部予約システムを使用しています。',
+    'reservation.external_button': '外部サイトで予約',
+    
+    // Missing auth translations
+    'auth.roleRequired': '役割の選択が必要です',
+    'auth.backToHome': 'ホームに戻る',
+    'auth.forgotPassword': 'パスワードを忘れた',
+    'auth.rememberMe': 'ログイン状態を保持',
   },
   zh: {
     // Navigation

@@ -6,14 +6,52 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Edit, Trash2, Flame, Leaf, Wheat, Filter } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getLocalizedValue } from '@/utils/localization';
-import { getAllMenuItems, getAllRestaurants, type MenuItem, type Restaurant } from '@/utils/restaurantData';
+import { getSupabaseClient } from '@/lib/supabase';
+import { toast } from '@/components/ui/use-toast';
+
+interface MenuItem {
+  id: string;
+  restaurant_id: string;
+  name_en: string;
+  name_ja?: string;
+  name_zh?: string;
+  name_ko?: string;
+  description_en?: string;
+  description_ja?: string;
+  description_zh?: string;
+  description_ko?: string;
+  price: number;
+  category: string;
+  image_url?: string;
+  is_available: boolean;
+  is_spicy?: boolean;
+  is_vegetarian?: boolean;
+  is_gluten_free?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface Restaurant {
+  id: string;
+  name: string;
+  name_en?: string;
+  name_ja?: string;
+  name_zh?: string;
+  name_ko?: string;
+}
+
+interface MenuItemWithRestaurant extends MenuItem {
+  restaurantId: string;
+  restaurantName: Record<string, string>;
+}
 
 const MenuManagement: React.FC = () => {
   const { t, currentLanguage } = useLanguage();
-  const [menuItems, setMenuItems] = useState<Array<MenuItem & { restaurantId: string; restaurantName: Record<string, string> }>>([]);
+  const [menuItems, setMenuItems] = useState<MenuItemWithRestaurant[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
@@ -38,10 +76,79 @@ const MenuManagement: React.FC = () => {
   });
 
   useEffect(() => {
-    // Load synchronized data
-    setMenuItems(getAllMenuItems());
-    setRestaurants(getAllRestaurants());
+    fetchMenuItems();
+    fetchRestaurants();
   }, []);
+
+  const fetchMenuItems = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase
+        .from('menu_items')
+        .select(`
+          *,
+          restaurants!inner(
+            id,
+            name,
+            name_en,
+            name_ja,
+            name_zh,
+            name_ko
+          )
+        `)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching menu items:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load menu items",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const menuItemsWithRestaurant: MenuItemWithRestaurant[] = (data || []).map(item => ({
+        ...item,
+        restaurantId: item.restaurant_id,
+        restaurantName: {
+          en: item.restaurants.name_en || item.restaurants.name,
+          ja: item.restaurants.name_ja || item.restaurants.name,
+          zh: item.restaurants.name_zh || item.restaurants.name,
+          ko: item.restaurants.name_ko || item.restaurants.name,
+        }
+      }));
+
+      setMenuItems(menuItemsWithRestaurant);
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load menu items",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchRestaurants = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase
+        .from('restaurants')
+        .select('id, name, name_en, name_ja, name_zh, name_ko')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) {
+        console.error('Error fetching restaurants:', error);
+        return;
+      }
+
+      setRestaurants(data || []);
+    } catch (error) {
+      console.error('Error fetching restaurants:', error);
+    }
+  };
 
   // Filter menu items based on selected restaurant
   const filteredMenuItems = selectedRestaurantFilter === 'all' 
@@ -51,50 +158,77 @@ const MenuManagement: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newItem: MenuItem = {
-      id: editingItem?.id || Date.now().toString(),
-      name: {
-        en: formData.name_en,
-        ja: formData.name_ja,
-        zh: formData.name_zh,
-        ko: formData.name_ko
-      },
-      description: {
-        en: formData.description_en,
-        ja: formData.description_ja,
-        zh: formData.description_zh,
-        ko: formData.description_ko
-      },
-      price: formData.price,
-      category: formData.category,
-      image: formData.image || '/placeholder.svg',
-      available: formData.available,
-      spicy: formData.spicy,
-      vegetarian: formData.vegetarian,
-      glutenFree: formData.glutenFree
-    };
+    try {
+      const supabase = getSupabaseClient();
+      
+      const menuItemData = {
+        restaurant_id: formData.restaurant_id,
+        name_en: formData.name_en,
+        name_ja: formData.name_ja || null,
+        name_zh: formData.name_zh || null,
+        name_ko: formData.name_ko || null,
+        description_en: formData.description_en || null,
+        description_ja: formData.description_ja || null,
+        description_zh: formData.description_zh || null,
+        description_ko: formData.description_ko || null,
+        price: formData.price,
+        category: formData.category,
+        image_url: formData.image || null,
+        is_available: formData.available,
+        is_spicy: formData.spicy,
+        is_vegetarian: formData.vegetarian,
+        is_gluten_free: formData.glutenFree
+      };
 
-    if (editingItem) {
-      // Update existing item
-      const updatedItems = menuItems.map(item => 
-        item.id === editingItem.id 
-          ? { ...item, ...newItem }
-          : item
-      );
-      setMenuItems(updatedItems);
-    } else {
-      // Add new item
-      const restaurant = restaurants.find(r => r.id === formData.restaurant_id);
-      if (restaurant) {
-        const newItemWithRestaurant = {
-          ...newItem,
-          restaurantId: formData.restaurant_id,
-          restaurantName: restaurant.name
-        };
-        setMenuItems([newItemWithRestaurant, ...menuItems]);
+      if (editingItem) {
+        // Update existing item
+        const { error } = await supabase
+          .from('menu_items')
+          .update(menuItemData)
+          .eq('id', editingItem.id);
+
+        if (error) {
+          console.error('Error updating menu item:', error);
+          toast({
+            title: "Error",
+            description: "Failed to update menu item",
+            variant: "destructive",
+          });
+          return;
+        }
+      } else {
+        // Add new item
+        const { error } = await supabase
+          .from('menu_items')
+          .insert([menuItemData]);
+
+        if (error) {
+          console.error('Error creating menu item:', error);
+          toast({
+            title: "Error",
+            description: "Failed to create menu item",
+            variant: "destructive",
+          });
+          return;
+        }
       }
+
+      // Refresh the menu items list
+      await fetchMenuItems();
+      resetForm();
+      
+      toast({
+        title: "Success",
+        description: editingItem ? "Menu item updated successfully" : "Menu item created successfully",
+      });
+    } catch (error) {
+      console.error('Error saving menu item:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save menu item",
+        variant: "destructive",
+      });
     }
-    resetForm();
   };
 
   const resetForm = () => {
@@ -120,33 +254,63 @@ const MenuManagement: React.FC = () => {
     setIsDialogOpen(false);
   };
 
-  const handleEdit = (item: MenuItem & { restaurantId: string; restaurantName: Record<string, string> }) => {
+  const handleEdit = (item: MenuItemWithRestaurant) => {
     setEditingItem(item);
     setFormData({
       restaurant_id: item.restaurantId,
-      name_en: item.name.en || '',
-      name_ja: item.name.ja || '',
-      name_zh: item.name.zh || '',
-      name_ko: item.name.ko || '',
-      description_en: item.description?.en || '',
-      description_ja: item.description?.ja || '',
-      description_zh: item.description?.zh || '',
-      description_ko: item.description?.ko || '',
+      name_en: item.name_en || '',
+      name_ja: item.name_ja || '',
+      name_zh: item.name_zh || '',
+      name_ko: item.name_ko || '',
+      description_en: item.description_en || '',
+      description_ja: item.description_ja || '',
+      description_zh: item.description_zh || '',
+      description_ko: item.description_ko || '',
       price: item.price,
       category: item.category,
-      image: item.image || '',
-      available: item.available,
-      spicy: item.spicy || false,
-      vegetarian: item.vegetarian || false,
-      glutenFree: item.glutenFree || false
+      image: item.image_url || '',
+      available: item.is_available,
+      spicy: item.is_spicy || false,
+      vegetarian: item.is_vegetarian || false,
+      glutenFree: item.is_gluten_free || false
     });
     setIsDialogOpen(true);
   };
 
   const handleDelete = async (id: string) => {
     if (confirm(t('confirm.delete'))) {
-      const updatedItems = menuItems.filter(item => item.id !== id);
-      setMenuItems(updatedItems);
+      try {
+        const supabase = getSupabaseClient();
+        const { error } = await supabase
+          .from('menu_items')
+          .delete()
+          .eq('id', id);
+
+        if (error) {
+          console.error('Error deleting menu item:', error);
+          toast({
+            title: "Error",
+            description: "Failed to delete menu item",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Refresh the menu items list
+        await fetchMenuItems();
+        
+        toast({
+          title: "Success",
+          description: "Menu item deleted successfully",
+        });
+      } catch (error) {
+        console.error('Error deleting menu item:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete menu item",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -155,12 +319,24 @@ const MenuManagement: React.FC = () => {
     return getLocalizedValue(text, lang);
   };
 
-  const getItemName = (item: MenuItem) => {
-    return getLocalizedText(item.name, currentLanguage);
+  const getItemName = (item: MenuItemWithRestaurant) => {
+    const nameObj = {
+      en: item.name_en,
+      ja: item.name_ja || item.name_en,
+      zh: item.name_zh || item.name_en,
+      ko: item.name_ko || item.name_en
+    };
+    return getLocalizedText(nameObj, currentLanguage);
   };
 
-  const getItemDescription = (item: MenuItem) => {
-    return getLocalizedText(item.description || '', currentLanguage);
+  const getItemDescription = (item: MenuItemWithRestaurant) => {
+    const descObj = {
+      en: item.description_en || '',
+      ja: item.description_ja || item.description_en || '',
+      zh: item.description_zh || item.description_en || '',
+      ko: item.description_ko || item.description_en || ''
+    };
+    return getLocalizedText(descObj, currentLanguage);
   };
 
   const getRestaurantName = (restaurantName: Record<string, string>) => {
@@ -197,7 +373,12 @@ const MenuManagement: React.FC = () => {
                   const restaurantItemCount = menuItems.filter(item => item.restaurantId === restaurant.id).length;
                   return (
                     <SelectItem key={restaurant.id} value={restaurant.id}>
-                      {getLocalizedText(restaurant.name, currentLanguage)} ({restaurantItemCount} items)
+                      {getLocalizedText({
+                        en: restaurant.name_en || restaurant.name,
+                        ja: restaurant.name_ja || restaurant.name,
+                        zh: restaurant.name_zh || restaurant.name,
+                        ko: restaurant.name_ko || restaurant.name
+                      }, currentLanguage)} ({restaurantItemCount} items)
                     </SelectItem>
                   );
                 })}
@@ -205,6 +386,7 @@ const MenuManagement: React.FC = () => {
             </Select>
           </div>
         </div>
+        
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => resetForm()}>
@@ -231,7 +413,12 @@ const MenuManagement: React.FC = () => {
                   <SelectContent>
                     {restaurants.map((restaurant) => (
                       <SelectItem key={restaurant.id} value={restaurant.id}>
-                        {getLocalizedText(restaurant.name, currentLanguage)}
+                        {getLocalizedText({
+                          en: restaurant.name_en || restaurant.name,
+                          ja: restaurant.name_ja || restaurant.name,
+                          zh: restaurant.name_zh || restaurant.name,
+                          ko: restaurant.name_ko || restaurant.name
+                        }, currentLanguage)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -345,38 +532,34 @@ const MenuManagement: React.FC = () => {
 
               <div className="flex gap-4">
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="available"
                     checked={formData.available}
-                    onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
+                    onCheckedChange={(checked) => setFormData({ ...formData, available: !!checked })}
                   />
                   <Label htmlFor="available">Available</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="spicy"
                     checked={formData.spicy}
-                    onChange={(e) => setFormData({ ...formData, spicy: e.target.checked })}
+                    onCheckedChange={(checked) => setFormData({ ...formData, spicy: !!checked })}
                   />
                   <Label htmlFor="spicy">Spicy</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="vegetarian"
                     checked={formData.vegetarian}
-                    onChange={(e) => setFormData({ ...formData, vegetarian: e.target.checked })}
+                    onCheckedChange={(checked) => setFormData({ ...formData, vegetarian: !!checked })}
                   />
                   <Label htmlFor="vegetarian">Vegetarian</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="glutenFree"
                     checked={formData.glutenFree}
-                    onChange={(e) => setFormData({ ...formData, glutenFree: e.target.checked })}
+                    onCheckedChange={(checked) => setFormData({ ...formData, glutenFree: !!checked })}
                   />
                   <Label htmlFor="glutenFree">Gluten Free</Label>
                 </div>
@@ -408,7 +591,12 @@ const MenuManagement: React.FC = () => {
             return (
               <div key={restaurant.id} className="text-center p-3 bg-white rounded border">
                 <div className="text-lg font-semibold text-navikko-secondary">
-                  {getLocalizedText(restaurant.name, currentLanguage)}
+                  {getLocalizedText({
+                    en: restaurant.name_en || restaurant.name,
+                    ja: restaurant.name_ja || restaurant.name,
+                    zh: restaurant.name_zh || restaurant.name,
+                    ko: restaurant.name_ko || restaurant.name
+                  }, currentLanguage)}
                 </div>
                 <div className="text-2xl font-bold text-navikko-primary">{restaurantItemCount}</div>
                 <div className="text-sm text-gray-600">Menu Items</div>
@@ -439,18 +627,18 @@ const MenuManagement: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-4">
-                {item.image && (
-                  <img src={item.image} alt={getItemName(item)} className="w-16 h-16 object-cover rounded" />
+                {item.image_url && (
+                  <img src={item.image_url} alt={getItemName(item)} className="w-16 h-16 object-cover rounded" />
                 )}
                 <div className="flex-1">
                   <div className="font-semibold text-lg">¥{item.price}</div>
                   <div className="text-sm text-gray-600 mb-2">{getItemDescription(item)}</div>
                   <div className="flex gap-2">
                     <Badge variant="outline">{item.category}</Badge>
-                    {item.spicy && <Badge variant="outline" className="text-red-600"><Flame className="h-3 w-3 mr-1" />Spicy</Badge>}
-                    {item.vegetarian && <Badge variant="outline" className="text-green-600"><Leaf className="h-3 w-3 mr-1" />Vegetarian</Badge>}
-                    {item.glutenFree && <Badge variant="outline" className="text-blue-600"><Wheat className="h-3 w-3 mr-1" />Gluten Free</Badge>}
-                    {!item.available && <Badge variant="outline" className="text-gray-500">Unavailable</Badge>}
+                    {item.is_spicy && <Badge variant="outline" className="text-red-600"><Flame className="h-3 w-3 mr-1" />Spicy</Badge>}
+                    {item.is_vegetarian && <Badge variant="outline" className="text-green-600"><Leaf className="h-3 w-3 mr-1" />Vegetarian</Badge>}
+                    {item.is_gluten_free && <Badge variant="outline" className="text-blue-600"><Wheat className="h-3 w-3 mr-1" />Gluten Free</Badge>}
+                    {!item.is_available && <Badge variant="outline" className="text-gray-500">Unavailable</Badge>}
                   </div>
                 </div>
               </div>

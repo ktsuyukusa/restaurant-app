@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { TOTPService, generateTOTPSecret } from '@/utils/totpService';
 import { TOTPQRCode } from '@/components/TOTPQRCode';
 import { getSupabaseClient } from '@/lib/supabase';
+import authService from '@/services/authService';
 
 interface Admin2FASetupProps {
   onSetupComplete: () => void;
@@ -25,6 +26,10 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
   useEffect(() => {
     // Try to get secret from database first, then localStorage, then generate new one
     const loadSecret = async () => {
+      // Get current user
+      const currentUser = authService.getCurrentUser();
+      const userEmail = currentUser?.email || 'admin@example.com';
+      
       try {
         const supabase = getSupabaseClient();
         
@@ -32,7 +37,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
         const { data: userData } = await supabase
           .from('users')
           .select('id')
-          .eq('email', 'wasando.tsuyukusa@gmail.com')
+          .eq('email', userEmail)
           .single();
         
         if (userData) {
@@ -48,7 +53,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
             console.log('2FA Setup: Using existing secret from database:', adminData.two_factor_secret);
             
             const totpService = new TOTPService({ secret: adminData.two_factor_secret });
-            const qrUrl = totpService.generateQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+            const qrUrl = totpService.generateQRCodeURL(userEmail, 'Navikko Admin');
             
             setTotpService(totpService);
             setSecret(adminData.two_factor_secret);
@@ -68,14 +73,14 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       let existingSecret = localStorage.getItem('admin_totp_secret');
       
       if (!existingSecret) {
-            // Generate new secret only if none exists anywhere
-    existingSecret = generateTOTPSecret();
+        // Generate new secret only if none exists anywhere
+        existingSecret = generateTOTPSecret();
         localStorage.setItem('admin_totp_secret', existingSecret);
       }
       
       // Create TOTP service with the exact secret
       const totpService = new TOTPService({ secret: existingSecret });
-      const qrUrl = totpService.generateQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+      const qrUrl = totpService.generateQRCodeURL(userEmail, 'Navikko Admin');
       
       setTotpService(totpService);
       setSecret(existingSecret);
@@ -107,6 +112,8 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
         // Update the database with the new secret using Supabase
         try {
           const supabase = getSupabaseClient();
+          const currentUser = authService.getCurrentUser();
+          const userEmail = currentUser?.email || 'admin@example.com';
           
           const { error } = await supabase
             .from('admin_access')
@@ -119,7 +126,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
               await supabase
                 .from('users')
                 .select('id')
-                .eq('email', 'wasando.tsuyukusa@gmail.com')
+                .eq('email', userEmail)
                 .single()
             ).data.id);
           
@@ -155,12 +162,15 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
   };
 
   const generateNewSecret = async () => {
+    const currentUser = authService.getCurrentUser();
+    const userEmail = currentUser?.email || 'admin@example.com';
+    
     // Clear old secret and generate new one
     localStorage.removeItem('admin_totp_secret');
     
-            const newSecret = generateTOTPSecret();
+    const newSecret = generateTOTPSecret();
     const newTotpService = new TOTPService({ secret: newSecret });
-    const qrUrl = newTotpService.generateQRCodeURL('wasando.tsuyukusa@gmail.com', 'Navikko Admin');
+    const qrUrl = newTotpService.generateQRCodeURL(userEmail, 'Navikko Admin');
     
     setTotpService(newTotpService);
     setSecret(newSecret);
@@ -177,7 +187,7 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
       const { data: userData } = await supabase
         .from('users')
         .select('id')
-        .eq('email', 'wasando.tsuyukusa@gmail.com')
+        .eq('email', userEmail)
         .single();
       if (userData) {
         await supabase
@@ -209,9 +219,9 @@ export const Admin2FASetup: React.FC<Admin2FASetupProps> = ({ onSetupComplete, o
         {qrCodeUrl && (
           <div className="flex flex-col items-center space-y-4">
             <div className="bg-white p-4 rounded-lg border">
-              <TOTPQRCode 
+              <TOTPQRCode
                 secret={secret}
-                accountName="wasando.tsuyukusa@gmail.com"
+                accountName={authService.getCurrentUser()?.email || 'admin@example.com'}
                 issuer="Navikko Admin"
                 size={200}
               />

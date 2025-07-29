@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Search, 
-  Filter, 
-  Clock, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Search,
+  Filter,
+  Clock,
+  CheckCircle,
+  XCircle,
   Eye,
   Phone,
   Mail
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getSupabaseClient } from '@/lib/supabase';
+import { toast } from '@/components/ui/use-toast';
 
 interface Order {
   id: string;
@@ -42,77 +44,67 @@ const OrdersManagement: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading orders data
-    setTimeout(() => {
-      const mockOrders: Order[] = [
-        {
-          id: 'order-001',
-          customerName: '田中太郎',
-          customerEmail: 'tanaka@example.com',
-          customerPhone: '080-1234-5678',
-          items: [
-            { name: 'Carbonara', quantity: 1, price: 1300 },
-            { name: 'レモンスパゲッティ', quantity: 1, price: 1200 }
-          ],
-          totalAmount: 2500,
-          status: 'pending',
-          pickupTime: '15:00',
-          orderTime: '14:30',
-          notes: 'Extra cheese please'
-        },
-        {
-          id: 'order-002',
-          customerName: 'John Smith',
-          customerEmail: 'john@example.com',
-          customerPhone: '080-9876-5432',
-          items: [
-            { name: 'Set Menu A', quantity: 2, price: 1800 }
-          ],
-          totalAmount: 3600,
-          status: 'preparing',
-          pickupTime: '16:00',
-          orderTime: '14:15'
-        },
-        {
-          id: 'order-003',
-          customerName: '李小明',
-          customerEmail: 'li@example.com',
-          customerPhone: '080-5555-1234',
-          items: [
-            { name: 'Seafood Pasta', quantity: 1, price: 1600 }
-          ],
-          totalAmount: 1600,
-          status: 'ready',
-          pickupTime: '15:30',
-          orderTime: '14:45'
-        },
-        {
-          id: 'order-004',
-          customerName: '佐藤花子',
-          customerEmail: 'sato@example.com',
-          customerPhone: '080-1111-2222',
-          items: [
-            { name: 'Mushroom Pasta', quantity: 1, price: 1400 },
-            { name: 'Set Menu B', quantity: 1, price: 2200 }
-          ],
-          totalAmount: 3600,
-          status: 'completed',
-          pickupTime: '14:00',
-          orderTime: '13:30'
-        }
-      ];
-      
-      setOrders(mockOrders);
-      setFilteredOrders(mockOrders);
-      setLoading(false);
-    }, 1000);
+    fetchOrders();
   }, []);
 
-  useEffect(() => {
-    filterOrders();
-  }, [searchTerm, statusFilter, orders]);
+  const fetchOrders = async () => {
+    try {
+      const supabase = getSupabaseClient();
+      const { data, error } = await supabase
+        .from('orders')
+        .select(`
+          *,
+          restaurants!inner(
+            name,
+            name_en,
+            name_ja,
+            name_zh,
+            name_ko
+          )
+        `)
+        .order('created_at', { ascending: false });
 
-  const filterOrders = () => {
+      if (error) {
+        console.error('Error fetching orders:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load orders",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const formattedOrders: Order[] = (data || []).map(order => ({
+        id: order.id,
+        customerName: order.customer_name,
+        customerEmail: order.customer_email,
+        customerPhone: order.customer_phone || '',
+        items: order.items || [],
+        totalAmount: order.total_amount,
+        status: order.status,
+        pickupTime: order.pickup_time || '',
+        orderTime: new Date(order.created_at).toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit'
+        }),
+        notes: order.notes || ''
+      }));
+
+      setOrders(formattedOrders);
+      setFilteredOrders(formattedOrders);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load orders",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
+  };
+
+  const filterOrders = useCallback(() => {
     let filtered = orders;
 
     // Search filter
@@ -129,14 +121,49 @@ const OrdersManagement: React.FC = () => {
     }
 
     setFilteredOrders(filtered);
-  };
+  }, [searchTerm, statusFilter, orders]);
 
-  const updateOrderStatus = (orderId: string, newStatus: Order['status']) => {
-    setOrders(prev => 
-      prev.map(order => 
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
+  useEffect(() => {
+    filterOrders();
+  }, [filterOrders]);
+
+  const updateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
+    try {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase
+        .from('orders')
+        .update({ status: newStatus })
+        .eq('id', orderId);
+
+      if (error) {
+        console.error('Error updating order status:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update order status",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Update local state
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+
+      toast({
+        title: "Success",
+        description: `Order status updated to ${newStatus}`,
+      });
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update order status",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusColor = (status: Order['status']) => {

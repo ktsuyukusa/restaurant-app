@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Globe, Instagram, Facebook, Twitter, MapPin, Phone, Clock, Star, Upload, Search, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -77,11 +78,36 @@ interface RestaurantOwnerData {
   }>;
 }
 
+interface ScrapedData {
+  name?: {
+    en?: string;
+    ja?: string;
+    zh?: string;
+    ko?: string;
+  };
+  description?: {
+    en?: string;
+    ja?: string;
+    zh?: string;
+    ko?: string;
+  };
+  address?: {
+    en?: string;
+    ja?: string;
+    zh?: string;
+    ko?: string;
+  };
+  phone?: string;
+  openingHours?: string;
+  images?: string[];
+  [key: string]: unknown;
+}
+
 const RestaurantOwnerRegistration: React.FC = () => {
   const { t } = useLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isScraping, setIsScraping] = useState(false);
-  const [scrapedData, setScrapedData] = useState<any>(null);
+  const [scrapedData, setScrapedData] = useState<ScrapedData | null>(null);
   
   const [formData, setFormData] = useState<RestaurantOwnerData>({
     ownerName: '',
@@ -131,7 +157,7 @@ const RestaurantOwnerRegistration: React.FC = () => {
     { code: 'zh', name: '中文' }
   ];
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number | File | null) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -142,7 +168,7 @@ const RestaurantOwnerRegistration: React.FC = () => {
     setFormData(prev => ({
       ...prev,
       [field]: {
-        ...prev[field as keyof RestaurantOwnerData] as any,
+        ...(prev[field as keyof RestaurantOwnerData] as Record<string, string>),
         [lang]: value
       }
     }));
@@ -175,10 +201,10 @@ const RestaurantOwnerRegistration: React.FC = () => {
     }));
   };
 
-  const updateMenuItem = (index: number, field: string, value: any) => {
+  const updateMenuItem = (index: number, field: string, value: string | number | boolean | File | null) => {
     setFormData(prev => ({
       ...prev,
-      menuItems: prev.menuItems.map((item, i) => 
+      menuItems: prev.menuItems.map((item, i) =>
         i === index ? { ...item, [field]: value } : item
       )
     }));
@@ -187,10 +213,10 @@ const RestaurantOwnerRegistration: React.FC = () => {
   const updateMenuItemMultilingual = (index: number, field: string, lang: string, value: string) => {
     setFormData(prev => ({
       ...prev,
-      menuItems: prev.menuItems.map((item, i) => 
-        i === index ? { 
-          ...item, 
-          [field]: { ...item[field as keyof typeof item] as any, [lang]: value }
+      menuItems: prev.menuItems.map((item, i) =>
+        i === index ? {
+          ...item,
+          [field]: { ...(item[field as keyof typeof item] as Record<string, string>), [lang]: value }
         } : item
       )
     }));
@@ -962,40 +988,36 @@ const RestaurantOwnerRegistration: React.FC = () => {
 
                             <div className="flex gap-4">
                               <div className="flex items-center space-x-2">
-                                <input
-                                  type="checkbox"
-                                  id={`available-${index}`}
+                                <Checkbox
+                                  id={`available-${item.id}-${index}`}
                                   checked={item.available}
-                                  onChange={(e) => updateMenuItem(index, 'available', e.target.checked)}
+                                  onCheckedChange={(checked) => updateMenuItem(index, 'available', checked)}
                                 />
-                                <Label htmlFor={`available-${index}`}>Available</Label>
+                                <Label htmlFor={`available-${item.id}-${index}`}>Available</Label>
                               </div>
                               <div className="flex items-center space-x-2">
-                                <input
-                                  type="checkbox"
-                                  id={`spicy-${index}`}
+                                <Checkbox
+                                  id={`spicy-${item.id}-${index}`}
                                   checked={item.spicy}
-                                  onChange={(e) => updateMenuItem(index, 'spicy', e.target.checked)}
+                                  onCheckedChange={(checked) => updateMenuItem(index, 'spicy', checked)}
                                 />
-                                <Label htmlFor={`spicy-${index}`}>Spicy</Label>
+                                <Label htmlFor={`spicy-${item.id}-${index}`}>Spicy</Label>
                               </div>
                               <div className="flex items-center space-x-2">
-                                <input
-                                  type="checkbox"
-                                  id={`vegetarian-${index}`}
+                                <Checkbox
+                                  id={`vegetarian-${item.id}-${index}`}
                                   checked={item.vegetarian}
-                                  onChange={(e) => updateMenuItem(index, 'vegetarian', e.target.checked)}
+                                  onCheckedChange={(checked) => updateMenuItem(index, 'vegetarian', checked)}
                                 />
-                                <Label htmlFor={`vegetarian-${index}`}>Vegetarian</Label>
+                                <Label htmlFor={`vegetarian-${item.id}-${index}`}>Vegetarian</Label>
                               </div>
                               <div className="flex items-center space-x-2">
-                                <input
-                                  type="checkbox"
-                                  id={`glutenFree-${index}`}
+                                <Checkbox
+                                  id={`glutenFree-${item.id}-${index}`}
                                   checked={item.glutenFree}
-                                  onChange={(e) => updateMenuItem(index, 'glutenFree', e.target.checked)}
+                                  onCheckedChange={(checked) => updateMenuItem(index, 'glutenFree', checked)}
                                 />
-                                <Label htmlFor={`glutenFree-${index}`}>Gluten Free</Label>
+                                <Label htmlFor={`glutenFree-${item.id}-${index}`}>Gluten Free</Label>
                               </div>
                             </div>
                           </CardContent>
