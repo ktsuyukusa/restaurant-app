@@ -31,12 +31,10 @@ const Navigation: React.FC<NavigationProps> = ({ onNavigate, currentSection }) =
     { id: 'subscription', label: 'Subscription', icon: CreditCard },
   ];
 
-  // Admin navigation items (includes everything)
+  // Admin navigation items (restaurant-specific management)
   const adminNavigationItems = [
-    { id: 'dashboard', label: t('dashboard'), icon: BarChart3 },
-    { id: 'orders', label: t('orders'), icon: Calendar },
-    { id: 'menu-management', label: t('menu_management'), icon: BookOpen },
     { id: 'restaurants', label: t('restaurants'), icon: Store },
+    { id: 'restaurant-management', label: t('restaurant_management'), icon: Settings },
     { id: 'users', label: t('users'), icon: Users },
   ];
 

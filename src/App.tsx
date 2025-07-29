@@ -34,7 +34,14 @@ function App() {
               <Route path="/menu-management" element={<AppLayout />} />
               <Route path="/subscription" element={<AppLayout />} />
               
+              {/* Restaurant-specific management routes */}
+              <Route path="/restaurant/:restaurantId/dashboard" element={<AppLayout />} />
+              <Route path="/restaurant/:restaurantId/orders" element={<AppLayout />} />
+              <Route path="/restaurant/:restaurantId/menu" element={<AppLayout />} />
+              <Route path="/restaurant/:restaurantId/analytics" element={<AppLayout />} />
+              
               {/* Admin routes */}
+              <Route path="/restaurant-management" element={<AppLayout />} />
               <Route path="/users" element={<AppLayout />} />
               <Route path="/reservations" element={<AppLayout />} />
               <Route path="/role-switcher" element={<AppLayout />} />

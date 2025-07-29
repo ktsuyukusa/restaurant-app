@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -44,13 +44,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
     }
   }, []);
 
-  useEffect(() => {
-    if (restaurantsWithDistance.length > 0) {
-      filterRestaurants();
-    }
-  }, [searchTerm, selectedCuisine, priceRange, sortBy, restaurantsWithDistance, currentLanguage]);
-
-  const filterRestaurants = () => {
+  const filterRestaurants = useCallback(() => {
     try {
       let filtered = [...restaurantsWithDistance];
 
@@ -58,8 +52,8 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
       if (searchTerm) {
         filtered = filtered.filter(restaurant => {
           const name = getLocalizedValue(restaurant.name, currentLanguage);
-          const description = getLocalizedValue(restaurant.description || '', currentLanguage);
-          const address = getLocalizedValue(restaurant.address || '', currentLanguage);
+          const description = getLocalizedValue(restaurant.description || {}, currentLanguage);
+          const address = getLocalizedValue(restaurant.address || {}, currentLanguage);
           
           const searchLower = searchTerm.toLowerCase();
           return (
@@ -109,7 +103,13 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
       console.error('Error filtering restaurants:', err);
       setFilteredRestaurants([]);
     }
-  };
+  }, [searchTerm, selectedCuisine, priceRange, sortBy, restaurantsWithDistance, currentLanguage]);
+
+  useEffect(() => {
+    if (restaurantsWithDistance.length > 0) {
+      filterRestaurants();
+    }
+  }, [restaurantsWithDistance, filterRestaurants]);
 
   const getUniqueCuisines = () => {
     const cuisines = restaurantsWithDistance.map(r => r.cuisine);
@@ -231,7 +231,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
           </h2>
           {hasLocation && (
             <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full font-medium">
-              📍 From your location
+              📍 {t('search.from_your_location')}
             </span>
           )}
         </div>
@@ -273,7 +273,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({ onViewDetails }) => {
         isOpen={showMapModal}
         onClose={() => setShowMapModal(false)}
         restaurants={filteredRestaurants}
-        onRestaurantSelect={onViewDetails}
+        userLocation={userLocation}
       />
     </div>
   );

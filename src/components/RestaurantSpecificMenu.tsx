@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -121,14 +121,7 @@ const RestaurantSpecificMenu: React.FC = () => {
     );
   };
 
-  useEffect(() => {
-    if (restaurantId) {
-      fetchRestaurantData();
-      fetchMenuItems();
-    }
-  }, [restaurantId]);
-
-  const fetchRestaurantData = async () => {
+  const fetchRestaurantData = useCallback(async () => {
     try {
       const supabase = getSupabaseClient();
       const { data, error } = await supabase
@@ -146,9 +139,9 @@ const RestaurantSpecificMenu: React.FC = () => {
     } catch (error) {
       console.error('Error fetching restaurant:', error);
     }
-  };
+  }, [restaurantId]);
 
-  const fetchMenuItems = async () => {
+  const fetchMenuItems = useCallback(async () => {
     try {
       const supabase = getSupabaseClient();
       const { data, error } = await supabase
@@ -176,7 +169,14 @@ const RestaurantSpecificMenu: React.FC = () => {
         variant: "destructive",
       });
     }
-  };
+  }, [restaurantId]);
+
+  useEffect(() => {
+    if (restaurantId) {
+      fetchRestaurantData();
+      fetchMenuItems();
+    }
+  }, [restaurantId, fetchRestaurantData, fetchMenuItems]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -458,6 +458,8 @@ const RestaurantSpecificMenu: React.FC = () => {
                         onChange={() => toggleLanguage(lang.code)}
                         disabled={lang.required}
                         className="rounded"
+                        aria-label={`Select ${lang.name} language support`}
+                        title={`Toggle ${lang.name} language support for menu items`}
                       />
                       <Label htmlFor={`lang-${lang.code}`} className={lang.required ? 'font-semibold' : ''}>
                         {lang.name} {lang.required && '*'}
@@ -636,10 +638,22 @@ const RestaurantSpecificMenu: React.FC = () => {
                   <div className="text-sm text-gray-600">{getRestaurantName()}</div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => handleEdit(item)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(item)}
+                    aria-label={`Edit ${getItemName(item)} menu item`}
+                    title={`Edit ${getItemName(item)} menu item`}
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => handleDelete(item.id)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(item.id)}
+                    aria-label={`Delete ${getItemName(item)} menu item`}
+                    title={`Delete ${getItemName(item)} menu item`}
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>

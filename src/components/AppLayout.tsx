@@ -15,6 +15,9 @@ import ReservationManagement from './ReservationManagement';
 import UserManagement from './UserManagement';
 import RestaurantOwnerDashboard from './RestaurantOwnerDashboard';
 import OrdersManagement from './OrdersManagement';
+import RestaurantSpecificDashboard from './RestaurantSpecificDashboard';
+import RestaurantSpecificOrders from './RestaurantSpecificOrders';
+import RestaurantSpecificMenu from './RestaurantSpecificMenu';
 import RoleSwitcher from './RoleSwitcher';
 import Profile from './Profile';
 import SecureRoute from './SecureRoute';
@@ -46,7 +49,14 @@ const AppLayout: React.FC = () => {
 
   // Extract current view from URL path
   const getCurrentViewFromPath = (pathname: string) => {
-    const path = pathname.split('/')[1] || 'restaurants';
+    const pathSegments = pathname.split('/').filter(Boolean);
+    
+    // Handle restaurant-specific routes
+    if (pathSegments[0] === 'restaurant' && pathSegments[2]) {
+      return `restaurant-${pathSegments[2]}`;
+    }
+    
+    const path = pathSegments[0] || 'restaurants';
     return path;
   };
 
@@ -54,12 +64,14 @@ const AppLayout: React.FC = () => {
 
   // Handle restaurant selection from URL
   useEffect(() => {
-    if (location.pathname.startsWith('/restaurant/') && params.id) {
+    if (location.pathname.startsWith('/restaurant/') && params.restaurantId) {
+      setSelectedRestaurantId(params.restaurantId);
+    } else if (params.id) {
       setSelectedRestaurantId(params.id);
     } else if (location.pathname === '/restaurants') {
       setSelectedRestaurantId(null);
     }
-  }, [location.pathname, params.id, setSelectedRestaurantId]);
+  }, [location.pathname, params.id, params.restaurantId, setSelectedRestaurantId]);
 
   // Handle navigation and ensure proper fallback
   useEffect(() => {
@@ -291,6 +303,36 @@ const AppLayout: React.FC = () => {
         return (
           <SecureRoute requiredRole="admin">
             <ReservationManagement />
+          </SecureRoute>
+        );
+      
+      // Restaurant-specific management routes (admin only)
+      case 'restaurant-dashboard':
+        return (
+          <SecureRoute requiredRole="admin">
+            <RestaurantSpecificDashboard />
+          </SecureRoute>
+        );
+      
+      case 'restaurant-orders':
+        return (
+          <SecureRoute requiredRole="admin">
+            <RestaurantSpecificOrders />
+          </SecureRoute>
+        );
+      
+      case 'restaurant-menu':
+        return (
+          <SecureRoute requiredRole="admin">
+            <RestaurantSpecificMenu />
+          </SecureRoute>
+        );
+      
+      // Admin restaurant management
+      case 'restaurant-management':
+        return (
+          <SecureRoute requiredRole="admin">
+            <RestaurantManagement />
           </SecureRoute>
         );
       

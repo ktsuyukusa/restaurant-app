@@ -212,30 +212,30 @@ const RestaurantManagement: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Loading...</div>;
+  if (loading) return <div className="p-8 text-center">{t('loading')}</div>;
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">{t('nav.restaurants')} Management</h1>
+        <h1 className="text-2xl font-bold">{t('restaurant_management')}</h1>
         <Button onClick={() => { setFormData({}); setEditingId(null); }}>
           <Plus className="h-4 w-4 mr-2" />
-          Add Restaurant
+          {t('restaurant.add')}
         </Button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{editingId ? 'Edit' : 'Add'} Restaurant</CardTitle>
+          <CardTitle>{editingId ? t('restaurant.edit') : t('restaurant.add')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Restaurant Names (Japanese Primary) */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Restaurant Names</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="text-lg font-semibold">{t('restaurant.names')}</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="name_ja">Name (Japanese) *</Label>
+                  <Label htmlFor="name_ja">{t('restaurant.name_japanese')} *</Label>
                   <Input
                     id="name_ja"
                     value={formData.name_ja || ''}
@@ -255,7 +255,7 @@ const RestaurantManagement: React.FC = () => {
                 </div>
                 {showEnglish && (
                   <div>
-                    <Label htmlFor="name_en">Name (English)</Label>
+                    <Label htmlFor="name_en">{t('restaurant.name_english')}</Label>
                     <Input
                       id="name_en"
                       value={formData.name_en || ''}
@@ -263,14 +263,25 @@ const RestaurantManagement: React.FC = () => {
                     />
                   </div>
                 )}
+                {(currentLanguage !== 'ja' && currentLanguage !== 'zh') && (
+                  <div>
+                    <Label htmlFor="name_romaji">{t('restaurant.name_romaji')}</Label>
+                    <Input
+                      id="name_romaji"
+                      value={formData.name_en || ''}
+                      onChange={(e) => setFormData({...formData, name_en: e.target.value})}
+                      placeholder="Romaji/English transliteration"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
             <div>
-              <Label htmlFor="cuisine">Cuisine Type</Label>
+              <Label htmlFor="cuisine">{t('restaurant.cuisine_type')}</Label>
               <Select value={formData.cuisine || ''} onValueChange={(value) => setFormData({...formData, cuisine: value})}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select cuisine type" />
+                  <SelectValue placeholder={t('restaurant.select_cuisine')} />
                 </SelectTrigger>
                 <SelectContent>
                   {restaurantTypes.map((type) => (
@@ -284,10 +295,10 @@ const RestaurantManagement: React.FC = () => {
             
             {/* Addresses (Japanese Primary) */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Addresses</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="text-lg font-semibold">{t('restaurant.addresses')}</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="address_ja">Address (Japanese) *</Label>
+                  <Label htmlFor="address_ja">{t('restaurant.address_japanese')} *</Label>
                   <Input
                     id="address_ja"
                     value={formData.address_ja || ''}
@@ -307,7 +318,7 @@ const RestaurantManagement: React.FC = () => {
                 </div>
                 {showEnglish && (
                   <div>
-                    <Label htmlFor="address_en">Address (English)</Label>
+                    <Label htmlFor="address_en">{t('restaurant.address_english')}</Label>
                     <Input
                       id="address_en"
                       value={formData.address_en || ''}
@@ -315,11 +326,22 @@ const RestaurantManagement: React.FC = () => {
                     />
                   </div>
                 )}
+                {(currentLanguage !== 'ja' && currentLanguage !== 'zh') && (
+                  <div>
+                    <Label htmlFor="address_romaji">{t('restaurant.address_romaji')}</Label>
+                    <Input
+                      id="address_romaji"
+                      value={formData.address_en || ''}
+                      onChange={(e) => setFormData({...formData, address_en: e.target.value})}
+                      placeholder="Romaji/English transliteration"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
             <div>
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone">{t('restaurant.phone_number')}</Label>
               <Input
                 id="phone"
                 value={formData.phone || ''}
@@ -330,10 +352,10 @@ const RestaurantManagement: React.FC = () => {
             
             {/* Descriptions (Japanese Primary) */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Descriptions</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="text-lg font-semibold">{t('restaurant.descriptions')}</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="description_ja">Description (Japanese)</Label>
+                  <Label htmlFor="description_ja">{t('restaurant.description_japanese')}</Label>
                   <Textarea
                     id="description_ja"
                     value={formData.description_ja || ''}
@@ -352,11 +374,22 @@ const RestaurantManagement: React.FC = () => {
                 </div>
                 {showEnglish && (
                   <div>
-                    <Label htmlFor="description_en">Description (English)</Label>
+                    <Label htmlFor="description_en">{t('restaurant.description_english')}</Label>
                     <Textarea
                       id="description_en"
                       value={formData.description_en || ''}
                       onChange={(e) => setFormData({...formData, description_en: e.target.value})}
+                    />
+                  </div>
+                )}
+                {(currentLanguage !== 'ja' && currentLanguage !== 'zh') && (
+                  <div>
+                    <Label htmlFor="description_romaji">{t('restaurant.description_romaji')}</Label>
+                    <Textarea
+                      id="description_romaji"
+                      value={formData.description_en || ''}
+                      onChange={(e) => setFormData({...formData, description_en: e.target.value})}
+                      placeholder="Romaji/English transliteration"
                     />
                   </div>
                 )}
@@ -365,7 +398,7 @@ const RestaurantManagement: React.FC = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="image_url">Image URL</Label>
+                <Label htmlFor="image_url">{t('restaurant.image_url')}</Label>
                 <Input
                   id="image_url"
                   value={formData.image_url || ''}
@@ -373,19 +406,19 @@ const RestaurantManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="opening_hours">Opening Hours</Label>
+                <Label htmlFor="opening_hours">{t('restaurant.opening_hours')}</Label>
                 <Input
                   id="opening_hours"
                   value={formData.opening_hours || ''}
                   onChange={(e) => setFormData({...formData, opening_hours: e.target.value})}
-                  placeholder="e.g., 11:00 - 22:00"
+                  placeholder={t('restaurant.opening_hours_placeholder')}
                 />
               </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="rating">Rating</Label>
+                <Label htmlFor="rating">{t('restaurant.rating')}</Label>
                 <Input
                   id="rating"
                   type="number"
@@ -397,16 +430,16 @@ const RestaurantManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="price_range">Price Range</Label>
+                <Label htmlFor="price_range">{t('restaurant.price_range')}</Label>
                 <Select value={formData.price_range || '$'} onValueChange={(value) => setFormData({...formData, price_range: value})}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="$">$ (Budget)</SelectItem>
-                    <SelectItem value="$$">$$ (Moderate)</SelectItem>
-                    <SelectItem value="$$$">$$$ (Expensive)</SelectItem>
-                    <SelectItem value="$$$$">$$$$ (Very Expensive)</SelectItem>
+                    <SelectItem value="$">{t('restaurant.price_budget')}</SelectItem>
+                    <SelectItem value="$$">{t('restaurant.price_moderate')}</SelectItem>
+                    <SelectItem value="$$$">{t('restaurant.price_expensive')}</SelectItem>
+                    <SelectItem value="$$$$">{t('restaurant.price_very_expensive')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -414,7 +447,7 @@ const RestaurantManagement: React.FC = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="latitude">Latitude</Label>
+                <Label htmlFor="latitude">{t('restaurant.latitude')}</Label>
                 <Input
                   id="latitude"
                   type="number"
@@ -424,7 +457,7 @@ const RestaurantManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="longitude">Longitude</Label>
+                <Label htmlFor="longitude">{t('restaurant.longitude')}</Label>
                 <Input
                   id="longitude"
                   type="number"
@@ -437,7 +470,7 @@ const RestaurantManagement: React.FC = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="external_booking_url">External Booking URL</Label>
+                <Label htmlFor="external_booking_url">{t('restaurant.external_booking_url')}</Label>
                 <Input
                   id="external_booking_url"
                   value={formData.external_booking_url || ''}
@@ -445,7 +478,7 @@ const RestaurantManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="notification_email">Notification Email</Label>
+                <Label htmlFor="notification_email">{t('restaurant.notification_email')}</Label>
                 <Input
                   id="notification_email"
                   type="email"
@@ -461,12 +494,12 @@ const RestaurantManagement: React.FC = () => {
                 checked={formData.is_active !== false}
                 onCheckedChange={(checked) => setFormData({...formData, is_active: checked})}
               />
-              <Label htmlFor="is_active">Active Restaurant</Label>
+              <Label htmlFor="is_active">{t('restaurant.active_restaurant')}</Label>
             </div>
             
             <div className="flex gap-2">
-              <Button type="submit">{editingId ? 'Update' : 'Create'}</Button>
-              <Button type="button" variant="outline" onClick={() => { setFormData({}); setEditingId(null); }}>Cancel</Button>
+              <Button type="submit">{editingId ? t('button.update') : t('button.create')}</Button>
+              <Button type="button" variant="outline" onClick={() => { setFormData({}); setEditingId(null); }}>{t('button.cancel')}</Button>
             </div>
           </form>
         </CardContent>
@@ -481,12 +514,12 @@ const RestaurantManagement: React.FC = () => {
                   <h3 className="font-semibold">{restaurant.name}</h3>
                   <p className="text-sm text-gray-600 mt-1">{restaurant.description}</p>
                   <div className="mt-2 text-sm space-y-1">
-                    <p><strong>Cuisine:</strong> {restaurant.cuisine}</p>
-                    <p><strong>Address:</strong> {restaurant.address}</p>
-                    <p><strong>Phone:</strong> {restaurant.phone}</p>
-                    <p><strong>Rating:</strong> {restaurant.rating || 'N/A'}</p>
-                    <p><strong>Price Range:</strong> {restaurant.price_range || 'N/A'}</p>
-                    <p><strong>Status:</strong> {restaurant.is_active ? 'Active' : 'Inactive'}</p>
+                    <p><strong>{t('restaurant.cuisine')}:</strong> {restaurant.cuisine}</p>
+                    <p><strong>{t('address')}:</strong> {restaurant.address}</p>
+                    <p><strong>{t('phone')}:</strong> {restaurant.phone}</p>
+                    <p><strong>{t('restaurant.rating')}:</strong> {restaurant.rating || t('n/a')}</p>
+                    <p><strong>{t('restaurant.price_range')}:</strong> {restaurant.price_range || t('n/a')}</p>
+                    <p><strong>{t('restaurant.status')}:</strong> {restaurant.is_active ? t('restaurant.active') : t('restaurant.inactive')}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -496,7 +529,7 @@ const RestaurantManagement: React.FC = () => {
                     onClick={() => window.location.href = `/restaurant/${restaurant.id}/dashboard`}
                     className="bg-navikko-primary hover:bg-navikko-primary/90"
                   >
-                    Manage
+                    {t('restaurant.manage')}
                   </Button>
                   <Button size="sm" variant="outline" onClick={() => handleEdit(restaurant)}>
                     <Edit className="h-4 w-4" />
