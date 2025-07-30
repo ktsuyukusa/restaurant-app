@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navikko - 管理者ログイン</title>
+    <meta name="description" content="Navikko管理者専用ログインページ">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/logo/Navikko2.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo/NAVIkko Green.png">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'japanese': ['Noto Sans JP', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        
+        /* Ensure proper mobile viewport behavior across all browsers */
+        @supports not (color: color(display-p3 1 0 0)) {
+            body {
+                -webkit-text-size-adjust: 100%; /* Safari fallback */
+                -ms-text-size-adjust: 100%; /* IE/Edge fallback */
+                text-size-adjust: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="font-japanese min-h-screen gradient-bg">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8">
+            <div class="text-center">
+                <img src="/logo/Navikko2.svg" alt="Navikko" class="mx-auto h-16 w-16">
+                <h2 class="mt-6 text-3xl font-bold text-white">管理者ログイン</h2>
+                <p class="mt-2 text-sm text-white/80">認証された管理者のみアクセス可能</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow-xl p-8">
+                <form class="space-y-6" action="https://restaurant-app-xi-ashy.vercel.app/admin" method="get">
+                    <div>
+                        <label for="admin-code" class="block text-sm font-medium text-gray-700">
+                            管理者コード
+                        </label>
+                        <input 
+                            id="admin-code" 
+                            name="code" 
+                            type="password" 
+                            required 
+                            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500"
+                            placeholder="管理者コードを入力"
+                        >
+                    </div>
+                    
+                    <div>
+                        <button 
+                            type="submit" 
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                        >
+                            管理画面にアクセス
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-6 text-center">
+                    <a href="/" class="text-sm text-purple-600 hover:text-purple-500">
+                        ← メインサイトに戻る
+                    </a>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <p class="text-xs text-white/60">
+                    このページは管理者専用です。<br>
+                    不正アクセスは記録され、法的措置の対象となる場合があります。
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Security: Clear form on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('admin-code').value = '';
+        });
+        
+        // Security: Clear form on page unload
+        window.addEventListener('beforeunload', function() {
+            document.getElementById('admin-code').value = '';
+        });
+    </script>
+</body>
+</html>
