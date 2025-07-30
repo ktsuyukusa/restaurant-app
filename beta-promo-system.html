@@ -194,6 +194,18 @@
                 expires: codeData.expires
             }));
 
+            // Set user role based on promo code type
+            if (codeData.type === 'restaurant') {
+                localStorage.setItem('navikko_user_role', 'restaurant_owner');
+                console.log('🏪 Restaurant owner role granted via promo code:', promoCode);
+            } else if (codeData.type === 'developer' || codeData.type === 'qa') {
+                localStorage.setItem('navikko_user_role', 'admin');
+                console.log('🔧 Admin role granted via promo code:', promoCode);
+            } else {
+                localStorage.setItem('navikko_user_role', 'customer');
+                console.log('👤 Customer role granted via promo code:', promoCode);
+            }
+
             // Redirect to beta platform
             setTimeout(() => {
                 // Redirect to the main React app (now served from root)
@@ -243,7 +255,16 @@
                 const now = new Date();
                 
                 if (now <= expiryDate) {
-                    // User still has valid access
+                    // User still has valid access - ensure role is set correctly
+                    const accessType = accessData.type;
+                    if (accessType === 'restaurant') {
+                        localStorage.setItem('navikko_user_role', 'restaurant_owner');
+                    } else if (accessType === 'developer' || accessType === 'qa') {
+                        localStorage.setItem('navikko_user_role', 'admin');
+                    } else {
+                        localStorage.setItem('navikko_user_role', 'customer');
+                    }
+                    
                     const continueAccess = confirm('You already have beta access. Continue to platform?');
                     if (continueAccess) {
                         window.location.href = '/';
@@ -251,6 +272,7 @@
                 } else {
                     // Access expired, clear it
                     localStorage.removeItem('navikko_beta_access');
+                    localStorage.removeItem('navikko_user_role');
                 }
             }
         });
