@@ -6,36 +6,30 @@
       "use": "@vercel/static"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/beta",
-      "dest": "/beta-promo-system.html"
+      "source": "/beta",
+      "destination": "/beta-promo-system.html"
     },
     {
-      "src": "/beta/(.*)",
-      "dest": "/beta-promo-system.html"
+      "source": "/beta/(.*)",
+      "destination": "/beta-promo-system.html"
     },
     {
-      "src": "/app",
-      "status": 302,
-      "headers": {
-        "Location": "https://restaurant-app-xi-ashy.vercel.app"
-      }
+      "source": "/app",
+      "destination": "https://restaurant-app-xi-ashy.vercel.app"
     },
     {
-      "src": "/app/(.*)",
-      "status": 302,
-      "headers": {
-        "Location": "https://restaurant-app-xi-ashy.vercel.app/$1"
-      }
+      "source": "/app/(.*)",
+      "destination": "https://restaurant-app-xi-ashy.vercel.app/$1"
     },
     {
-      "src": "/",
-      "dest": "/index.html"
+      "source": "/",
+      "destination": "/index.html"
     },
     {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/(.*)",
+      "destination": "/$1"
     }
   ],
   "headers": [
