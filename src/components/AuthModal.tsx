@@ -59,6 +59,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [showTermsOfService, setShowTermsOfService] = useState(false);
   const [showTwoFactorAuth, setShowTwoFactorAuth] = useState(false);
   const [pendingLoginData, setPendingLoginData] = useState<AuthLoginData | null>(null);
+  const [showAdminOption, setShowAdminOption] = useState(false);
+  const [adminUnlockClicks, setAdminUnlockClicks] = useState(0);
 
   // Login form state
   const [loginData, setLoginData] = useState<AuthLoginData>({
@@ -286,6 +288,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     });
     setError(null);
     setAgreeToTerms(false);
+    setShowAdminOption(false);
+    setAdminUnlockClicks(0);
   };
 
   const handleClose = () => {
@@ -407,8 +411,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <CardContent>
                   <form onSubmit={handleSignup} className="space-y-4">
                     <div>
-                      <Label>{t('auth.account_type', 'Account Type')}</Label>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-2">
+                      <Label
+                        onClick={() => {
+                          setAdminUnlockClicks(prev => prev + 1);
+                          if (adminUnlockClicks >= 4) {
+                            setShowAdminOption(true);
+                          }
+                        }}
+                        className="cursor-pointer"
+                      >
+                        {t('auth.account_type', 'Account Type')}
+                      </Label>
+                      <div className={`grid gap-3 mt-2 ${showAdminOption ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'}`}>
                         <Button
                           type="button"
                           variant={signupData.userType === 'customer' ? 'default' : 'outline'}
@@ -427,16 +441,23 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                           <Store className="h-5 w-5" />
                           <span className="text-sm">{t('auth.restaurant_owner', 'Restaurant Owner')}</span>
                         </Button>
-                        <Button
-                          type="button"
-                          variant={signupData.userType === 'admin' ? 'default' : 'outline'}
-                          onClick={() => updateSignupField('userType', 'admin')}
-                          className="flex flex-col items-center gap-2 h-auto p-4"
-                        >
-                          <Crown className="h-5 w-5" />
-                          <span className="text-sm">{t('auth.admin', 'Admin')}</span>
-                        </Button>
+                        {showAdminOption && (
+                          <Button
+                            type="button"
+                            variant={signupData.userType === 'admin' ? 'default' : 'outline'}
+                            onClick={() => updateSignupField('userType', 'admin')}
+                            className="flex flex-col items-center gap-2 h-auto p-4"
+                          >
+                            <Crown className="h-5 w-5" />
+                            <span className="text-sm">{t('auth.admin', 'Admin')}</span>
+                          </Button>
+                        )}
                       </div>
+                      {showAdminOption && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Admin option unlocked
+                        </p>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
