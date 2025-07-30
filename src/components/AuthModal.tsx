@@ -243,11 +243,26 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     }
 
     try {
-      const user = await authService.signup(signupData);
+      // Transform the signup data to match authService expectations
+      const transformedSignupData = {
+        ...signupData,
+        restaurantInfo: signupData.userType === 'restaurant_owner' ? {
+          name: signupData.restaurantName,
+          address: signupData.restaurantAddress,
+          phone: signupData.restaurantPhone,
+          cuisine: 'Other' // Default cuisine type
+        } : undefined
+      };
+
+      console.log('🔍 AuthModal: Signup data being sent:', transformedSignupData);
+      console.log('🔍 AuthModal: Restaurant info:', transformedSignupData.restaurantInfo);
+
+      const user = await authService.signup(transformedSignupData);
       signup(signupData);
       onClose();
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Signup failed';
+      console.error('🔍 AuthModal: Signup error:', error);
       setError(errorMessage);
     } finally {
       setIsLoading(false);

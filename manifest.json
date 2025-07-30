@@ -1,0 +1,33 @@
+{
+  "name": "Navikko - Multilingual Restaurant App",
+  "short_name": "Navikko",
+  "description": "Multilingual restaurant app for Japanese restaurants. Seamless communication with international tourists in 11 languages.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo/NAVIkko Green.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/logo/NAVIkko Green.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/logo/Navikko2.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["food", "business", "productivity"],
+  "lang": "ja",
+  "dir": "ltr"
+}

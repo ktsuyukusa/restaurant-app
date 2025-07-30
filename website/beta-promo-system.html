@@ -6,6 +6,17 @@
     <title>Navikko Beta - Enter Promo Code</title>
     <meta name="description" content="Enter your promotional code to access Navikko beta testing.">
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/logo/Navikko2.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo/NAVIkko Green.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo/NAVIkko Green.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo/NAVIkko Green.png">
+    <!-- Theme color for supported browsers (Chrome, Safari, Edge) -->
+    <meta name="theme-color" content="#667eea">
+    <!-- Fallback for browsers that don't support theme-color -->
+    <meta name="msapplication-navbutton-color" content="#667eea">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -52,28 +63,38 @@
                         <label for="promoCode" class="block text-sm font-medium text-gray-700 mb-2">
                             Promotional Code
                         </label>
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             id="promoCode"
                             name="promoCode"
                             placeholder="Enter your promo code"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 promo-input uppercase tracking-wider"
                             required
-                            maxlength="20">
+                            maxlength="20"
+                            autocomplete="off"
+                            spellcheck="false"
+                            aria-describedby="promoCodeHelp">
+                        <div id="promoCodeHelp" class="mt-1 text-xs text-gray-500">
+                            Enter the promotional code provided to you for beta access
+                        </div>
                     </div>
 
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         id="submitBtn"
-                        class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors">
+                        class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-describedby="submitHelp">
                         Access Beta Platform
                     </button>
+                    <div id="submitHelp" class="sr-only">
+                        Submit the form to validate your promotional code and access the beta platform
+                    </div>
                 </form>
 
                 <!-- Error Message -->
-                <div id="errorMessage" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div id="errorMessage" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg" role="alert" aria-live="polite">
                     <div class="flex">
-                        <svg class="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-red-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
                         </svg>
                         <p class="text-sm text-red-700" id="errorText">Invalid promotional code. Please check and try again.</p>
@@ -81,9 +102,9 @@
                 </div>
 
                 <!-- Success Message -->
-                <div id="successMessage" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div id="successMessage" class="hidden mt-4 p-4 bg-green-50 border border-green-200 rounded-lg" role="alert" aria-live="polite">
                     <div class="flex">
-                        <svg class="w-5 h-5 text-green-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <svg class="w-5 h-5 text-green-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                         </svg>
                         <p class="text-sm text-green-700">Access granted! Redirecting to beta platform...</p>

@@ -415,6 +415,9 @@ class AuthService {
 
   // Restaurant owner signup with subscription requirement
   async signupRestaurantOwner(data: SignupData): Promise<User> {
+    console.log('🔍 AuthService: Restaurant owner signup data received:', data);
+    console.log('🔍 AuthService: Restaurant info:', data.restaurantInfo);
+    
     if (data.userType !== 'restaurant_owner') {
       throw new Error('Invalid user type for restaurant owner signup');
     }
@@ -424,8 +427,19 @@ class AuthService {
       throw new Error('All fields are required');
     }
 
-    if (!data.restaurantInfo?.name || !data.restaurantInfo?.address || !data.restaurantInfo?.phone) {
-      throw new Error('Restaurant information is required');
+    if (!data.restaurantInfo?.name) {
+      console.error('🔍 AuthService: Missing restaurant name:', data.restaurantInfo?.name);
+      throw new Error('Restaurant name is required');
+    }
+    
+    if (!data.restaurantInfo?.address) {
+      console.error('🔍 AuthService: Missing restaurant address:', data.restaurantInfo?.address);
+      throw new Error('Restaurant address is required');
+    }
+    
+    if (!data.restaurantInfo?.phone) {
+      console.error('🔍 AuthService: Missing restaurant phone:', data.restaurantInfo?.phone);
+      throw new Error('Restaurant phone is required');
     }
 
     // Check if user already exists

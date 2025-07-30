@@ -8,6 +8,15 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/logo/Navikko2.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo/NAVIkko Green.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/logo/NAVIkko Green.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo/NAVIkko Green.png">
+    <!-- Theme color for mobile browsers (Chrome, Safari, Edge) -->
+    <!-- Note: Not supported by Firefox, Firefox for Android, Opera -->
+    <meta name="theme-color" content="#667eea">
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="/manifest.json">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -34,6 +43,22 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .card-hover { transition: transform 0.3s ease; }
         .card-hover:hover { transform: translateY(-5px); }
+        
+        /* Cross-browser theme color fallback for browsers that don't support meta theme-color */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --theme-color: #667eea;
+            }
+        }
+        
+        /* Ensure proper mobile viewport behavior across all browsers */
+        @supports not (color: color(display-p3 1 0 0)) {
+            body {
+                text-size-adjust: 100%;
+                -webkit-text-size-adjust: 100%; /* Safari fallback */
+                -ms-text-size-adjust: 100%; /* IE/Edge fallback */
+            }
+        }
     </style>
 </head>
 
@@ -430,10 +455,6 @@
     </div>
 
     <div id="content-pl" class="language-content font-international">
-        <nav class="bg-white shadow-sm py-4">
-            <div class="container mx-auto px-6 flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-<div id="content-pl" class="language-content font-international">
         <nav class="bg-white shadow-sm py-4">
             <div class="container mx-auto px-6 flex justify-between items-center">
                 <div class="flex items-center space-x-3">
