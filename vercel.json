@@ -1,12 +1,5 @@
 {
   "version": 2,
-  "name": "navikko-website",
-  "builds": [
-    {
-      "src": "website/**",
-      "use": "@vercel/static"
-    }
-  ],
   "routes": [
     {
       "src": "/beta",
@@ -106,11 +99,5 @@
         }
       ]
     }
-  ],
-  "functions": {
-    "website/**": {
-      "includeFiles": "website/**"
-    }
-  },
-  "outputDirectory": "website"
+  ]
 }
