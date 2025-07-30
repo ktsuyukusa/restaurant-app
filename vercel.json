@@ -2,18 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "*.html",
+      "src": "beta-promo-system.html",
       "use": "@vercel/static"
     },
     {
-      "src": "package.json",
-      "use": "@vercel/node"
+      "src": "dist/**",
+      "use": "@vercel/static"
     }
   ],
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": "vite",
   "rewrites": [
     {
       "source": "/beta",
@@ -24,16 +20,12 @@
       "destination": "/beta-promo-system.html"
     },
     {
-      "source": "/app",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/app/(.*)",
-      "destination": "/index.html"
+      "source": "/(.*)",
+      "destination": "/dist/$1"
     },
     {
       "source": "/",
-      "destination": "/index.html"
+      "destination": "/dist/index.html"
     }
   ],
   "headers": [
