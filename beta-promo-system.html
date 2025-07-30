@@ -196,15 +196,8 @@
 
             // Redirect to beta platform
             setTimeout(() => {
-                // Determine redirect based on code type
-                let redirectUrl = 'https://app.navikko.com';
-                
-                if (codeData.type === 'demo') {
-                    redirectUrl = 'https://demo.navikko.com';
-                } else if (codeData.type === 'developer') {
-                    redirectUrl = 'https://dev.navikko.com';
-                }
-                
+                // Redirect to the actual React app
+                const redirectUrl = 'https://restaurant-app-xi-ashy.vercel.app';
                 window.location.href = redirectUrl;
             }, 2000);
         });
@@ -253,7 +246,7 @@
                     // User still has valid access
                     const continueAccess = confirm('You already have beta access. Continue to platform?');
                     if (continueAccess) {
-                        window.location.href = 'https://app.navikko.com';
+                        window.location.href = 'https://restaurant-app-xi-ashy.vercel.app';
                     }
                 } else {
                     // Access expired, clear it
