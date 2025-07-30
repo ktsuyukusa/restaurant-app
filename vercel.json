@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "website/**",
+      "src": "*.html",
       "use": "@vercel/static"
     }
   ],
@@ -22,14 +22,6 @@
     {
       "source": "/app/(.*)",
       "destination": "https://restaurant-app-xi-ashy.vercel.app/$1"
-    },
-    {
-      "source": "/",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
     }
   ],
   "headers": [

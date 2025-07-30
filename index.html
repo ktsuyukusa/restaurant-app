@@ -1,15 +1,577 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/logo/Navikko2.svg" />
-    <link rel="apple-touch-icon" href="/logo/NAVIkko Green.png" />
-    <link rel="shortcut icon" href="/logo/Navikko2.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Navikko - Restaurant Discovery</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navikko - 多言語レストランアプリ</title>
+    <meta name="description" content="日本のレストラン向け多言語対応アプリ。11言語対応で外国人観光客との円滑なコミュニケーションを実現。">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/logo/Navikko2.svg">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'japanese': ['Noto Sans JP', 'sans-serif'],
+                        'international': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .language-content { display: none; }
+        .language-content.active { display: block; animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card-hover { transition: transform 0.3s ease; }
+        .card-hover:hover { transform: translateY(-5px); }
+    </style>
+</head>
+
+<body class="font-japanese">
+    <!-- Language Selector -->
+    <div class="fixed top-4 right-4 z-50">
+        <select id="languageSelect" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm shadow-lg" title="言語を選択">
+            <option value="ja">🇯🇵 日本語</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="zh">🇨🇳 中文</option>
+            <option value="ko">🇰🇷 한국어</option>
+            <option value="th">🇹🇭 ไทย</option>
+            <option value="vi">🇻🇳 Tiếng Việt</option>
+            <option value="ms">🇲🇾 Bahasa Melayu</option>
+            <option value="id">🇮🇩 Bahasa Indonesia</option>
+            <option value="pl">🇵🇱 Polski</option>
+            <option value="es">🇪🇸 Español</option>
+            <option value="ro">🇷🇴 Română</option>
+        </select>
+    </div>
+
+    <!-- Japanese Content (Primary) -->
+    <div id="content-ja" class="language-content active">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#features" class="text-gray-700 hover:text-purple-600">機能</a>
+                    <a href="#pricing" class="text-gray-700 hover:text-purple-600">料金</a>
+                    <a href="#contact" class="text-gray-700 hover:text-purple-600">お問い合わせ</a>
+                </div>
+                <div class="flex space-x-3">
+                    <a href="/beta" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
+                        ベータ版を試す
+                    </a>
+                    <a href="https://restaurant-app-xi-ashy.vercel.app" class="border border-purple-600 text-purple-600 px-6 py-2 rounded-lg hover:bg-purple-50">
+                        今すぐ始める
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">外国人観光客との架け橋</h1>
+                <p class="text-xl mb-8 max-w-3xl mx-auto">
+                    Navikkoは日本のレストラン向け多言語対応アプリです。<br>
+                    11言語対応で外国人観光客との円滑なコミュニケーションを実現。
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/beta" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">
+                        ベータ版アクセス
+                    </a>
+                    <a href="#demo" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-purple-600">
+                        デモを見る
+                    </a>
+                </div>
+                
+                <div class="mt-12">
+                    <p class="text-sm opacity-75 mb-4">対応言語（11言語）</p>
+                    <div class="flex flex-wrap justify-center gap-3">
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇯🇵 日本語</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇺🇸 English</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇨🇳 中文</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇰🇷 한국어</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇹🇭 ไทย</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇻🇳 Tiếng Việt</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇲🇾 Bahasa Melayu</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇮🇩 Bahasa Indonesia</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇵🇱 Polski</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇪🇸 Español</span>
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-sm">🇷🇴 Română</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-12">主な機能</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-lg card-hover text-center">
+                        <div class="text-4xl mb-4">🌐</div>
+                        <h3 class="text-xl font-semibold mb-4">11言語対応</h3>
+                        <p class="text-gray-600">世界中の観光客とコミュニケーション可能</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-lg card-hover text-center">
+                        <div class="text-4xl mb-4">📱</div>
+                        <h3 class="text-xl font-semibold mb-4">スマート注文</h3>
+                        <p class="text-gray-600">QRコードで簡単注文・決済</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-lg card-hover text-center">
+                        <div class="text-4xl mb-4">📍</div>
+                        <h3 class="text-xl font-semibold mb-4">近接アラート</h3>
+                        <p class="text-gray-600">500m圏内の観光客に自動通知</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="py-20 bg-gray-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-12">料金プラン</h2>
+                <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-bold mb-4 text-center">ベーシック</h3>
+                        <div class="text-center mb-6">
+                            <span class="text-4xl font-bold">¥0</span>
+                            <span class="text-gray-600">/月</span>
+                        </div>
+                        <ul class="space-y-3 mb-8">
+                            <li>✓ 基本的な多言語対応</li>
+                            <li>✓ QRコード注文</li>
+                            <li>✓ 月間100注文まで</li>
+                        </ul>
+                        <a href="/beta" class="block w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-semibold text-center hover:bg-gray-300">ベータ版を試す</a>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-xl border-2 border-purple-500">
+                        <h3 class="text-2xl font-bold mb-4 text-center">プロ</h3>
+                        <div class="text-center mb-6">
+                            <span class="text-4xl font-bold">¥9,800</span>
+                            <span class="text-gray-600">/月</span>
+                        </div>
+                        <ul class="space-y-3 mb-8">
+                            <li>✓ 全機能利用可能</li>
+                            <li>✓ 無制限注文</li>
+                            <li>✓ 近接アラート機能</li>
+                        </ul>
+                        <a href="/beta" class="block w-full bg-purple-600 text-white py-3 rounded-lg font-semibold text-center hover:bg-purple-700">ベータ版でお試し</a>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-lg">
+                        <h3 class="text-2xl font-bold mb-4 text-center">エンタープライズ</h3>
+                        <div class="text-center mb-6">
+                            <span class="text-4xl font-bold">¥29,800</span>
+                            <span class="text-gray-600">/月</span>
+                        </div>
+                        <ul class="space-y-3 mb-8">
+                            <li>✓ 複数店舗対応</li>
+                            <li>✓ カスタム機能開発</li>
+                            <li>✓ 専用サポート</li>
+                        </ul>
+                        <a href="#contact" class="block w-full bg-gray-800 text-white py-3 rounded-lg font-semibold text-center hover:bg-gray-700">お問い合わせ</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-12">お問い合わせ</h2>
+                <div class="max-w-2xl mx-auto">
+                    <form class="space-y-6" action="mailto:contact@navikko.com" method="post" enctype="text/plain">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <input type="text" name="restaurant" placeholder="店舗名" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                            <input type="text" name="name" placeholder="お名前" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <input type="email" name="email" placeholder="メールアドレス" class="w-full p-3 border border-gray-300 rounded-lg" required>
+                            <input type="tel" name="phone" placeholder="電話番号" class="w-full p-3 border border-gray-300 rounded-lg">
+                        </div>
+                        <textarea rows="4" name="message" placeholder="お問い合わせ内容" class="w-full p-3 border border-gray-300 rounded-lg"></textarea>
+                        <button type="submit" class="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700">
+                            送信する
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold">Navikko</span>
+                </div>
+                <p class="text-gray-400 mb-4">外国人観光客との架け橋となる多言語レストランアプリ</p>
+                <p class="text-gray-500">&copy; 2025 Navikko. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- English Content -->
+    <div id="content-en" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#features" class="text-gray-700 hover:text-purple-600">Features</a>
+                    <a href="#pricing" class="text-gray-700 hover:text-purple-600">Pricing</a>
+                    <a href="#contact" class="text-gray-700 hover:text-purple-600">Contact</a>
+                </div>
+                <a href="/beta" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">Try Beta</a>
+            </div>
+        </nav>
+
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">Bridge with International Tourists</h1>
+                <p class="text-xl mb-8 max-w-3xl mx-auto">
+                    Navikko is a multilingual restaurant app for Japanese restaurants.<br>
+                    Seamless communication with international tourists in 11 languages.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/beta" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">Try Beta</a>
+                    <a href="#demo" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-purple-600">View Demo</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-12">Key Features</h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-lg shadow-lg card-hover text-center">
+                        <div class="text-4xl mb-4">🌐</div>
+                        <h3 class="text-xl font-semibold mb-4">11 Languages</h3>
+                        <p class="text-gray-600">Communicate with tourists worldwide</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-lg card-hover text-center">
+                        <div class="text-4xl mb-4">📱</div>
+                        <h3 class="text-xl font-semibold mb-4">Smart Ordering</h3>
+                        <p class="text-gray-600">Easy QR code ordering and payment</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-lg shadow-lg card-hover text-center">
+                        <div class="text-4xl mb-4">📍</div>
+                        <h3 class="text-xl font-semibold mb-4">Proximity Alerts</h3>
+                        <p class="text-gray-600">Auto-notify tourists within 500m</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold">Navikko</span>
+                </div>
+                <p class="text-gray-400 mb-4">Multilingual restaurant app bridging with international tourists</p>
+                <p class="text-gray-500">&copy; 2025 Navikko. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Simplified content for other languages -->
+    <div id="content-zh" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <a href="https://app.navikko.com" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">立即开始</a>
+            </div>
+        </nav>
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">与国际游客的桥梁</h1>
+                <p class="text-xl mb-8">面向日本餐厅的多语言应用，支持11种语言</p>
+                <a href="https://app.navikko.com" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">免费开始</a>
+            </div>
+        </section>
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Navikko. 版权所有。</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="content-ko" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <a href="https://app.navikko.com" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">시작하기</a>
+            </div>
+        </nav>
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">국제 관광객과의 가교</h1>
+                <p class="text-xl mb-8">일본 레스토랑을 위한 다국어 앱, 11개 언어 지원</p>
+                <a href="https://app.navikko.com" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">무료 시작</a>
+            </div>
+        </section>
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Navikko. 모든 권리 보유.</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="content-th" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <a href="https://app.navikko.com" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">เริ่มต้นใช้งาน</a>
+            </div>
+        </nav>
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">สะพานเชื่อมกับนักท่องเที่ยวต่างชาติ</h1>
+                <p class="text-xl mb-8">แอปร้านอาหารหลายภาษาสำหรับร้านอาหารญี่ปุ่น รองรับ 11 ภาษา</p>
+                <a href="https://app.navikko.com" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">เริ่มฟรี</a>
+            </div>
+        </section>
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Navikko. สงวนลิขสิทธิ์.</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="content-vi" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <a href="https://app.navikko.com" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">Bắt đầu</a>
+            </div>
+        </nav>
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">Cầu nối với du khách quốc tế</h1>
+                <p class="text-xl mb-8">Ứng dụng nhà hàng đa ngôn ngữ cho các nhà hàng Nhật Bản, hỗ trợ 11 ngôn ngữ</p>
+                <a href="https://app.navikko.com" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">Bắt đầu miễn phí</a>
+            </div>
+        </section>
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Navikko. Bảo lưu mọi quyền.</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="content-ms" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <a href="https://app.navikko.com" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">Mulakan</a>
+            </div>
+        </nav>
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">Jambatan dengan pelancong antarabangsa</h1>
+                <p class="text-xl mb-8">Aplikasi restoran pelbagai bahasa untuk restoran Jepun, sokongan 11 bahasa</p>
+                <a href="https://app.navikko.com" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">Mula percuma</a>
+            </div>
+        </section>
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Navikko. Hak cipta terpelihara.</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="content-id" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <a href="https://app.navikko.com" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">Mulai</a>
+            </div>
+        </nav>
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">Jembatan dengan wisatawan internasional</h1>
+                <p class="text-xl mb-8">Aplikasi restoran multibahasa untuk restoran Jepang, dukungan 11 bahasa</p>
+                <a href="https://app.navikko.com" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">Mulai gratis</a>
+            </div>
+        </section>
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Navikko. Hak cipta dilindungi.</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="content-pl" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+<div id="content-pl" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <a href="https://app.navikko.com" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">Rozpocznij</a>
+            </div>
+        </nav>
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">Most z międzynarodowymi turystami</h1>
+                <p class="text-xl mb-8">Wielojęzyczna aplikacja restauracyjna dla japońskich restauracji, obsługa 11 języków</p>
+                <a href="https://app.navikko.com" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">Rozpocznij za darmo</a>
+            </div>
+        </section>
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Navikko. Wszelkie prawa zastrzeżone.</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="content-es" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <a href="https://app.navikko.com" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">Comenzar</a>
+            </div>
+        </nav>
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">Puente con turistas internacionales</h1>
+                <p class="text-xl mb-8">Aplicación de restaurante multiidioma para restaurantes japoneses, soporte para 11 idiomas</p>
+                <a href="https://app.navikko.com" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">Comenzar gratis</a>
+            </div>
+        </section>
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Navikko. Todos los derechos reservados.</p>
+            </div>
+        </footer>
+    </div>
+
+    <div id="content-ro" class="language-content font-international">
+        <nav class="bg-white shadow-sm py-4">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <img src="/logo/Navikko2.svg" alt="Navikko" class="h-8 w-8">
+                    <span class="text-xl font-bold text-purple-600">Navikko</span>
+                </div>
+                <a href="https://app.navikko.com" class="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">Începe</a>
+            </div>
+        </nav>
+        <section class="gradient-bg text-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-5xl font-bold mb-6">Pod cu turiștii internaționali</h1>
+                <p class="text-xl mb-8">Aplicație de restaurant multilingvă pentru restaurantele japoneze, suport pentru 11 limbi</p>
+                <a href="https://app.navikko.com" class="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100">Începe gratuit</a>
+            </div>
+        </section>
+        <footer class="bg-gray-800 text-white py-12">
+            <div class="container mx-auto px-6 text-center">
+                <p>&copy; 2025 Navikko. Toate drepturile rezervate.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Language Switching JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const languageSelect = document.getElementById('languageSelect');
+            const languageContents = document.querySelectorAll('.language-content');
+            
+            // Set initial language based on browser preference or default to Japanese
+            const browserLang = navigator.language.split('-')[0];
+            const supportedLangs = ['ja', 'en', 'zh', 'ko', 'th', 'vi', 'ms', 'id', 'pl', 'es', 'ro'];
+            const defaultLang = supportedLangs.includes(browserLang) ? browserLang : 'ja';
+            
+            // Set initial language
+            languageSelect.value = defaultLang;
+            showLanguageContent(defaultLang);
+            
+            // Language change handler
+            languageSelect.addEventListener('change', function() {
+                const selectedLang = this.value;
+                showLanguageContent(selectedLang);
+                
+                // Update page language attribute
+                document.documentElement.lang = selectedLang;
+                
+                // Update page title based on language
+                const titles = {
+                    'ja': 'Navikko - 多言語レストランアプリ',
+                    'en': 'Navikko - Multilingual Restaurant App',
+                    'zh': 'Navikko - 多语言餐厅应用',
+                    'ko': 'Navikko - 다국어 레스토랑 앱',
+                    'th': 'Navikko - แอปร้านอาหารหลายภาษา',
+                    'vi': 'Navikko - Ứng dụng nhà hàng đa ngôn ngữ',
+                    'ms': 'Navikko - Aplikasi restoran pelbagai bahasa',
+                    'id': 'Navikko - Aplikasi restoran multibahasa',
+                    'pl': 'Navikko - Wielojęzyczna aplikacja restauracyjna',
+                    'es': 'Navikko - Aplicación de restaurante multiidioma',
+                    'ro': 'Navikko - Aplicație de restaurant multilingvă'
+                };
+                document.title = titles[selectedLang] || titles['ja'];
+            });
+            
+            function showLanguageContent(lang) {
+                // Hide all content
+                languageContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show selected language content
+                const targetContent = document.getElementById(`content-${lang}`);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            }
+            
+            // Smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
 </html>
