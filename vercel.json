@@ -6,7 +6,11 @@
       "use": "@vercel/static"
     },
     {
-      "src": "index.html",
+      "src": "marketing-website.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "dist/**",
       "use": "@vercel/static"
     }
   ],
@@ -18,6 +22,18 @@
     {
       "source": "/beta/(.*)",
       "destination": "/beta-promo-system.html"
+    },
+    {
+      "source": "/marketing",
+      "destination": "/marketing-website.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/dist/$1"
+    },
+    {
+      "source": "/",
+      "destination": "/dist/index.html"
     }
   ],
   "headers": [
