@@ -455,7 +455,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                       </div>
                       {showAdminOption && (
                         <p className="text-xs text-gray-500 mt-1">
-                          Admin option unlocked
+                          Admin option unlocked - Click 5 times to reveal
                         </p>
                       )}
                     </div>
