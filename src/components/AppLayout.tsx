@@ -286,7 +286,7 @@ const AppLayout: React.FC = () => {
       case 'subscription':
         return (
           <SecureRoute requiredRole="restaurant_owner">
-            <SubscriptionManagement />
+            <SubscriptionManagement restaurantId={user?.id || ''} />
           </SecureRoute>
         );
       

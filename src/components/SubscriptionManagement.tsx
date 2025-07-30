@@ -1,290 +1,283 @@
-import React, { useState } from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useAppContext } from '@/hooks/useAppContext';
-import authService from '@/services/authService';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Crown, Star, Zap } from 'lucide-react';
-import { toast } from '@/components/ui/use-toast';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, CreditCard, Calendar, Users, CheckCircle, XCircle } from 'lucide-react';
+import { subscriptionService, type Subscription, type SubscriptionPlan, type SubscriptionPricing } from '../services/subscriptionService';
+import { stripeService } from '../services/stripeService';
+import { useAuth } from '../hooks/useAuth';
 
-interface SubscriptionPlan {
-  id: string;
-  name: string;
-  price: number;
-  currency: string;
-  features: string[];
-  duration: string;
-  popular?: boolean;
-  recommended?: boolean;
+interface SubscriptionManagementProps {
+  restaurantId: string;
 }
 
-const SubscriptionManagement: React.FC = () => {
-  const { t } = useLanguage();
-  const { user, setUser } = useAppContext();
-  const [isLoading, setIsLoading] = useState<string | null>(null);
+export const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({ restaurantId }) => {
+  const { user } = useAuth();
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [availablePlans, setAvailablePlans] = useState<SubscriptionPricing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const plans: SubscriptionPlan[] = [
-    {
-      id: 'basic',
-      name: 'Basic Plan',
-      price: 5000,
-      currency: 'JPY',
-      duration: 'monthly',
-      features: [
-        'Menu Management',
-        'Order Management', 
-        'Basic Analytics',
-        'Email Support',
-        'Up to 100 orders/month',
-        'Basic reporting'
-      ]
-    },
-    {
-      id: 'premium',
-      name: 'Premium Plan',
-      price: 10000,
-      currency: 'JPY',
-      duration: 'monthly',
-      popular: true,
-      features: [
-        'All Basic Features',
-        'Advanced Analytics',
-        'Multi-language Support',
-        'Priority Support',
-        'Custom Branding',
-        'Unlimited orders',
-        'Advanced reporting',
-        'Customer insights'
-      ]
-    },
-    {
-      id: 'enterprise',
-      name: 'Enterprise Plan',
-      price: 25000,
-      currency: 'JPY',
-      duration: 'monthly',
-      recommended: true,
-      features: [
-        'All Premium Features',
-        'API Access',
-        'White-label Solution',
-        'Dedicated Support',
-        'Custom Integration',
-        'Multi-location support',
-        'Advanced security',
-        'Custom development'
-      ]
-    }
-  ];
-
-  const handleSubscribe = async (planId: string) => {
-    if (!user) {
-      toast({
-        title: "Error",
-        description: "Please log in to subscribe to a plan",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsLoading(planId);
+  const loadSubscriptionData = useCallback(async () => {
     try {
-      // For demo purposes, we'll simulate payment processing
-      const subscription = await authService.purchaseSubscription(planId, 'demo_payment_method');
-      
-      // Update user with new subscription
-      if (user) {
-        const updatedUser = { ...user, subscription };
-        setUser(updatedUser);
-      }
+      setLoading(true);
+      setError(null);
 
-      toast({
-        title: "Subscription Successful!",
-        description: `You are now subscribed to the ${plans.find(p => p.id === planId)?.name}`,
-      });
+      // Load current subscription
+      const currentSub = await subscriptionService.getRestaurantSubscription(restaurantId);
+      setSubscription(currentSub);
 
-    } catch (error) {
-      console.error('Subscription error:', error);
-      toast({
-        title: "Subscription Failed",
-        description: "There was an error processing your subscription. Please try again.",
-        variant: "destructive"
-      });
+      // Load available plans (pricing for Japan as default)
+      const plans = await subscriptionService.getPricingForCountry('JP');
+      setAvailablePlans(plans);
+    } catch (err) {
+      console.error('Error loading subscription data:', err);
+      setError('Failed to load subscription information');
     } finally {
-      setIsLoading(null);
+      setLoading(false);
+    }
+  }, [restaurantId]);
+
+  useEffect(() => {
+    loadSubscriptionData();
+  }, [loadSubscriptionData]);
+
+  const handleUpgrade = async (planId: string) => {
+    if (!user) return;
+
+    try {
+      setUpgrading(planId);
+      setError(null);
+
+      // Create checkout session
+      const { sessionId, url } = await stripeService.createCheckoutSession({
+        priceId: planId,
+        userId: user.id,
+        restaurantId,
+        successUrl: `${window.location.origin}/subscription/success`,
+        cancelUrl: `${window.location.origin}/subscription/cancel`,
+        countryCode: 'JP', // This should be dynamic based on user location
+      });
+
+      // Redirect to Stripe Checkout
+      window.location.href = url;
+    } catch (err) {
+      console.error('Error creating checkout session:', err);
+      setError('Failed to start upgrade process');
+    } finally {
+      setUpgrading(null);
     }
   };
 
-  const getCurrentPlan = () => {
-    return user?.subscription?.plan;
-  };
+  const handleManageSubscription = async () => {
+    if (!subscription?.stripe_customer_id) return;
 
-  const isCurrentPlan = (planId: string) => {
-    return getCurrentPlan() === planId;
-  };
-
-  const getPlanIcon = (planId: string) => {
-    switch (planId) {
-      case 'basic':
-        return <Zap className="w-6 h-6" />;
-      case 'premium':
-        return <Star className="w-6 h-6" />;
-      case 'enterprise':
-        return <Crown className="w-6 h-6" />;
-      default:
-        return <Zap className="w-6 h-6" />;
+    try {
+      const { url } = await stripeService.createPortalSession(
+        subscription.stripe_customer_id,
+        window.location.href
+      );
+      window.location.href = url;
+    } catch (err) {
+      console.error('Error opening customer portal:', err);
+      setError('Failed to open subscription management');
     }
   };
+
+  const formatPrice = (amount: number, currency: string = 'JPY') => {
+    return new Intl.NumberFormat('ja-JP', {
+      style: 'currency',
+      currency: currency.toUpperCase(),
+    }).format(amount);
+  };
+
+  const getStatusBadge = (status: Subscription['status']) => {
+    const statusConfig = {
+      active: { color: 'bg-green-100 text-green-800', label: 'Active' },
+      trialing: { color: 'bg-blue-100 text-blue-800', label: 'Trial' },
+      past_due: { color: 'bg-yellow-100 text-yellow-800', label: 'Past Due' },
+      canceled: { color: 'bg-red-100 text-red-800', label: 'Canceled' },
+      incomplete: { color: 'bg-gray-100 text-gray-800', label: 'Incomplete' },
+    };
+
+    const config = statusConfig[status] || statusConfig.incomplete;
+    return <Badge className={config.color}>{config.label}</Badge>;
+  };
+
+  const getPlanFeatures = (planType: string) => {
+    const features = {
+      starter: [
+        'Up to 50 menu items',
+        'Basic order management',
+        'Email support',
+        'Mobile app access',
+      ],
+      standard: [
+        'Up to 200 menu items',
+        'Advanced analytics',
+        'Priority support',
+        'Custom branding',
+        'Multi-location support',
+      ],
+      premium: [
+        'Unlimited menu items',
+        'Advanced integrations',
+        '24/7 phone support',
+        'Custom development',
+        'Dedicated account manager',
+      ],
+    };
+
+    return features[planType as keyof typeof features] || [];
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin" />
+        <span className="ml-2">Loading subscription information...</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Choose Your Subscription Plan
-        </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Select the perfect plan for your restaurant. All plans include our core features with different levels of support and capabilities.
-        </p>
-      </div>
+    <div className="space-y-6">
+      {error && (
+        <Alert variant="destructive">
+          <XCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
-      {/* Current Subscription Status */}
-      {user?.subscription && (
-        <Card className="mb-8 bg-blue-50 border-blue-200">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
+      {/* Current Subscription */}
+      {subscription && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Current Subscription
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <h3 className="text-lg font-semibold text-blue-900">
-                  Current Subscription: {user.subscription.plan.charAt(0).toUpperCase() + user.subscription.plan.slice(1)} Plan
-                </h3>
-                <p className="text-blue-700">
-                  Status: <Badge variant={user.subscription.status === 'active' ? 'default' : 'destructive'}>
-                    {user.subscription.status}
-                  </Badge>
-                </p>
-                <p className="text-blue-700">
-                  Expires: {new Date(user.subscription.endDate).toLocaleDateString()}
+                <p className="text-sm text-gray-600">Plan</p>
+                <p className="font-semibold capitalize">{subscription.plan_id}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Status</p>
+                {getStatusBadge(subscription.status)}
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Next Billing</p>
+                <p className="font-semibold">
+                  {subscription.current_period_end 
+                    ? new Date(subscription.current_period_end).toLocaleDateString('ja-JP')
+                    : 'N/A'
+                  }
                 </p>
               </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-blue-900">
-                  ¥{user.subscription.price.toLocaleString()}
-                </p>
-                <p className="text-blue-700">per month</p>
-              </div>
+            </div>
+            
+            <div className="mt-4 pt-4 border-t">
+              <Button onClick={handleManageSubscription} variant="outline">
+                Manage Subscription
+              </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Subscription Plans */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {plans.map((plan) => (
-          <Card 
-            key={plan.id} 
-            className={`relative ${
-              plan.popular ? 'ring-2 ring-blue-500 shadow-lg' : ''
-            } ${
-              plan.recommended ? 'ring-2 ring-purple-500 shadow-lg' : ''
-            }`}
-          >
-            {plan.popular && (
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-blue-500 text-white px-4 py-1">
-                  Most Popular
-                </Badge>
-              </div>
-            )}
-            {plan.recommended && (
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-purple-500 text-white px-4 py-1">
-                  Recommended
-                </Badge>
-              </div>
-            )}
-
-            <CardHeader className="text-center pb-4">
-              <div className="flex justify-center mb-2">
-                {getPlanIcon(plan.id)}
-              </div>
-              <CardTitle className="text-xl">{plan.name}</CardTitle>
-              <div className="flex items-baseline justify-center">
-                <span className="text-3xl font-bold">¥{plan.price.toLocaleString()}</span>
-                <span className="text-gray-600 ml-1">/month</span>
-              </div>
-            </CardHeader>
-
-            <CardContent>
-              <ul className="space-y-3 mb-6">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start">
-                    <Check className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button
-                className={`w-full ${
-                  isCurrentPlan(plan.id) 
-                    ? 'bg-gray-400 cursor-not-allowed' 
-                    : plan.popular 
-                    ? 'bg-blue-600 hover:bg-blue-700' 
-                    : plan.recommended 
-                    ? 'bg-purple-600 hover:bg-purple-700'
-                    : 'bg-gray-600 hover:bg-gray-700'
-                }`}
-                onClick={() => handleSubscribe(plan.id)}
-                disabled={isCurrentPlan(plan.id) || isLoading === plan.id}
-              >
-                {isLoading === plan.id ? (
-                  'Processing...'
-                ) : isCurrentPlan(plan.id) ? (
-                  'Current Plan'
-                ) : (
-                  'Subscribe Now'
-                )}
-              </Button>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Additional Information */}
-      <div className="mt-12 text-center">
-        <h3 className="text-xl font-semibold mb-4">Why Choose Navikko?</h3>
+      {/* Available Plans */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">
+          {subscription ? 'Upgrade Your Plan' : 'Choose Your Plan'}
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="text-center">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Zap className="w-6 h-6 text-blue-600" />
-            </div>
-            <h4 className="font-semibold mb-2">Easy to Use</h4>
-            <p className="text-gray-600 text-sm">
-              Intuitive interface designed specifically for restaurant management
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Star className="w-6 h-6 text-green-600" />
-            </div>
-            <h4 className="font-semibold mb-2">Multi-language Support</h4>
-            <p className="text-gray-600 text-sm">
-              Serve customers in their preferred language
-            </p>
-          </div>
-          <div className="text-center">
-            <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Crown className="w-6 h-6 text-purple-600" />
-            </div>
-            <h4 className="font-semibold mb-2">24/7 Support</h4>
-            <p className="text-gray-600 text-sm">
-              Get help whenever you need it with our dedicated support team
-            </p>
-          </div>
+          {availablePlans.map((plan) => {
+            const isCurrentPlan = subscription?.plan_id === plan.plan_id;
+            const features = getPlanFeatures(plan.plan_id);
+            
+            return (
+              <Card key={plan.id} className={isCurrentPlan ? 'ring-2 ring-blue-500' : ''}>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="capitalize">{plan.plan_id}</span>
+                    {isCurrentPlan && <Badge>Current</Badge>}
+                  </CardTitle>
+                  <CardDescription>
+                    <span className="text-2xl font-bold">
+                      {subscriptionService.formatPrice(plan.price_monthly, plan.currency)}
+                    </span>
+                    <span className="text-sm text-gray-600">
+                      /month
+                    </span>
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 mb-6">
+                    {features.map((feature, index) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  
+                  {!isCurrentPlan && (
+                    <Button
+                      onClick={() => handleUpgrade(plan.stripe_price_id || plan.id)}
+                      disabled={upgrading === plan.id}
+                      className="w-full"
+                    >
+                      {upgrading === plan.id ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          Processing...
+                        </>
+                      ) : (
+                        subscription ? 'Upgrade' : 'Get Started'
+                      )}
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
+
+      {/* Usage Information */}
+      {subscription && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Usage Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-gray-600">Menu Items</p>
+                <p className="font-semibold">Loading...</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Orders This Month</p>
+                <p className="font-semibold">Loading...</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Storage Used</p>
+                <p className="font-semibold">Loading...</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
 
-export default SubscriptionManagement; 
+export default SubscriptionManagement;

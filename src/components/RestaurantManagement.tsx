@@ -18,11 +18,13 @@ interface Restaurant {
   name: string;
   name_en?: string;
   name_ja?: string;
+  name_romaji?: string;
   name_zh?: string;
   name_ko?: string;
   address: string;
   address_en?: string;
   address_ja?: string;
+  address_romaji?: string;
   address_zh?: string;
   address_ko?: string;
   phone: string;
@@ -30,6 +32,7 @@ interface Restaurant {
   description?: string;
   description_en?: string;
   description_ja?: string;
+  description_romaji?: string;
   description_zh?: string;
   description_ko?: string;
   latitude?: number;
@@ -89,16 +92,19 @@ const RestaurantManagement: React.FC = () => {
     name: '',
     name_en: '',
     name_ja: '',
+    name_romaji: '',
     name_zh: '',
     name_ko: '',
     address: '',
     address_en: '',
     address_ja: '',
+    address_romaji: '',
     address_zh: '',
     address_ko: '',
     description: '',
     description_en: '',
     description_ja: '',
+    description_romaji: '',
     description_zh: '',
     description_ko: '',
     phone: '',
@@ -253,6 +259,16 @@ const RestaurantManagement: React.FC = () => {
                     required
                   />
                 </div>
+                <div>
+                  <Label htmlFor="name_romaji">{t('restaurant.name_romaji')} *</Label>
+                  <Input
+                    id="name_romaji"
+                    value={formData.name_romaji || ''}
+                    onChange={(e) => setFormData({...formData, name_romaji: e.target.value})}
+                    placeholder="Romaji/English transliteration"
+                    required
+                  />
+                </div>
                 {showEnglish && (
                   <div>
                     <Label htmlFor="name_en">{t('restaurant.name_english')}</Label>
@@ -260,17 +276,6 @@ const RestaurantManagement: React.FC = () => {
                       id="name_en"
                       value={formData.name_en || ''}
                       onChange={(e) => setFormData({...formData, name_en: e.target.value})}
-                    />
-                  </div>
-                )}
-                {(currentLanguage !== 'ja' && currentLanguage !== 'zh') && (
-                  <div>
-                    <Label htmlFor="name_romaji">{t('restaurant.name_romaji')}</Label>
-                    <Input
-                      id="name_romaji"
-                      value={formData.name_en || ''}
-                      onChange={(e) => setFormData({...formData, name_en: e.target.value})}
-                      placeholder="Romaji/English transliteration"
                     />
                   </div>
                 )}
@@ -316,6 +321,16 @@ const RestaurantManagement: React.FC = () => {
                     required
                   />
                 </div>
+                <div>
+                  <Label htmlFor="address_romaji">{t('restaurant.address_romaji')} *</Label>
+                  <Input
+                    id="address_romaji"
+                    value={formData.address_romaji || ''}
+                    onChange={(e) => setFormData({...formData, address_romaji: e.target.value})}
+                    placeholder="Romaji/English transliteration"
+                    required
+                  />
+                </div>
                 {showEnglish && (
                   <div>
                     <Label htmlFor="address_en">{t('restaurant.address_english')}</Label>
@@ -323,17 +338,6 @@ const RestaurantManagement: React.FC = () => {
                       id="address_en"
                       value={formData.address_en || ''}
                       onChange={(e) => setFormData({...formData, address_en: e.target.value})}
-                    />
-                  </div>
-                )}
-                {(currentLanguage !== 'ja' && currentLanguage !== 'zh') && (
-                  <div>
-                    <Label htmlFor="address_romaji">{t('restaurant.address_romaji')}</Label>
-                    <Input
-                      id="address_romaji"
-                      value={formData.address_en || ''}
-                      onChange={(e) => setFormData({...formData, address_en: e.target.value})}
-                      placeholder="Romaji/English transliteration"
                     />
                   </div>
                 )}
@@ -372,6 +376,15 @@ const RestaurantManagement: React.FC = () => {
                     }}
                   />
                 </div>
+                <div>
+                  <Label htmlFor="description_romaji">{t('restaurant.description_romaji')}</Label>
+                  <Textarea
+                    id="description_romaji"
+                    value={formData.description_romaji || ''}
+                    onChange={(e) => setFormData({...formData, description_romaji: e.target.value})}
+                    placeholder="Romaji/English transliteration"
+                  />
+                </div>
                 {showEnglish && (
                   <div>
                     <Label htmlFor="description_en">{t('restaurant.description_english')}</Label>
@@ -379,17 +392,6 @@ const RestaurantManagement: React.FC = () => {
                       id="description_en"
                       value={formData.description_en || ''}
                       onChange={(e) => setFormData({...formData, description_en: e.target.value})}
-                    />
-                  </div>
-                )}
-                {(currentLanguage !== 'ja' && currentLanguage !== 'zh') && (
-                  <div>
-                    <Label htmlFor="description_romaji">{t('restaurant.description_romaji')}</Label>
-                    <Textarea
-                      id="description_romaji"
-                      value={formData.description_en || ''}
-                      onChange={(e) => setFormData({...formData, description_en: e.target.value})}
-                      placeholder="Romaji/English transliteration"
                     />
                   </div>
                 )}

@@ -59,17 +59,20 @@ CREATE TABLE IF NOT EXISTS public.reservations (
 );
 
 -- Update restaurants table to support multilingual fields properly
-ALTER TABLE public.restaurants 
+ALTER TABLE public.restaurants
 ADD COLUMN IF NOT EXISTS name_en TEXT,
 ADD COLUMN IF NOT EXISTS name_ja TEXT,
+ADD COLUMN IF NOT EXISTS name_romaji TEXT,
 ADD COLUMN IF NOT EXISTS name_zh TEXT,
 ADD COLUMN IF NOT EXISTS name_ko TEXT,
 ADD COLUMN IF NOT EXISTS description_en TEXT,
 ADD COLUMN IF NOT EXISTS description_ja TEXT,
+ADD COLUMN IF NOT EXISTS description_romaji TEXT,
 ADD COLUMN IF NOT EXISTS description_zh TEXT,
 ADD COLUMN IF NOT EXISTS description_ko TEXT,
 ADD COLUMN IF NOT EXISTS address_en TEXT,
 ADD COLUMN IF NOT EXISTS address_ja TEXT,
+ADD COLUMN IF NOT EXISTS address_romaji TEXT,
 ADD COLUMN IF NOT EXISTS address_zh TEXT,
 ADD COLUMN IF NOT EXISTS address_ko TEXT;
 
@@ -151,19 +154,21 @@ CREATE INDEX IF NOT EXISTS idx_reservations_date ON public.reservations(reservat
 
 -- Sample restaurant (you can modify this)
 INSERT INTO public.restaurants (
-  name, name_en, name_ja, name_zh, name_ko,
-  address, address_en, address_ja, address_zh, address_ko,
+  name, name_en, name_ja, name_romaji, name_zh, name_ko,
+  address, address_en, address_ja, address_romaji, address_zh, address_ko,
   phone, cuisine, rating, price_range, is_active,
   latitude, longitude, opening_hours
 ) VALUES (
   'Test Restaurant',
   'Test Restaurant',
   'テストレストラン',
+  'Tesuto Resutoran',
   '测试餐厅',
   '테스트 레스토랑',
   'Test Address',
   'Test Address',
   'テスト住所',
+  'Tesuto Juusho',
   '测试地址',
   '테스트 주소',
   '080-1234-5678',

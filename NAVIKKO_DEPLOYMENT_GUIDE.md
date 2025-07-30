@@ -87,7 +87,7 @@ The system includes pre-configured promotional codes:
 
 #### Restaurant Beta Codes
 - `RESTAURANT2025` - Restaurant Beta Access (expires 2025-12-31)
-- `BETA-REST-001` - Early Restaurant Access (expires 2025-06-30)
+- `BETA-REST-001` - Early Restaurant Access (expires 2025-08-31)
 
 #### General Access
 - `NAVIKKO-BETA` - General Beta Access (expires 2025-12-31)

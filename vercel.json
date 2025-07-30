@@ -14,14 +14,18 @@
     {
       "source": "/beta/(.*)",
       "destination": "/beta-promo-system.html"
-    },
+    }
+  ],
+  "redirects": [
     {
       "source": "/app",
-      "destination": "https://restaurant-app-xi-ashy.vercel.app"
+      "destination": "https://restaurant-app-xi-ashy.vercel.app",
+      "permanent": false
     },
     {
       "source": "/app/(.*)",
-      "destination": "https://restaurant-app-xi-ashy.vercel.app/$1"
+      "destination": "https://restaurant-app-xi-ashy.vercel.app/$1",
+      "permanent": false
     }
   ],
   "headers": [
