@@ -28,16 +28,6 @@
       "source": "/app/(.*)",
       "destination": "https://restaurant-app-xi-ashy.vercel.app/$1",
       "permanent": false
-    },
-    {
-      "source": "/demo",
-      "destination": "https://demo-navikko.vercel.app",
-      "permanent": false
-    },
-    {
-      "source": "/dev",
-      "destination": "https://dev-navikko.vercel.app",
-      "permanent": false
     }
   ],
   "headers": [
@@ -59,37 +49,6 @@
         {
           "key": "Referrer-Policy",
           "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://restaurant-app-xi-ashy.vercel.app;"
-        }
-      ]
-    },
-    {
-      "source": "/website/assets/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/website/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2))",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/website/(.*\\.html)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
         }
       ]
     }
