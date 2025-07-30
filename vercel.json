@@ -2,15 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "beta-promo-system.html",
+      "src": "*.html",
       "use": "@vercel/static"
     },
     {
-      "src": "marketing-website.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "dist/**",
+      "src": "assets/**",
       "use": "@vercel/static"
     }
   ],
@@ -26,14 +22,6 @@
     {
       "source": "/marketing",
       "destination": "/marketing-website.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/dist/$1"
-    },
-    {
-      "source": "/",
-      "destination": "/dist/index.html"
     }
   ],
   "headers": [
