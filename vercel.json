@@ -1,16 +1,116 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": "vite",
-  "rewrites": [
+  "version": 2,
+  "name": "navikko-website",
+  "builds": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "src": "website/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/beta",
+      "dest": "/website/beta-promo-system.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/beta/(.*)",
+      "dest": "/website/beta-promo-system.html"
+    },
+    {
+      "src": "/app",
+      "status": 302,
+      "headers": {
+        "Location": "https://restaurant-app-xi-ashy.vercel.app"
+      }
+    },
+    {
+      "src": "/app/(.*)",
+      "status": 302,
+      "headers": {
+        "Location": "https://restaurant-app-xi-ashy.vercel.app/$1"
+      }
+    },
+    {
+      "src": "/demo",
+      "status": 302,
+      "headers": {
+        "Location": "https://demo-navikko.vercel.app"
+      }
+    },
+    {
+      "src": "/dev",
+      "status": 302,
+      "headers": {
+        "Location": "https://dev-navikko.vercel.app"
+      }
+    },
+    {
+      "src": "/",
+      "dest": "/website/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/website/$1"
     }
-  ]
-} 
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://restaurant-app-xi-ashy.vercel.app;"
+        }
+      ]
+    },
+    {
+      "source": "/website/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/website/**/*.{js,css,png,jpg,jpeg,gif,svg,ico,woff,woff2}",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/website/**/*.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    }
+  ],
+  "functions": {
+    "website/**": {
+      "includeFiles": "website/**"
+    }
+  },
+  "outputDirectory": "website"
+}
