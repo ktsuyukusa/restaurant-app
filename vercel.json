@@ -9,11 +9,11 @@
   "routes": [
     {
       "src": "/beta",
-      "dest": "/website/beta-promo-system.html"
+      "dest": "/beta-promo-system.html"
     },
     {
       "src": "/beta/(.*)",
-      "dest": "/website/beta-promo-system.html"
+      "dest": "/beta-promo-system.html"
     },
     {
       "src": "/app",
@@ -31,11 +31,11 @@
     },
     {
       "src": "/",
-      "dest": "/website/index.html"
+      "dest": "/index.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/website/$1"
+      "dest": "/$1"
     }
   ],
   "headers": [
