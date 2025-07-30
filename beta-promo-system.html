@@ -196,8 +196,8 @@
 
             // Redirect to beta platform
             setTimeout(() => {
-                // Redirect to the app route which will redirect to React app
-                const redirectUrl = 'https://www.navikko.com/app';
+                // Redirect to the main React app (now served from root)
+                const redirectUrl = '/';
                 window.location.href = redirectUrl;
             }, 2000);
         });
@@ -246,7 +246,7 @@
                     // User still has valid access
                     const continueAccess = confirm('You already have beta access. Continue to platform?');
                     if (continueAccess) {
-                        window.location.href = 'https://www.navikko.com/app';
+                        window.location.href = '/';
                     }
                 } else {
                     // Access expired, clear it

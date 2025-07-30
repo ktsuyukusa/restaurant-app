@@ -2,10 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "*.html",
-      "use": "@vercel/static"
+      "src": "package.json",
+      "use": "@vercel/node"
     }
   ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "vite",
   "rewrites": [
     {
       "source": "/beta",
@@ -14,18 +19,10 @@
     {
       "source": "/beta/(.*)",
       "destination": "/beta-promo-system.html"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/app",
-      "destination": "https://restaurant-app-xi-ashy.vercel.app",
-      "permanent": false
     },
     {
-      "source": "/app/(.*)",
-      "destination": "https://restaurant-app-xi-ashy.vercel.app/$1",
-      "permanent": false
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
