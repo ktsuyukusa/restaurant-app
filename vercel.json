@@ -1,33 +1,41 @@
 {
   "version": 2,
-  "rewrites": [
+  "builds": [
     {
-      "source": "/beta",
-      "destination": "/website/beta-promo-system.html"
-    },
-    {
-      "source": "/beta/(.*)",
-      "destination": "/website/beta-promo-system.html"
-    },
-    {
-      "source": "/",
-      "destination": "/website/index.html"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/website/$1"
+      "src": "website/**",
+      "use": "@vercel/static"
     }
   ],
-  "redirects": [
+  "routes": [
     {
-      "source": "/app",
-      "destination": "https://restaurant-app-xi-ashy.vercel.app",
-      "permanent": false
+      "src": "/beta",
+      "dest": "/website/beta-promo-system.html"
     },
     {
-      "source": "/app/(.*)",
-      "destination": "https://restaurant-app-xi-ashy.vercel.app/$1",
-      "permanent": false
+      "src": "/beta/(.*)",
+      "dest": "/website/beta-promo-system.html"
+    },
+    {
+      "src": "/app",
+      "status": 302,
+      "headers": {
+        "Location": "https://restaurant-app-xi-ashy.vercel.app"
+      }
+    },
+    {
+      "src": "/app/(.*)",
+      "status": 302,
+      "headers": {
+        "Location": "https://restaurant-app-xi-ashy.vercel.app/$1"
+      }
+    },
+    {
+      "src": "/",
+      "dest": "/website/index.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/website/$1"
     }
   ],
   "headers": [
