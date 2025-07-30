@@ -1,37 +1,8 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "assets/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "AZ Dining Saku/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "logo/**",
-      "use": "@vercel/static"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/beta",
-      "destination": "/beta-promo-system.html"
-    },
-    {
-      "source": "/beta/(.*)",
-      "destination": "/beta-promo-system.html"
-    },
-    {
-      "source": "/marketing",
-      "destination": "/marketing-website.html"
-    }
-  ],
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "installCommand": "npm install",
   "headers": [
     {
       "source": "/(.*)",
@@ -53,6 +24,12 @@
           "value": "strict-origin-when-cross-origin"
         }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
