@@ -123,14 +123,15 @@ const Header: React.FC<HeaderProps> = ({
                 </Button>
               </div>
             ) : (
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="default"
                 size="sm"
                 onClick={() => setShowAuthModal(true)}
-                className="text-gray-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
+                className="bg-navikko-primary hover:bg-navikko-primary/90 text-white px-4 py-2 rounded-lg transition-colors font-medium"
                 title="Login / Sign Up"
               >
-                <LogIn className="h-5 w-5" />
+                <LogIn className="h-4 w-4 mr-2" />
+                {t('auth.get_started', 'Get Started')}
               </Button>
             )}
             

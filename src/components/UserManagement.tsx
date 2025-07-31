@@ -160,24 +160,27 @@ const UserManagement: React.FC = () => {
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">{t('nav.users')}</h1>
+        <div>
+          <h1 className="text-2xl font-bold">{t('nav.users')}</h1>
+          <p className="text-gray-600 mt-1">Manage user profiles and restaurant owner registrations</p>
+        </div>
         <div className="flex gap-2">
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button onClick={() => resetForm()}>
                 <Plus className="h-4 w-4 mr-2" />
-                {t('button.add')}
+                Add User Profile
               </Button>
             </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>
-                {editingUser ? t('button.edit') : t('button.add')} {t('nav.users')}
+                {editingUser ? 'Edit' : 'Add'} User Profile
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="name">{t('form.name')}</Label>
+                <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -186,7 +189,7 @@ const UserManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="email">{t('form.email')}</Label>
+                <Label htmlFor="email">Email Address</Label>
                 <Input
                   id="email"
                   type="email"
@@ -196,7 +199,7 @@ const UserManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="language">{t('form.language')}</Label>
+                <Label htmlFor="language">Preferred Language</Label>
                 <Select
                   value={formData.language}
                   onValueChange={(value) => setFormData({ ...formData, language: value })}
@@ -215,10 +218,10 @@ const UserManagement: React.FC = () => {
               </div>
               <div className="flex gap-2 pt-4">
                 <Button type="button" variant="outline" onClick={resetForm} className="flex-1">
-                  {t('button.cancel')}
+                  Cancel
                 </Button>
                 <Button type="submit" className="flex-1">
-                  {editingUser ? t('button.update') : t('button.create')}
+                  {editingUser ? 'Update' : 'Create'}
                 </Button>
               </div>
             </form>
@@ -233,14 +236,17 @@ const UserManagement: React.FC = () => {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <User className="h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No users found</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No user profiles found</h3>
               <p className="text-gray-600 text-center mb-4">
-                Get started by adding your first user profile to the system.
+                User profiles are created automatically when users register through the main application.
+                You can also manually add profiles here for administrative purposes.
               </p>
-              <Button onClick={() => setIsDialogOpen(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add First User
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={() => setIsDialogOpen(true)} variant="outline">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add User Profile
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ) : (
@@ -260,6 +266,7 @@ const UserManagement: React.FC = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleEdit(user)}
+                      title="Edit user profile"
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -267,6 +274,7 @@ const UserManagement: React.FC = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleDelete(user.id)}
+                      title="Delete user profile"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

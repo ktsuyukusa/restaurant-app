@@ -9,24 +9,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { 
-  User, 
-  Store, 
-  Crown, 
-  Mail, 
-  Lock, 
-  Phone, 
+import {
+  User,
+  Store,
+  Mail,
+  Lock,
+  Phone,
   Building,
   MapPin,
   CreditCard,
   Eye,
-  EyeOff,
-  Shield
+  EyeOff
 } from 'lucide-react';
 import { useAppContext } from '@/hooks/useAppContext';
 import authService, { LoginData as AuthLoginData } from '@/services/authService';
 import { SignupData } from '@/utils/types';
-import { validateAdminCode } from '@/config/adminCodes';
 import GoogleSignIn from './GoogleSignIn';
 import PrivacyPolicyModal from './PrivacyPolicyModal';
 import TermsOfServiceModal from './TermsOfServiceModal';
@@ -59,8 +56,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [showTermsOfService, setShowTermsOfService] = useState(false);
   const [showTwoFactorAuth, setShowTwoFactorAuth] = useState(false);
   const [pendingLoginData, setPendingLoginData] = useState<AuthLoginData | null>(null);
-  const [showAdminOption, setShowAdminOption] = useState(false);
-  const [adminUnlockClicks, setAdminUnlockClicks] = useState(0);
 
   // Login form state
   const [loginData, setLoginData] = useState<AuthLoginData>({
@@ -79,8 +74,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     locationConsent: false,
     restaurantName: '',
     restaurantAddress: '',
-    restaurantPhone: '',
-    adminCode: ''
+    restaurantPhone: ''
   });
 
   const userTypes = [
@@ -99,14 +93,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       icon: Store,
       color: 'bg-green-100 text-green-800',
       features: ['Dashboard', 'Order management', 'Menu management', 'Analytics']
-    },
-    {
-      id: 'admin',
-      name: 'Admin',
-      description: 'Full system access and management',
-      icon: Crown,
-      color: 'bg-purple-100 text-purple-800',
-      features: ['All restaurant features', 'User management', 'System settings', 'Analytics']
     }
   ];
 
@@ -235,14 +221,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       }
     }
 
-    // Admin validation
-    if (signupData.userType === 'admin') {
-      if (!signupData.adminCode || !validateAdminCode(signupData.adminCode)) {
-        setError('Invalid admin code');
-        setIsLoading(false);
-        return;
-      }
-    }
 
     try {
       // Transform the signup data to match authService expectations
@@ -283,13 +261,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
       locationConsent: false,
       restaurantName: '',
       restaurantAddress: '',
-      restaurantPhone: '',
-      adminCode: ''
+      restaurantPhone: ''
     });
     setError(null);
     setAgreeToTerms(false);
-    setShowAdminOption(false);
-    setAdminUnlockClicks(0);
   };
 
   const handleClose = () => {
@@ -411,53 +386,35 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <CardContent>
                   <form onSubmit={handleSignup} className="space-y-4">
                     <div>
-                      <Label
-                        onClick={() => {
-                          setAdminUnlockClicks(prev => prev + 1);
-                          if (adminUnlockClicks >= 4) {
-                            setShowAdminOption(true);
-                          }
-                        }}
-                        className="cursor-pointer"
-                      >
+                      <Label htmlFor="account-type">
                         {t('auth.account_type', 'Account Type')}
                       </Label>
-                      <div className={`grid gap-3 mt-2 ${showAdminOption ? 'grid-cols-1 md:grid-cols-3' : 'grid-cols-1 md:grid-cols-2'}`}>
+                      <div className="grid gap-3 mt-2 grid-cols-1 md:grid-cols-2">
                         <Button
                           type="button"
                           variant={signupData.userType === 'customer' ? 'default' : 'outline'}
                           onClick={() => updateSignupField('userType', 'customer')}
-                          className="flex flex-col items-center gap-2 h-auto p-4"
+                          className="flex flex-col items-center gap-3 h-auto p-6 border-2 transition-all hover:shadow-md"
                         >
-                          <User className="h-5 w-5" />
-                          <span className="text-sm">{t('auth.customer', 'Customer')}</span>
+                          <User className="h-8 w-8" />
+                          <div className="text-center">
+                            <div className="font-semibold text-base">{t('auth.customer', 'Customer')}</div>
+                            <div className="text-xs text-gray-600 mt-1">Browse restaurants and place orders</div>
+                          </div>
                         </Button>
                         <Button
                           type="button"
                           variant={signupData.userType === 'restaurant_owner' ? 'default' : 'outline'}
                           onClick={() => updateSignupField('userType', 'restaurant_owner')}
-                          className="flex flex-col items-center gap-2 h-auto p-4"
+                          className="flex flex-col items-center gap-3 h-auto p-6 border-2 transition-all hover:shadow-md"
                         >
-                          <Store className="h-5 w-5" />
-                          <span className="text-sm">{t('auth.restaurant_owner', 'Restaurant Owner')}</span>
+                          <Store className="h-8 w-8" />
+                          <div className="text-center">
+                            <div className="font-semibold text-base">{t('auth.restaurant_owner', 'Restaurant Owner')}</div>
+                            <div className="text-xs text-gray-600 mt-1">Manage your restaurant and orders</div>
+                          </div>
                         </Button>
-                        {showAdminOption && (
-                          <Button
-                            type="button"
-                            variant={signupData.userType === 'admin' ? 'default' : 'outline'}
-                            onClick={() => updateSignupField('userType', 'admin')}
-                            className="flex flex-col items-center gap-2 h-auto p-4"
-                          >
-                            <Crown className="h-5 w-5" />
-                            <span className="text-sm">{t('auth.admin', 'Admin')}</span>
-                          </Button>
-                        )}
                       </div>
-                      {showAdminOption && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          Admin option unlocked - Click 5 times to reveal
-                        </p>
-                      )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -627,33 +584,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                       </div>
                     )}
 
-                    {signupData.userType === 'admin' && (
-                      <div className="space-y-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                        <h3 className="font-semibold text-purple-800 flex items-center gap-2">
-                          <Shield className="h-4 w-4" />
-                          {t('auth.admin_verification', 'Admin Verification')}
-                        </h3>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="admin-code">{t('auth.admin_code', 'Admin Code')}</Label>
-                          <div className="relative">
-                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                            <Input
-                              id="admin-code"
-                              type="password"
-                              placeholder={t('auth.enter_admin_code', 'Enter admin verification code')}
-                              value={signupData.adminCode || ''}
-                              onChange={(e) => updateSignupField('adminCode', e.target.value)}
-                              className="pl-10"
-                              required
-                            />
-                          </div>
-                          <p className="text-xs text-purple-600">
-                            {t('auth.admin_code_desc', 'Admin code required for system administrator access')}
-                          </p>
-                        </div>
-                      </div>
-                    )}
 
                     {/* Terms and Privacy Policy Agreement */}
                     <div className="space-y-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
