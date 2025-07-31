@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CreditCard, Calendar, Users, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, CreditCard, Calendar, Users, CheckCircle, XCircle, Info } from 'lucide-react';
 import { subscriptionService, type Subscription, type SubscriptionPlan, type SubscriptionPricing } from '../services/subscriptionService';
 import { stripeService } from '../services/stripeService';
 import { useAuth } from '../hooks/useAuth';
@@ -113,20 +113,44 @@ export const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({ 
         'Basic order management',
         'Email support',
         'Mobile app access',
+        '5 languages supported',
+        'Basic analytics',
+        'QR code ordering',
+        'Basic customer notifications',
+        'Simple reservation system'
       ],
       standard: [
         'Up to 200 menu items',
-        'Advanced analytics',
-        'Priority support',
+        'Advanced order management',
+        'Priority email support',
         'Custom branding',
+        '10 languages supported',
+        'Advanced analytics',
+        'Reservation system',
         'Multi-location support',
+        'Customer loyalty program',
+        'Advanced reporting dashboard',
+        'Push notifications',
+        'Social media integration',
+        'Basic marketing tools'
       ],
       premium: [
         'Unlimited menu items',
-        'Advanced integrations',
+        'Full order management suite',
         '24/7 phone support',
         'Custom development',
+        'All languages supported',
+        'Real-time analytics',
+        'Advanced reservation system',
+        'API access',
         'Dedicated account manager',
+        'White-label solution',
+        'AI-powered recommendations',
+        'Advanced marketing automation',
+        'Customer segmentation',
+        'Loyalty program customization',
+        'Multi-channel ordering',
+        'Advanced inventory management'
       ],
     };
 
@@ -150,6 +174,19 @@ export const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({ 
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      {/* Restaurant Owner Testing Program Notice */}
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertDescription>
+          <strong>Restaurant Owner Testing Program</strong>
+          <p className="text-sm mt-1">
+            Thank you for participating in our testing program. Your promotional code grants you access to test 
+            our platform with extended trial periods (30 days to 1 year). After your trial period, you can 
+            continue with a paid subscription or downgrade to a free plan.
+          </p>
+        </AlertDescription>
+      </Alert>
 
       {/* Current Subscription */}
       {subscription && (
@@ -246,6 +283,13 @@ export const SubscriptionManagement: React.FC<SubscriptionManagementProps> = ({ 
               </Card>
             );
           })}
+        </div>
+        
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-500">
+            All plans include a 14-day free trial. Restaurant owners testing with promotional codes 
+            receive extended trial periods (30 days to 1 year).
+          </p>
         </div>
       </div>
 

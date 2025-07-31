@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Globe, CreditCard, Shield } from 'lucide-react';
+import { CheckCircle, Globe, CreditCard, Shield, Users, Menu, BarChart3, Calendar, MapPin, Smartphone, QrCode, Bell } from 'lucide-react';
 import { subscriptionService, type SubscriptionPricing } from '../services/subscriptionService';
 
 interface PricingPageProps {
@@ -50,6 +50,10 @@ export const PricingPage: React.FC<PricingPageProps> = ({ countryCode = 'JP' }) 
         'Mobile app access',
         '5 languages supported',
         'Basic analytics',
+        'QR code ordering',
+        'Basic customer notifications',
+        'Simple reservation system',
+        'Basic reporting dashboard'
       ],
       standard: [
         'Up to 200 menu items',
@@ -60,6 +64,12 @@ export const PricingPage: React.FC<PricingPageProps> = ({ countryCode = 'JP' }) 
         'Advanced analytics',
         'Reservation system',
         'Multi-location support',
+        'Customer loyalty program',
+        'Advanced reporting dashboard',
+        'Push notifications',
+        'Social media integration',
+        'Basic marketing tools',
+        'Customer feedback system'
       ],
       premium: [
         'Unlimited menu items',
@@ -72,6 +82,14 @@ export const PricingPage: React.FC<PricingPageProps> = ({ countryCode = 'JP' }) 
         'API access',
         'Dedicated account manager',
         'White-label solution',
+        'AI-powered recommendations',
+        'Advanced marketing automation',
+        'Customer segmentation',
+        'Loyalty program customization',
+        'Multi-channel ordering',
+        'Advanced inventory management',
+        'Staff management system',
+        'Performance benchmarking'
       ],
     };
 
@@ -80,15 +98,20 @@ export const PricingPage: React.FC<PricingPageProps> = ({ countryCode = 'JP' }) 
 
   const getPlanDescription = (planId: string) => {
     const descriptions = {
-      starter: 'Perfect for small restaurants getting started',
-      standard: 'Ideal for growing restaurants with multiple needs',
-      premium: 'Complete solution for enterprise restaurants',
+      starter: 'Perfect for small restaurants getting started with multilingual service',
+      standard: 'Ideal for growing restaurants with multiple needs and locations',
+      premium: 'Complete solution for enterprise restaurants with advanced requirements',
     };
 
     return descriptions[planId as keyof typeof descriptions] || '';
   };
 
   const getPopularPlan = () => 'standard';
+
+  const handleGetStarted = () => {
+    // Redirect to the promotional code system
+    window.location.href = '/beta';
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12">
@@ -101,6 +124,10 @@ export const PricingPage: React.FC<PricingPageProps> = ({ countryCode = 'JP' }) 
           <p className="text-xl text-gray-600 mb-8">
             Transparent pricing tailored to your region. No hidden fees.
           </p>
+          <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-8 rounded">
+            <p className="font-semibold">Restaurant Owner Testing Program</p>
+            <p className="text-sm">Use promotional codes for free trial access (14-day free trial included with all plans)</p>
+          </div>
 
           {/* Country Selector */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
@@ -177,6 +204,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({ countryCode = 'JP' }) 
                     </ul>
 
                     <Button
+                      onClick={handleGetStarted}
                       className={`w-full ${
                         isPopular
                           ? 'bg-blue-600 hover:bg-blue-700'
@@ -190,6 +218,9 @@ export const PricingPage: React.FC<PricingPageProps> = ({ countryCode = 'JP' }) 
                     <div className="text-center mt-4">
                       <p className="text-xs text-gray-500">
                         14-day free trial • No credit card required
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Use promotional code for restaurant owner testing
                       </p>
                     </div>
                   </CardContent>
@@ -232,6 +263,33 @@ export const PricingPage: React.FC<PricingPageProps> = ({ countryCode = 'JP' }) 
           </div>
         </div>
 
+        {/* Restaurant Owner Benefits */}
+        <div className="bg-white rounded-lg shadow-lg p-8 mb-12">
+          <h2 className="text-2xl font-bold text-center mb-8">Benefits for Restaurant Owners</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="text-center">
+              <Menu className="h-10 w-10 text-blue-600 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">Multilingual Menu</h3>
+              <p className="text-sm text-gray-600">Reach international customers with translated menus</p>
+            </div>
+            <div className="text-center">
+              <BarChart3 className="h-10 w-10 text-green-600 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">Advanced Analytics</h3>
+              <p className="text-sm text-gray-600">Track customer behavior and optimize your offerings</p>
+            </div>
+            <div className="text-center">
+              <Calendar className="h-10 w-10 text-purple-600 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">Reservation System</h3>
+              <p className="text-sm text-gray-600">Manage bookings efficiently with our integrated system</p>
+            </div>
+            <div className="text-center">
+              <Smartphone className="h-10 w-10 text-yellow-600 mx-auto mb-3" />
+              <h3 className="font-semibold mb-2">Mobile Ordering</h3>
+              <p className="text-sm text-gray-600">Enable customers to order directly from their phones</p>
+            </div>
+          </div>
+        </div>
+
         {/* FAQ Section */}
         <div className="bg-white rounded-lg shadow-lg p-8">
           <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
@@ -252,6 +310,20 @@ export const PricingPage: React.FC<PricingPageProps> = ({ countryCode = 'JP' }) 
               <h3 className="font-semibold mb-2">Is there a free trial?</h3>
               <p className="text-gray-600 text-sm">
                 Yes, all plans come with a 14-day free trial. No credit card required to start.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">How do I get a promotional code?</h3>
+              <p className="text-gray-600 text-sm">
+                Restaurant owners can request promotional codes for testing by contacting our team. 
+                Club members and partners receive exclusive codes with extended trial periods.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-2">What happens after the trial period?</h3>
+              <p className="text-gray-600 text-sm">
+                After your trial period ends, you can continue with a paid subscription or downgrade to a free plan 
+                with limited features. We'll notify you before your trial ends.
               </p>
             </div>
             <div>
