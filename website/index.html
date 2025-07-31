@@ -11,9 +11,13 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/logo/NAVIkko Green.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/logo/NAVIkko Green.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/logo/NAVIkko Green.png">
-    <!-- Theme color for mobile browsers (Chrome, Safari, Edge) -->
-    <!-- Note: Not supported by Firefox, Firefox for Android, Opera -->
+    <!-- Theme color for mobile browsers -->
+<!-- Light theme color for all browsers -->
+    <!-- Dark theme color for browsers that support media attribute -->
+    <!-- Primary color for Chrome, Safari, Edge. CSS fallback for Firefox, Opera -->
     <meta name="theme-color" content="#667eea">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#4a5bb5">
+
     
     <!-- Web App Manifest -->
     <link rel="manifest" href="/manifest.json">
@@ -44,11 +48,23 @@
         .card-hover { transition: transform 0.3s ease; }
         .card-hover:hover { transform: translateY(-5px); }
         
-        /* Cross-browser theme color fallback for browsers that don't support meta theme-color */
-        @media (prefers-color-scheme: light) {
-            :root {
-                --theme-color: #667eea;
-            }
+        /* Theme color variables for cross-browser compatibility */
+        :root {
+            --theme-color: #667eea;
+            --theme-color-dark: #4a5bb5;
+        }
+        
+        /* Apply theme color to elements for browsers that don't support meta theme-color */
+        .text-purple-600 {
+            color: var(--theme-color) !important;
+        }
+        
+        .bg-purple-600 {
+            background-color: var(--theme-color) !important;
+        }
+        
+        .border-purple-600 {
+            border-color: var(--theme-color) !important;
         }
         
         /* Ensure proper mobile viewport behavior across all browsers */

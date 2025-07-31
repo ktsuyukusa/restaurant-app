@@ -57,14 +57,7 @@ const RestaurantSpecificOrders: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (restaurantId) {
-      fetchRestaurantData();
-      fetchOrders();
-    }
-  }, [restaurantId]);
-
-  const fetchRestaurantData = async () => {
+  const fetchRestaurantData = useCallback(async () => {
     try {
       const supabase = getSupabaseClient();
       const { data, error } = await supabase
@@ -82,9 +75,9 @@ const RestaurantSpecificOrders: React.FC = () => {
     } catch (error) {
       console.error('Error fetching restaurant:', error);
     }
-  };
+  }, [restaurantId]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const supabase = getSupabaseClient();
       const { data, error } = await supabase
@@ -131,7 +124,14 @@ const RestaurantSpecificOrders: React.FC = () => {
       });
       setLoading(false);
     }
-  };
+  }, [restaurantId]);
+
+  useEffect(() => {
+    if (restaurantId) {
+      fetchRestaurantData();
+      fetchOrders();
+    }
+  }, [restaurantId, fetchRestaurantData, fetchOrders]);
 
   const filterOrders = useCallback(() => {
     let filtered = orders;
