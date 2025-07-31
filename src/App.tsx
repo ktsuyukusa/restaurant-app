@@ -1,4 +1,5 @@
 import React from 'react';
+// Force deployment: Registration system optimized - 2024-07-31
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { AppProvider } from '@/contexts/AppContext';

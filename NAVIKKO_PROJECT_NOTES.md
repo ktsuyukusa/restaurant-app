@@ -1,4 +1,4 @@
-# Navikko Project Notes
+![alt text](image.png)# Navikko Project Notes
 
 ## Important Project Information
 
