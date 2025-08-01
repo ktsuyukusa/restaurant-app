@@ -11,11 +11,18 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/logo/NAVIkko Green.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/logo/NAVIkko Green.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/logo/NAVIkko Green.png">
-    <!-- Theme color for supported browsers (Chrome, Safari, Edge) -->
-    <meta name="theme-color" content="#667eea">
-    <!-- Fallback for browsers that don't support theme-color -->
+    <!-- Theme color with media query for better browser support -->
+    <meta name="theme-color" content="#667eea" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#4c51bf" media="(prefers-color-scheme: dark)">
+    
+    <!-- Browser-specific theme color fallbacks -->
     <meta name="msapplication-navbutton-color" content="#667eea">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- Additional meta tags for better PWA support -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Navikko">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -165,9 +172,10 @@
         const successMessage = document.getElementById('successMessage');
         const errorText = document.getElementById('errorText');
 
-        // Auto-uppercase input
+        // Auto-uppercase input with IE11 compatibility
         promoInput.addEventListener('input', function() {
-            this.value = this.value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+            var currentValue = this.value || '';
+            this.value = currentValue.toUpperCase().replace(/[^A-Z0-9-]/g, '');
         });
 
         // Form submission
@@ -209,14 +217,19 @@
             showSuccess();
             logAttempt(promoCode, true, codeData.description);
             
-            // Store access info
-            localStorage.setItem('navikko_restaurant_access', JSON.stringify({
-                code: promoCode,
-                type: codeData.type,
-                description: codeData.description,
-                accessTime: new Date().toISOString(),
-                expires: codeData.expires
-            }));
+            // Store access info with error handling
+            try {
+                localStorage.setItem('navikko_restaurant_access', JSON.stringify({
+                    code: promoCode,
+                    type: codeData.type,
+                    description: codeData.description,
+                    accessTime: new Date().toISOString(),
+                    expires: codeData.expires
+                }));
+            } catch (error) {
+                console.warn('Unable to store access info:', error);
+                // Continue with redirect even if storage fails
+            }
 
             // Redirect to restaurant platform
             setTimeout(() => {
@@ -246,43 +259,60 @@
         }
 
         function logAttempt(code, success, details) {
-            // Log access attempts for analytics
-            const logData = {
-                timestamp: new Date().toISOString(),
-                code: code,
-                success: success,
-                details: details,
-                userAgent: navigator.userAgent,
-                referrer: document.referrer
-            };
-            
-            // In production, send to analytics service
-            console.log('Restaurant access attempt:', logData);
-            
-            // Store locally for demo purposes
-            const attempts = JSON.parse(localStorage.getItem('navikko_access_attempts') || '[]');
-            attempts.push(logData);
-            localStorage.setItem('navikko_access_attempts', JSON.stringify(attempts.slice(-50))); // Keep last 50
+            // Log access attempts for analytics with error handling
+            try {
+                var logData = {
+                    timestamp: new Date().toISOString(),
+                    code: code,
+                    success: success,
+                    details: details,
+                    userAgent: navigator.userAgent || 'Unknown',
+                    referrer: document.referrer || 'Direct'
+                };
+                
+                // In production, send to analytics service
+                console.log('Restaurant access attempt:', logData);
+                
+                // Store locally for demo purposes with fallback
+                var attempts = [];
+                try {
+                    var storedAttempts = localStorage.getItem('navikko_access_attempts');
+                    attempts = storedAttempts ? JSON.parse(storedAttempts) : [];
+                } catch (parseError) {
+                    console.warn('Error parsing stored attempts:', parseError);
+                    attempts = [];
+                }
+                
+                attempts.push(logData);
+                localStorage.setItem('navikko_access_attempts', JSON.stringify(attempts.slice(-50))); // Keep last 50
+            } catch (error) {
+                console.warn('Unable to log attempt:', error);
+            }
         }
 
-        // Check if user already has access
+        // Check if user already has access with better error handling
         window.addEventListener('load', function() {
-            const existingAccess = localStorage.getItem('navikko_restaurant_access');
-            if (existingAccess) {
-                const accessData = JSON.parse(existingAccess);
-                const expiryDate = new Date(accessData.expires);
-                const now = new Date();
-                
-                if (now <= expiryDate) {
-                    // User still has valid access
-                    const continueAccess = confirm('You already have restaurant access. Continue to platform?');
-                    if (continueAccess) {
-                        window.location.href = 'https://app.navikko.com';
+            try {
+                var existingAccess = localStorage.getItem('navikko_restaurant_access');
+                if (existingAccess) {
+                    var accessData = JSON.parse(existingAccess);
+                    var expiryDate = new Date(accessData.expires);
+                    var now = new Date();
+                    
+                    if (now <= expiryDate) {
+                        // User still has valid access
+                        var continueAccess = confirm('You already have restaurant access. Continue to platform?');
+                        if (continueAccess) {
+                            window.location.href = 'https://app.navikko.com';
+                        }
+                    } else {
+                        // Access expired, clear it
+                        localStorage.removeItem('navikko_restaurant_access');
                     }
-                } else {
-                    // Access expired, clear it
-                    localStorage.removeItem('navikko_restaurant_access');
                 }
+            } catch (error) {
+                // Handle localStorage errors (private browsing, storage full, etc.)
+                console.warn('Unable to access localStorage:', error);
             }
         });
     </script>
