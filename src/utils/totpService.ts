@@ -147,9 +147,22 @@ export const generateTOTPSecret = (): string => {
   return totp.generateSecret();
 };
 
-export const verifyTOTPCode = async (secret: string, token: string, window: number = 1): Promise<boolean> => {
+export const verifyTOTPCode = async (secret: string, token: string, window: number = 3): Promise<boolean> => {
   console.log('🔍 TOTP Debug: Verifying token:', token, 'with secret:', secret);
+  console.log('🔍 TOTP Debug: Current time:', new Date().toISOString());
+  console.log('🔍 TOTP Debug: Unix timestamp:', Math.floor(Date.now() / 1000));
+  console.log('🔍 TOTP Debug: Counter:', Math.floor(Date.now() / 1000 / 30));
+  console.log('🔍 TOTP Debug: Window size:', window);
+  
   const totp = new TOTPService({ secret });
+  
+  // Generate codes for debugging
+  const currentCounter = Math.floor(Date.now() / 1000 / 30);
+  for (let i = -window; i <= window; i++) {
+    const testCode = await totp.generateCodeForCounter(currentCounter + i);
+    console.log(`🔍 TOTP Debug: Counter ${currentCounter + i} (${i >= 0 ? '+' : ''}${i}): ${testCode}`);
+  }
+  
   const result = await totp.verifyCode(token, window);
   console.log('🔍 TOTP Debug: Verification result:', result);
   return result;

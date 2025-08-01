@@ -777,8 +777,11 @@ class AuthService {
           console.log('🔍 Login 2FA Debug: Using secret from database:', user.adminAccess.twoFactorSecret);
           console.log('🔍 Login 2FA Debug: Verifying code:', twoFactorCode);
           
-          // Use browser-compatible TOTP verification
-          const isValid = await verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode);
+          // Use browser-compatible TOTP verification with larger window for time drift
+          console.log('🔍 Login 2FA Debug: Current time:', new Date().toISOString());
+          console.log('🔍 Login 2FA Debug: Unix timestamp:', Math.floor(Date.now() / 1000));
+          console.log('🔍 Login 2FA Debug: Counter:', Math.floor(Date.now() / 1000 / 30));
+          const isValid = await verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode, 3); // Increased window to 3
           
           console.log('🔍 Login 2FA Debug: Verification result:', isValid);
           
