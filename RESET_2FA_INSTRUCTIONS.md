@@ -5,7 +5,8 @@ If you're having trouble with 2FA login, follow these steps to reset your 2FA se
 ## Steps to Reset 2FA:
 
 1. **Open the Reset Tool**:
-   - Open `reset-2fa-qr-code.html` in your browser
+   - Access `reset-2fa-qr-code.html` through your web server
+   - The file is located in the `public` directory
 
 2. **Generate a New Secret**:
    - Click the "Generate Fresh 2FA Secret" button
