@@ -90,10 +90,15 @@ export class TOTPService {
       throw new Error('Invalid hash length for TOTP generation');
     }
     
-    const code = ((hash[offset] & 0xff) << 24) |
-                 ((hash[offset + 1] & 0xff) << 16) |
-                 ((hash[offset + 2] & 0xff) << 8) |
-                 (hash[offset + 3] & 0xff);
+    // RFC 6238 specifies big-endian byte order for the 32-bit integer
+    // Fix potential endianness issue by using DataView for consistent byte order
+    const codeBuffer = new ArrayBuffer(4);
+    const codeView = new DataView(codeBuffer);
+    codeView.setUint8(0, hash[offset]);
+    codeView.setUint8(1, hash[offset + 1]);
+    codeView.setUint8(2, hash[offset + 2]);
+    codeView.setUint8(3, hash[offset + 3]);
+    const code = codeView.getUint32(0, false); // false = big-endian
 
     // Apply RFC 6238 mask to clear the high bit (this is the correct way)
     const maskedCode = code & 0x7fffffff;
