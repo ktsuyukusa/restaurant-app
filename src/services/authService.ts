@@ -743,23 +743,28 @@ class AuthService {
         const { data: adminData, error: adminError } = await supabase
           .from('admin_access')
           .select('*')
-          .eq('user_id', userData.id)
-          .single();
+          .eq('user_id', userData.id);
         
         if (adminError) {
           console.error('🔍 Login Debug: Admin data query error:', adminError);
         }
 
-        if (adminData) {
+        console.log('🔍 Login Debug: Raw admin data response:', adminData);
+        console.log('🔍 Login Debug: Admin data length:', adminData?.length);
+
+        if (adminData && adminData.length > 0) {
+          const admin = adminData[0]; // Get first record
           user.adminAccess = {
-            level: adminData.level,
-            permissions: adminData.permissions,
-            accessCode: adminData.access_code,
-            twoFactorSecret: adminData.two_factor_secret,
-            twoFactorEnabled: adminData.two_factor_enabled
+            level: admin.level,
+            permissions: admin.permissions,
+            accessCode: admin.access_code,
+            twoFactorSecret: admin.two_factor_secret,
+            twoFactorEnabled: admin.two_factor_enabled
           };
           console.log('🔍 Login Debug: Admin data loaded for user ID:', userData.id);
-          console.log('🔍 Login Debug: Admin data:', adminData);
+          console.log('🔍 Login Debug: Admin data:', admin);
+        } else {
+          console.log('🔍 Login Debug: No admin_access records found for user:', userData.id);
         }
 
         // Check 2FA for admin users
