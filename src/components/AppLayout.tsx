@@ -18,7 +18,6 @@ import OrdersManagement from './OrdersManagement';
 import RestaurantSpecificDashboard from './RestaurantSpecificDashboard';
 import RestaurantSpecificOrders from './RestaurantSpecificOrders';
 import RestaurantSpecificMenu from './RestaurantSpecificMenu';
-import RoleSwitcher from './RoleSwitcher';
 import Profile from './Profile';
 import SecureRoute from './SecureRoute';
 import SubscriptionManagement from './SubscriptionManagement';
@@ -110,9 +109,6 @@ const AppLayout: React.FC = () => {
     navigate('/menu-management');
   };
 
-  const handleRoleSwitcherClick = () => {
-    navigate('/role-switcher');
-  };
 
   const handleNavigate = (section: string) => {
     navigate(`/${section}`);
@@ -336,13 +332,6 @@ const AppLayout: React.FC = () => {
           </SecureRoute>
         );
       
-      // Development/Testing (admin only)
-      case 'role-switcher':
-        return (
-          <SecureRoute requiredRole="admin">
-            <RoleSwitcher />
-          </SecureRoute>
-        );
       
       default:
         // Default to restaurants view for authenticated users
@@ -359,7 +348,6 @@ const AppLayout: React.FC = () => {
         onCartClick={handleCartClick}
         onProfileClick={handleProfileClick}
         onAdminClick={handleAdminClick}
-        onRoleSwitcherClick={handleRoleSwitcherClick}
       />
       
       {isAuthenticated && (

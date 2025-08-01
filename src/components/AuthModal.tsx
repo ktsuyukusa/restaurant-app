@@ -96,6 +96,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     }
   ];
 
+  // Remove admin option from signup - admin accounts should only be created through secure backend processes
+  // This ensures the signup form only shows Customer and Restaurant Owner options
+
   const cuisines = [
     'Japanese', 'Italian', 'Chinese', 'Korean', 'French', 'Thai', 
     'Indian', 'American', 'Mexican', 'Mediterranean', 'Fusion', 'Other'

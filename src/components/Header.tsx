@@ -14,7 +14,6 @@ interface HeaderProps {
   onCartClick: () => void;
   onProfileClick: () => void;
   onAdminClick?: () => void;
-  onRoleSwitcherClick?: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -22,8 +21,7 @@ const Header: React.FC<HeaderProps> = ({
   cartItemCount,
   onCartClick,
   onProfileClick,
-  onAdminClick,
-  onRoleSwitcherClick
+  onAdminClick
 }) => {
   const { t } = useLanguage();
   const { 
@@ -148,17 +146,6 @@ const Header: React.FC<HeaderProps> = ({
               </Button>
             )}
             
-            {onRoleSwitcherClick && (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={onRoleSwitcherClick}
-                className="text-gray-600 hover:bg-gray-100 p-2 rounded-lg transition-colors"
-                title={`Current Role: ${userRole} - Click to switch`}
-              >
-                <Crown className="h-5 w-5" />
-              </Button>
-            )}
             
             {/* Debug Tool (Admin Only) */}
             {isAdmin && (
