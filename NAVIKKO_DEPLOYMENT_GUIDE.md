@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide covers deploying the Navikko website to navikko.com using Vercel, with integrated beta testing and promotional code system.
+This guide covers deploying the Navikko website to navikko.com using Vercel, with integrated promotional code system.
 
 ## Architecture
 
@@ -46,7 +46,6 @@ Ensure your website structure is ready:
 website/
 ├── index.html                 # Main multilingual website
 ├── production-website.html    # Full production version
-├── beta-promo-system.html    # Beta access with promo codes
 └── assets/                   # Static assets
 ```
 
@@ -54,7 +53,6 @@ website/
 
 The `vercel.json` file is already configured with:
 - Static file serving from `website/` directory
-- URL routing (`/beta` → beta access page)
 - Redirects to main app
 - Security headers
 - Caching policies
@@ -66,7 +64,7 @@ Since your Vercel deployment is connected to GitHub:
 1. **Commit and push your changes**:
    ```bash
    git add .
-   git commit -m "Add website with beta promotional code system"
+   git commit -m "Add website with promotional code system"
    git push origin main
    ```
 
@@ -74,7 +72,7 @@ Since your Vercel deployment is connected to GitHub:
 3. **Monitor deployment** in Vercel Dashboard
 4. **Verify deployment**:
    ```bash
-   curl -I https://navikko.com/beta
+   curl -I https://navikko.com
    ```
 
 **Note**: This ensures consistent deployments and maintains your GitHub workflow.
@@ -106,35 +104,19 @@ The system includes pre-configured promotional codes:
 - `DEMO-2025` - Demo Access (expires 2025-12-31)
 - `SHOWCASE` - Showcase Demo (expires 2025-12-31)
 
-### Beta Access Flow
+### Promotional Code Integration
 
-1. User visits `navikko.com`
-2. Clicks "ベータ版を試す" (Try Beta) or "Try Beta"
-3. Redirected to `/beta` (beta-promo-system.html)
-4. Enters promotional code
-5. System validates code and expiry
-6. On success: redirected to main app
-7. Access stored in localStorage for future visits
+Promotional codes are now integrated directly into the main application:
 
-### Managing Beta Codes
+1. **Registration Flow**: Optional promo code field during signup
+2. **Subscription Purchase**: Discount codes during payment
+3. **Admin Panel**: Manual code validation for special access
 
-To add new promotional codes, edit `website/beta-promo-system.html`:
-
-```javascript
-const VALID_PROMO_CODES = {
-    'NEW-CODE-2025': { 
-        type: 'restaurant', 
-        expires: '2025-12-31', 
-        description: 'New Restaurant Access' 
-    },
-    // Add more codes here
-};
-```
+See `PROMOTIONAL_CODES.md` for available codes and implementation details.
 
 ## URL Structure
 
 - `navikko.com` → Main website (Japanese/English)
-- `navikko.com/beta` → Beta access with promo codes
 - `navikko.com/app` → Redirect to main React app
 - `navikko.com/demo` → Redirect to demo environment
 - `navikko.com/dev` → Redirect to development environment
@@ -178,11 +160,11 @@ The deployment includes security headers:
 
 ### Access Logging
 
-The beta system logs access attempts:
+The promotional code system logs access attempts:
 - Valid/invalid code attempts
 - User agent and referrer information
 - Timestamp and code type
-- Stored in localStorage (client-side)
+- Stored in database for analytics
 
 ### Production Monitoring
 
@@ -204,11 +186,11 @@ Consider adding:
 ### Code Updates
 
 To update promotional codes:
-1. Edit `website/beta-promo-system.html`
-2. Modify the `VALID_PROMO_CODES` object
+1. Edit `PROMOTIONAL_CODES.md` for reference
+2. Update the promotional code validation in the subscription service
 3. Commit and push to GitHub:
    ```bash
-   git add website/beta-promo-system.html
+   git add PROMOTIONAL_CODES.md src/services/subscriptionService.ts
    git commit -m "Update promotional codes"
    git push origin main
    ```
