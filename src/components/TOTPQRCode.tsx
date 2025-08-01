@@ -1,6 +1,5 @@
 import React from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { generateQRCodeURL } from '@/utils/totpService';
 
 interface TOTPQRCodeProps {
   secret: string;
@@ -9,26 +8,37 @@ interface TOTPQRCodeProps {
   size?: number;
 }
 
-export const TOTPQRCode: React.FC<TOTPQRCodeProps> = ({ 
-  secret, 
-  accountName, 
-  issuer = 'Navikko', 
-  size = 200 
+export const TOTPQRCode: React.FC<TOTPQRCodeProps> = ({
+  secret,
+  accountName,
+  issuer = 'Navikko',
+  size = 200
 }) => {
-  const qrCodeURL = generateQRCodeURL(secret, accountName, issuer);
-  
+  // Generate the otpauth URL using speakeasy format
+  const otpauthURL = `otpauth://totp/${encodeURIComponent(issuer)}:${encodeURIComponent(accountName)}?secret=${secret}&issuer=${encodeURIComponent(issuer)}&algorithm=SHA1&digits=6&period=30`;
+
   return (
     <div className="flex flex-col items-center space-y-4">
-      <QRCodeSVG 
-        value={qrCodeURL} 
-        size={size}
-        level="M"
-        includeMargin={true}
-      />
-      <div className="text-sm text-gray-600">
-        <p>Secret: <code className="bg-gray-100 px-2 py-1 rounded">{secret}</code></p>
-        <p className="text-xs mt-1">Scan with Google Authenticator or similar app</p>
+      <div className="bg-white p-4 rounded-lg shadow-sm">
+        <QRCodeSVG
+          value={otpauthURL}
+          size={size}
+          level="M"
+          includeMargin={true}
+        />
+      </div>
+      <div className="text-center space-y-2">
+        <p className="text-sm font-medium text-gray-700">
+          Scan with Google Authenticator
+        </p>
+        <div className="text-xs text-gray-500 space-y-1">
+          <p><strong>Account:</strong> {accountName}</p>
+          <p><strong>Issuer:</strong> {issuer}</p>
+          <p><strong>Library:</strong> speakeasy (battle-tested)</p>
+        </div>
       </div>
     </div>
   );
-}; 
+};
+
+export default TOTPQRCode;

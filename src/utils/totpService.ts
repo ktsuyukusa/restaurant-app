@@ -1,5 +1,5 @@
-// Battle-tested TOTP implementation using otplib - compatible with Google Authenticator
-import { authenticator } from 'otplib';
+// Battle-tested TOTP implementation using speakeasy - industry standard backend solution
+import * as speakeasy from 'speakeasy';
 
 export interface TOTPConfig {
   secret: string;
@@ -18,52 +18,65 @@ export class TOTPService {
       period: config.period || 30,
       algorithm: config.algorithm || 'SHA1'
     };
-
-    // Configure otplib with our settings
-    authenticator.options = {
-      digits: this.config.digits,
-      step: this.config.period
-    };
   }
 
-  // Generate a new TOTP secret (base32 encoded)
+  // Generate a new TOTP secret (base32 encoded) using speakeasy
   generateSecret(): string {
-    return authenticator.generateSecret();
+    const secret = speakeasy.generateSecret({
+      name: 'Navikko Admin',
+      issuer: 'Navikko'
+    });
+    return secret.base32;
   }
 
-  // Generate current TOTP code using otplib
+  // Generate current TOTP code using speakeasy
   async generateCode(): Promise<string> {
-    return authenticator.generate(this.config.secret);
+    return speakeasy.totp({
+      secret: this.config.secret,
+      encoding: 'base32',
+      digits: this.config.digits,
+      step: this.config.period,
+      algorithm: this.config.algorithm.toLowerCase() as 'sha1' | 'sha256' | 'sha512'
+    });
   }
 
   // Generate TOTP code for a specific counter (for debugging)
   async generateCodeForCounter(counter: number): Promise<string> {
-    // For debugging purposes, we'll use the current implementation
-    // otplib doesn't support generating codes for specific counters directly
-    return authenticator.generate(this.config.secret);
+    const time = counter * this.config.period;
+    return speakeasy.totp({
+      secret: this.config.secret,
+      encoding: 'base32',
+      digits: this.config.digits,
+      step: this.config.period,
+      algorithm: this.config.algorithm.toLowerCase() as 'sha1' | 'sha256' | 'sha512',
+      time: time
+    });
   }
 
-  // Verify a TOTP code using otplib
+  // Verify a TOTP code using speakeasy with proper time window
   async verifyCode(token: string, window: number = 1): Promise<boolean> {
-    // Configure the window for time drift tolerance
-    const originalWindow = authenticator.options.window;
-    authenticator.options.window = window;
-    
-    try {
-      const isValid = authenticator.verify({
-        token,
-        secret: this.config.secret
-      });
-      return isValid;
-    } finally {
-      // Restore original window setting
-      authenticator.options.window = originalWindow;
-    }
+    return speakeasy.totp.verify({
+      secret: this.config.secret,
+      encoding: 'base32',
+      token: token,
+      digits: this.config.digits,
+      step: this.config.period,
+      algorithm: this.config.algorithm.toLowerCase() as 'sha1' | 'sha256' | 'sha512',
+      window: window
+    });
   }
 
   // Generate QR code URL for authenticator apps (Google Authenticator format)
   generateQRCodeURL(accountName: string, issuer: string = 'Navikko'): string {
-    return authenticator.keyuri(accountName, issuer, this.config.secret);
+    return speakeasy.otpauthURL({
+      secret: this.config.secret,
+      label: `${issuer}:${accountName}`,
+      issuer: issuer,
+      type: 'totp',
+      digits: this.config.digits,
+      period: this.config.period,
+      algorithm: this.config.algorithm.toLowerCase() as 'sha1' | 'sha256' | 'sha512'
+    });
   }
 
   // Get secret for manual entry
@@ -73,7 +86,10 @@ export class TOTPService {
 
   // Get remaining time for current code
   getRemainingTime(): number {
-    return authenticator.timeRemaining();
+    const now = Math.floor(Date.now() / 1000);
+    const timeStep = Math.floor(now / this.config.period);
+    const nextStep = (timeStep + 1) * this.config.period;
+    return nextStep - now;
   }
 
   // Get current counter (for debugging)
@@ -94,52 +110,81 @@ export class TOTPService {
       currentTime: now,
       counter: Math.floor(now / this.config.period),
       remainingTime: this.getRemainingTime(),
-      library: 'otplib'
+      library: 'speakeasy (battle-tested)'
     };
   }
 }
 
-// Utility functions using otplib
+// Utility functions using speakeasy
 export const generateTOTPSecret = (): string => {
-  return authenticator.generateSecret();
+  const secret = speakeasy.generateSecret({
+    name: 'Navikko Admin',
+    issuer: 'Navikko'
+  });
+  return secret.base32;
 };
 
 export const verifyTOTPCode = async (secret: string, token: string, window: number = 3): Promise<boolean> => {
-  console.log('🔍 TOTP Debug (otplib): Verifying token:', token, 'with secret:', secret);
-  console.log('🔍 TOTP Debug (otplib): Current time:', new Date().toISOString());
-  console.log('🔍 TOTP Debug (otplib): Unix timestamp:', Math.floor(Date.now() / 1000));
-  console.log('🔍 TOTP Debug (otplib): Window size:', window);
-  
-  // Configure otplib
-  const originalWindow = authenticator.options.window;
-  authenticator.options.window = window;
-  authenticator.options.step = 30;
-  authenticator.options.digits = 6;
+  console.log('🔍 TOTP Debug (speakeasy): Verifying token:', token, 'with secret:', secret);
+  console.log('🔍 TOTP Debug (speakeasy): Current time:', new Date().toISOString());
+  console.log('🔍 TOTP Debug (speakeasy): Unix timestamp:', Math.floor(Date.now() / 1000));
+  console.log('🔍 TOTP Debug (speakeasy): Window size:', window);
   
   try {
     // Generate current code for debugging
-    const currentCode = authenticator.generate(secret);
-    console.log(`🔍 TOTP Debug (otplib): Current code: ${currentCode}`);
+    const currentCode = speakeasy.totp({
+      secret: secret,
+      encoding: 'base32',
+      digits: 6,
+      step: 30,
+      algorithm: 'sha1'
+    });
+    console.log(`🔍 TOTP Debug (speakeasy): Current code: ${currentCode}`);
     
-    const result = authenticator.verify({
-      token,
-      secret
+    const result = speakeasy.totp.verify({
+      secret: secret,
+      encoding: 'base32',
+      token: token,
+      digits: 6,
+      step: 30,
+      algorithm: 'sha1',
+      window: window
     });
     
-    console.log('🔍 TOTP Debug (otplib): Verification result:', result);
-    console.log('🔍 TOTP Debug (otplib): Time remaining:', authenticator.timeRemaining(), 'seconds');
+    console.log('🔍 TOTP Debug (speakeasy): Verification result:', result);
+    
+    // Calculate remaining time
+    const now = Math.floor(Date.now() / 1000);
+    const timeStep = Math.floor(now / 30);
+    const nextStep = (timeStep + 1) * 30;
+    const remainingTime = nextStep - now;
+    console.log('🔍 TOTP Debug (speakeasy): Time remaining:', remainingTime, 'seconds');
     
     return result;
-  } finally {
-    // Restore original window setting
-    authenticator.options.window = originalWindow;
+  } catch (error) {
+    console.error('🔍 TOTP Debug (speakeasy): Error during verification:', error);
+    return false;
   }
 };
 
 export const generateTOTPCode = async (secret: string): Promise<string> => {
-  return authenticator.generate(secret);
+  return speakeasy.totp({
+    secret: secret,
+    encoding: 'base32',
+    digits: 6,
+    step: 30,
+    algorithm: 'sha1'
+  });
 };
 
 export const generateQRCodeURL = (secret: string, accountName: string, issuer: string = 'Navikko'): string => {
-  return authenticator.keyuri(accountName, issuer, secret);
+  return speakeasy.otpauthURL({
+    secret: secret,
+    label: `${issuer}:${accountName}`,
+    issuer: issuer,
+    type: 'totp',
+    digits: 6,
+    period: 30,
+    algorithm: 'sha1'
+  });
 };
