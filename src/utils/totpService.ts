@@ -90,13 +90,16 @@ export class TOTPService {
       throw new Error('Invalid hash length for TOTP generation');
     }
     
-    const code = ((hash[offset] & 0x7f) << 24) |
+    const code = ((hash[offset] & 0xff) << 24) |
                  ((hash[offset + 1] & 0xff) << 16) |
                  ((hash[offset + 2] & 0xff) << 8) |
                  (hash[offset + 3] & 0xff);
 
+    // Apply RFC 6238 mask to clear the high bit (this is the correct way)
+    const maskedCode = code & 0x7fffffff;
+
     const modulo = Math.pow(10, this.config.digits);
-    return (code % modulo).toString().padStart(this.config.digits, '0');
+    return (maskedCode % modulo).toString().padStart(this.config.digits, '0');
   }
 
   // Verify a TOTP code
