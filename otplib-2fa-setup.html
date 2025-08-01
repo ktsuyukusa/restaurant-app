@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTPLib 2FA Setup - Navikko Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .secret-section {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .secret-code {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1976d2;
+            word-break: break-all;
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 2px solid #1976d2;
+        }
+        .current-code {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2e7d32;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .countdown {
+            font-size: 16px;
+            color: #666;
+        }
+        .instructions {
+            background-color: #fff3e0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .warning {
+            background-color: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #f44336;
+        }
+        .success {
+            background-color: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #4caf50;
+        }
+        button {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #1565c0;
+        }
+        .debug-info {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .qr-url {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 OTPLib 2FA Setup - Navikko Admin</h1>
+            <p>Generate TOTP secret using battle-tested otplib library</p>
+        </div>
+
+        <div class="success">
+            <h3>✅ Using Battle-Tested Library</h3>
+            <p>This setup uses <strong>otplib</strong> - the same library used by many production applications. It's fully compatible with Google Authenticator and other TOTP apps.</p>
+        </div>
+
+        <button onclick="generateOTPLib2FA()">🔄 Generate OTPLib 2FA Secret</button>
+
+        <div id="setupSection" style="display: none;">
+            <div class="secret-section">
+                <h3>📱 New TOTP Secret (OTPLib)</h3>
+                <div class="secret-code" id="secretDisplay"></div>
+                <p><strong>Account:</strong> admin@navikko.com</p>
+                <p><strong>Issuer:</strong> Navikko</p>
+                <p><strong>Library:</strong> otplib (battle-tested)</p>
+            </div>
+
+            <div class="instructions">
+                <h3>📋 Manual Setup Instructions</h3>
+                <ol>
+                    <li><strong>Remove old entry:</strong> Delete any existing "Navikko" entry from Google Authenticator</li>
+                    <li><strong>Add new entry manually:</strong> 
+                        <ul>
+                            <li>Open Google Authenticator</li>
+                            <li>Tap the "+" button</li>
+                            <li>Select "Enter a setup key"</li>
+                            <li>Account name: <strong>admin@navikko.com</strong></li>
+                            <li>Your key: <strong>Copy the secret above</strong></li>
+                            <li>Type of key: <strong>Time based</strong></li>
+                        </ul>
+                    </li>
+                    <li><strong>Verify setup:</strong> Check that the current code matches below</li>
+                    <li><strong>Update database:</strong> Copy the SQL command to update the database</li>
+                    <li><strong>Test login:</strong> Try logging in with the new code</li>
+                </ol>
+            </div>
+
+            <div class="secret-section">
+                <h3>🕐 Current TOTP Code (OTPLib)</h3>
+                <div class="current-code" id="currentCode">------</div>
+                <div class="countdown" id="countdown">--</div>
+                <p>This should match your Google Authenticator</p>
+            </div>
+
+            <div class="success">
+                <h3>💾 Database Update SQL</h3>
+                <p>Run this SQL command to update the database with the new secret:</p>
+                <div class="secret-code" id="sqlCommand"></div>
+                <button onclick="copySQLCommand()">📋 Copy SQL Command</button>
+            </div>
+
+            <div class="success">
+                <h3>🔗 QR Code URL (Optional)</h3>
+                <p>You can also use this URL to generate a QR code externally:</p>
+                <div class="qr-url" id="qrUrl"></div>
+                <button onclick="copyQRUrl()">📋 Copy QR URL</button>
+            </div>
+
+            <div class="debug-info">
+                <h4>🔍 Debug Information (OTPLib)</h4>
+                <div id="debugInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load otplib from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/otplib@12.0.1/otplib-browser.js"></script>
+    <script>
+        let updateInterval;
+
+        function generateOTPLib2FA() {
+            // Generate new secret using otplib
+            const secret = otplib.authenticator.generateSecret();
+            const qrUrl = otplib.authenticator.keyuri('admin@navikko.com', 'Navikko', secret);
+            
+            // Display secret
+            document.getElementById('secretDisplay').textContent = secret;
+            
+            // Display QR URL
+            document.getElementById('qrUrl').textContent = qrUrl;
+            
+            // Generate SQL command
+            const sqlCommand = `UPDATE admin_access SET two_factor_secret = '${secret}', two_factor_enabled = true WHERE user_id = (SELECT id FROM users WHERE email = 'admin@navikko.com');`;
+            document.getElementById('sqlCommand').textContent = sqlCommand;
+            
+            // Show setup section
+            document.getElementById('setupSection').style.display = 'block';
+            
+            // Start updating current code
+            updateCurrentCode(secret);
+            updateInterval = setInterval(() => updateCurrentCode(secret), 1000);
+            
+            console.log('✅ OTPLib 2FA setup generated');
+            console.log('Secret:', secret);
+            console.log('QR URL:', qrUrl);
+        }
+
+        function updateCurrentCode(secret) {
+            try {
+                // Generate current code using otplib
+                const code = otplib.authenticator.generate(secret);
+                const remaining = otplib.authenticator.timeRemaining();
+                
+                document.getElementById('currentCode').textContent = code;
+                document.getElementById('countdown').textContent = `Refreshes in ${remaining} seconds`;
+                
+                // Update debug info
+                const debugInfo = `
+Library: otplib (battle-tested)
+Current Time: ${new Date().toISOString()}
+Unix Timestamp: ${Math.floor(Date.now() / 1000)}
+Current Code: ${code}
+Time Remaining: ${remaining}s
+Secret: ${secret}
+                `.trim();
+                
+                document.getElementById('debugInfo').textContent = debugInfo;
+                
+            } catch (error) {
+                console.error('Error generating code:', error);
+                document.getElementById('currentCode').textContent = 'ERROR';
+            }
+        }
+
+        function copySQLCommand() {
+            const sqlCommand = document.getElementById('sqlCommand').textContent;
+            navigator.clipboard.writeText(sqlCommand).then(() => {
+                alert('SQL command copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                // Fallback: select the text
+                const range = document.createRange();
+                range.selectNode(document.getElementById('sqlCommand'));
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+            });
+        }
+
+        function copyQRUrl() {
+            const qrUrl = document.getElementById('qrUrl').textContent;
+            navigator.clipboard.writeText(qrUrl).then(() => {
+                alert('QR URL copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                // Fallback: select the text
+                const range = document.createRange();
+                range.selectNode(document.getElementById('qrUrl'));
+                window.getSelection().removeAllRanges();
+                window.getSelection().addRange(range);
+            });
+        }
+
+        // Cleanup interval on page unload
+        window.addEventListener('beforeunload', () => {
+            if (updateInterval) {
+                clearInterval(updateInterval);
+            }
+        });
+    </script>
+</body>
+</html>
