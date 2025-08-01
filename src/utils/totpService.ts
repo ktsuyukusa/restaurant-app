@@ -1,5 +1,13 @@
 // RFC 6238 TOTP implementation for browser - compatible with Google Authenticator
 // This is a secure, browser-compatible implementation
+// FIXED: Compensates for 8-second clock drift issue
+
+// Time synchronization configuration
+const TIME_SYNC_CONFIG = {
+  // Compensate for 8-second clock drift (app is 8 seconds faster)
+  CLOCK_DRIFT_COMPENSATION: -8, // seconds to subtract from current time
+  ENABLE_TIME_SYNC: true
+};
 
 export interface TOTPConfig {
   secret: string;
@@ -54,10 +62,20 @@ export class TOTPService {
     return new Uint8Array(bytes);
   }
 
-  // Generate current TOTP code
+  // Generate current TOTP code with time synchronization
   async generateCode(): Promise<string> {
-    const counter = Math.floor(Date.now() / 1000 / this.config.period);
+    const now = this.getSynchronizedTime();
+    const counter = Math.floor(now / this.config.period);
     return this.generateCodeForCounter(counter);
+  }
+
+  // Get synchronized time accounting for clock drift
+  private getSynchronizedTime(): number {
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (TIME_SYNC_CONFIG.ENABLE_TIME_SYNC) {
+      return currentTime + TIME_SYNC_CONFIG.CLOCK_DRIFT_COMPENSATION;
+    }
+    return currentTime;
   }
 
   // Generate TOTP code for a specific counter (RFC 6238)
@@ -107,9 +125,10 @@ export class TOTPService {
     return (maskedCode % modulo).toString().padStart(this.config.digits, '0');
   }
 
-  // Verify a TOTP code
+  // Verify a TOTP code with time synchronization
   async verifyCode(token: string, window: number = 1): Promise<boolean> {
-    const counter = Math.floor(Date.now() / 1000 / this.config.period);
+    const now = this.getSynchronizedTime();
+    const counter = Math.floor(now / this.config.period);
     
     for (let i = -window; i <= window; i++) {
       const expectedCode = await this.generateCodeForCounter(counter + i);
@@ -133,16 +152,36 @@ export class TOTPService {
     return this.config.secret;
   }
 
-  // Get remaining time for current code
+  // Get remaining time for current code with time synchronization
   getRemainingTime(): number {
-    const now = Math.floor(Date.now() / 1000);
+    const now = this.getSynchronizedTime();
     const period = this.config.period;
     return period - (now % period);
   }
 
-  // Get current counter (for debugging)
+  // Get current counter (for debugging) with time synchronization
   getCurrentCounter(): number {
-    return Math.floor(Date.now() / 1000 / this.config.period);
+    const now = this.getSynchronizedTime();
+    return Math.floor(now / this.config.period);
+  }
+
+  // Get debug timing information
+  getTimingDebugInfo(): {
+    rawTime: number;
+    synchronizedTime: number;
+    clockDriftCompensation: number;
+    counter: number;
+    remainingTime: number;
+  } {
+    const rawTime = Math.floor(Date.now() / 1000);
+    const synchronizedTime = this.getSynchronizedTime();
+    return {
+      rawTime,
+      synchronizedTime,
+      clockDriftCompensation: TIME_SYNC_CONFIG.CLOCK_DRIFT_COMPENSATION,
+      counter: Math.floor(synchronizedTime / this.config.period),
+      remainingTime: this.config.period - (synchronizedTime % this.config.period)
+    };
   }
 }
 
@@ -153,19 +192,22 @@ export const generateTOTPSecret = (): string => {
 };
 
 export const verifyTOTPCode = async (secret: string, token: string, window: number = 3): Promise<boolean> => {
+  const totp = new TOTPService({ secret });
+  const timingInfo = totp.getTimingDebugInfo();
+  
   console.log('🔍 TOTP Debug: Verifying token:', token, 'with secret:', secret);
   console.log('🔍 TOTP Debug: Current time:', new Date().toISOString());
-  console.log('🔍 TOTP Debug: Unix timestamp:', Math.floor(Date.now() / 1000));
-  console.log('🔍 TOTP Debug: Counter:', Math.floor(Date.now() / 1000 / 30));
+  console.log('🔍 TOTP Debug: Raw timestamp:', timingInfo.rawTime);
+  console.log('🔍 TOTP Debug: Synchronized timestamp:', timingInfo.synchronizedTime);
+  console.log('🔍 TOTP Debug: Clock drift compensation:', timingInfo.clockDriftCompensation, 'seconds');
+  console.log('🔍 TOTP Debug: Counter:', timingInfo.counter);
+  console.log('🔍 TOTP Debug: Remaining time:', timingInfo.remainingTime, 'seconds');
   console.log('🔍 TOTP Debug: Window size:', window);
   
-  const totp = new TOTPService({ secret });
-  
-  // Generate codes for debugging
-  const currentCounter = Math.floor(Date.now() / 1000 / 30);
+  // Generate codes for debugging with synchronized time
   for (let i = -window; i <= window; i++) {
-    const testCode = await totp.generateCodeForCounter(currentCounter + i);
-    console.log(`🔍 TOTP Debug: Counter ${currentCounter + i} (${i >= 0 ? '+' : ''}${i}): ${testCode}`);
+    const testCode = await totp.generateCodeForCounter(timingInfo.counter + i);
+    console.log(`🔍 TOTP Debug: Counter ${timingInfo.counter + i} (${i >= 0 ? '+' : ''}${i}): ${testCode}`);
   }
   
   const result = await totp.verifyCode(token, window);
