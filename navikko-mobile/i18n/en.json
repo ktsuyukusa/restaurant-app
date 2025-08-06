@@ -1,0 +1,42 @@
+{
+  "language": "en",
+  "loading": {
+    "restaurants": "Loading restaurants..."
+  },
+  "restaurants": {
+    "title": "Restaurants",
+    "map": "Map",
+    "list": "List"
+  },
+  "map": {
+    "map_not_available": "Map not available on this platform"
+  },
+  "error": {
+    "title": "Error",
+    "fetch_restaurants": "Failed to fetch restaurants"
+  },
+  "menu": {
+    "cart": "Cart",
+    "clear_cart": "Clear Cart",
+    "total": "Total",
+    "checkout": "Checkout",
+    "cart_empty": "Your cart is empty",
+    "add_items_first": "Add some items first",
+    "item_details": "Item Details",
+    "quantity": "Quantity",
+    "add_to_cart": "Add to Cart"
+  },
+  "order": {
+    "order_type": "Order Type",
+    "pickup": "Pickup",
+    "delivery": "Delivery",
+    "contact_info": "Contact Information",
+    "phone_placeholder": "Enter your phone number",
+    "delivery_address": "Delivery Address",
+    "address_placeholder": "Enter your delivery address",
+    "special_instructions": "Special Instructions",
+    "instructions_placeholder": "Any special requests?",
+    "price_breakdown": "Price Breakdown",
+    "delivery_fee": "Delivery Fee"
+  }
+} 
