@@ -53,8 +53,6 @@ const Profile: React.FC = () => {
 
   const getRoleName = () => {
     switch (userRole) {
-      case 'admin':
-        return 'Administrator';
       case 'restaurant_owner':
         return 'Restaurant Owner';
       default:
@@ -235,4 +233,4 @@ const Profile: React.FC = () => {
   );
 };
 
-export default Profile; 
+export default Profile;  

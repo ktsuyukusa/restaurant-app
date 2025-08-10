@@ -99,8 +99,6 @@ export const dictionary: Dictionary = {
     "welcome.for_customers_desc": "Browse restaurants, place orders, and enjoy seamless dining experiences",
     "welcome.for_owners": "For Restaurant Owners",
     "welcome.for_owners_desc": "Manage your restaurant, orders, and menus with powerful tools",
-    "welcome.for_admins": "For Administrators",
-    "welcome.for_admins_desc": "Full system access and comprehensive management capabilities",
     
     // Features
     "features.multilingual": "Multilingual Support",

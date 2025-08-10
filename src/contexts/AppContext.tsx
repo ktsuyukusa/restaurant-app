@@ -76,23 +76,23 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   };
 
   // Role-based access control functions
-  const hasRole = (role: 'customer' | 'restaurant_owner' | 'admin'): boolean => {
+  const hasRole = (role: 'customer' | 'restaurant_owner'): boolean => {
     if (!user) return false;
     
     // Super admin can access all roles
-    if (user.userType === 'admin' && user.adminAccess?.level === 'super_admin') {
+    if (user.adminAccess?.level === 'super_admin') {
       return true;
     }
     
-    // Admin can access all roles except when specifically checking for admin role
-    if (user.userType === 'admin' && role !== 'admin') {
+    // Admin can access all roles
+    if (user.adminAccess) {
       return true;
     }
     
     return userRole === role;
   };
 
-  const isAdmin = hasRole('admin');
+  const isAdmin = user?.adminAccess ? true : false;
   const isRestaurantOwner = hasRole('restaurant_owner');
   const isCustomer = hasRole('customer');
 
@@ -107,8 +107,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     console.log('🔍 Admin access check - AuthService isAdmin:', authService.isAdmin());
     console.log('🔍 Admin access check - AuthService isAuthenticated:', authService.isAuthenticated());
     
-    // For development: Allow admin users even without 2FA if they have admin userType
-    if (user.userType === 'admin') {
+    // For development: Allow admin users even without 2FA if they have adminAccess
+    if (user.adminAccess) {
       console.log('🔒 Admin features access granted (development mode)');
       return true;
     }
@@ -124,7 +124,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     if (!user) return false;
     
     // Admin users can always access restaurant features
-    if (user.userType === 'admin') {
+    if (user.adminAccess) {
       console.log('🔒 Admin user granted restaurant features access');
       return true;
     }
@@ -151,25 +151,20 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     
     // For admin users, allow role switching for testing purposes
     const currentUser = authService.getCurrentUser();
-    if (currentUser && currentUser.userType === 'admin') {
+    if (currentUser && currentUser.adminAccess) {
       console.log('🔒 Admin user switching role for testing:', role);
       setUserRole(role);
       // Keep the admin user object but change the display role
       return;
     }
     
-    // For non-admin users, prevent admin role assignment
-    if (role === 'admin') {
-      console.log('🔒 Admin role assignment blocked - requires proper authentication');
-      return;
-    }
     
     setUserRole(role);
     
     // Update authentication state for non-admin users
     if (role) {
       const user = authService.getCurrentUser();
-      if (user && user.userType !== 'admin') {
+      if (user && !user.adminAccess) {
         setUser(user);
       }
     } else {

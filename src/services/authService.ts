@@ -11,7 +11,7 @@ export interface User {
   email: string;
   name: string;
   phone: string;
-  userType: 'customer' | 'restaurant_owner' | 'admin';
+  userType: 'customer' | 'restaurant_owner';
   createdAt: string;
   locationConsent?: boolean;
   paymentMethods?: PaymentMethod[];
@@ -59,7 +59,7 @@ export interface SignupData {
   password: string;
   name: string;
   phone: string;
-  userType: 'customer' | 'restaurant_owner' | 'admin';
+  userType: 'customer' | 'restaurant_owner';
   locationConsent?: boolean;
   restaurantInfo?: Partial<RestaurantInfo>;
   adminCode?: string;
@@ -81,7 +81,7 @@ export interface GoogleUser {
 }
 
 export interface GoogleSignInData {
-  userType: 'customer' | 'restaurant_owner' | 'admin';
+  userType: 'customer' | 'restaurant_owner';
   locationConsent?: boolean;
   restaurantInfo?: Partial<RestaurantInfo>;
   adminCode?: string;
@@ -208,8 +208,8 @@ class AuthService {
     localStorage.setItem('navikko_user_data', JSON.stringify(user));
     localStorage.setItem('navikko_user_role', user.userType);
     
-    // Save admin 2FA status if applicable
-    if (user.userType === 'admin' && this.admin2FAVerified) {
+    // Save admin 2FA status if applicable (for existing admin users)
+    if (user.adminAccess && this.admin2FAVerified) {
       localStorage.setItem('navikko_admin_2fa_verified', 'true');
     }
   }
@@ -541,11 +541,10 @@ class AuthService {
     }
   }
 
-  // Admin signup with admin code validation
+  // Admin signup with admin code validation (DISABLED for public signup)
   async signupAdmin(data: SignupData): Promise<User> {
-    if (data.userType !== 'admin') {
-      throw new Error('Invalid user type for admin signup');
-    }
+    // SECURITY: Admin signup disabled for public interface
+    throw new Error('Admin signup is disabled for security. Admin accounts must be created through secure backend processes.');
 
     // Validate required fields
     if (!data.email || !data.password || !data.name || !data.phone || !data.adminCode) {
@@ -639,7 +638,7 @@ class AuthService {
       return user;
     } catch (error: unknown) {
       console.error('Admin signup error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to create admin account');
+      throw new Error('Failed to create admin account');
     }
   }
 
@@ -650,8 +649,6 @@ class AuthService {
         return this.signupCustomer(data);
       case 'restaurant_owner':
         return this.signupRestaurantOwner(data);
-      case 'admin':
-        return this.signupAdmin(data);
       default:
         throw new Error('Invalid user type');
     }
@@ -801,8 +798,8 @@ class AuthService {
       this.trackLoginAttempt(data.email, true);
       this.currentUser = user;
       
-      // Mark admin as 2FA verified if they completed 2FA
-      if (user.userType === 'admin' && twoFactorCode) {
+      // Mark admin as 2FA verified if they completed 2FA (for existing admin users)
+      if (user.adminAccess && twoFactorCode) {
         this.admin2FAVerified = true;
         console.log('🔒 Admin 2FA verification completed successfully');
         // Save 2FA status immediately
@@ -851,7 +848,7 @@ class AuthService {
   // Check if user is authenticated
   isAuthenticated(): boolean {
     // SECURITY: Admin users cannot be authenticated without proper 2FA verification
-    if (this.currentUser?.userType === 'admin') {
+    if (this.currentUser?.adminAccess) {
       if (this.admin2FAVerified) {
         console.log('🔒 Admin user authenticated - 2FA verification completed');
         return true;
@@ -871,7 +868,7 @@ class AuthService {
   // Check if user is admin
   isAdmin(): boolean {
     // SECURITY: Admin users cannot be considered admin without proper 2FA verification
-    if (this.currentUser?.userType === 'admin') {
+    if (this.currentUser?.adminAccess) {
       if (this.admin2FAVerified) {
         console.log('🔒 Admin access granted - 2FA verification completed');
         return true;
@@ -1009,14 +1006,14 @@ class AuthService {
   async signInWithGoogle(googleUser: GoogleUser, signInData: GoogleSignInData): Promise<User> {
     console.log('Google Sign-In attempt for email:', googleUser.email);
     
-    // Check IP restriction for admin login
-    if (signInData.userType === 'admin' && !this.isIPAllowedForAdmin()) {
+    // Check IP restriction for admin login (for existing admin users with adminCode)
+    if (signInData.adminCode && !this.isIPAllowedForAdmin()) {
       throw new Error('Access denied from this IP address for admin accounts.');
     }
 
-    // Validate admin code for admin signup
-    if (signInData.userType === 'admin') {
-      if (!signInData.adminCode || !validateAdminCode(signInData.adminCode)) {
+    // Validate admin code for existing admin users (no new admin signup allowed)
+    if (signInData.adminCode) {
+      if (!validateAdminCode(signInData.adminCode)) {
         throw new Error('Invalid admin access code required for admin registration.');
       }
     }
@@ -1056,7 +1053,7 @@ class AuthService {
       locationConsent: signInData.locationConsent || false,
       paymentMethods: [],
       restaurantInfo: signInData.restaurantInfo as RestaurantInfo,
-      adminAccess: signInData.userType === 'admin' && signInData.adminCode ? {
+      adminAccess: signInData.adminCode ? {
         level: getAdminLevel(signInData.adminCode) || 'admin',
         permissions: ['user_management', 'restaurant_management', 'system_settings', 'analytics'],
         accessCode: signInData.adminCode
@@ -1073,8 +1070,8 @@ class AuthService {
       createdAt: new Date().toISOString()
     };
 
-    // For new admin users, require 2FA setup
-    if (signInData.userType === 'admin' && this.requires2FA(signInData.userType)) {
+    // For existing admin users, require 2FA setup
+    if (signInData.adminCode && this.requires2FA('admin')) {
       throw new Error('Admin users must complete 2FA setup through the admin panel');
     }
 
@@ -1133,7 +1130,7 @@ class AuthService {
       locationConsent: signInData.locationConsent || false,
       paymentMethods: [],
       restaurantInfo: signInData.restaurantInfo,
-      adminAccess: signInData.userType === 'admin' && signInData.adminCode ? {
+      adminAccess: signInData.adminCode ? {
         level: getAdminLevel(signInData.adminCode) || 'admin',
         permissions: ['user_management', 'restaurant_management', 'system_settings', 'analytics'],
         accessCode: signInData.adminCode
@@ -1221,7 +1218,7 @@ class AuthService {
       throw new Error('User not found');
     }
 
-    if (user.userType !== 'admin') {
+    if (!user.adminAccess) {
       throw new Error('2FA is only available for admin accounts');
     }
 
@@ -1244,7 +1241,7 @@ class AuthService {
       throw new Error('User not found');
     }
 
-    if (user.userType !== 'admin' || !user.adminAccess?.twoFactorSecret) {
+    if (!user.adminAccess || !user.adminAccess?.twoFactorSecret) {
       throw new Error('2FA not available for this account');
     }
 
@@ -1271,7 +1268,7 @@ class AuthService {
       throw new Error('User not found');
     }
 
-    if (user.userType !== 'admin' || !user.adminAccess?.twoFactorSecret) {
+    if (!user.adminAccess || !user.adminAccess?.twoFactorSecret) {
       throw new Error('2FA not available for this account');
     }
 
@@ -1353,4 +1350,4 @@ class AuthService {
   }
 }
 
-export default AuthService.getInstance(); 
+export default AuthService.getInstance();          

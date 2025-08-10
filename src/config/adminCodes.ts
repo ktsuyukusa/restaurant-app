@@ -26,10 +26,9 @@ export const getAdminCodes = () => {
   return ADMIN_CODES.development;
 };
 
-// Validate admin code
+// Validate admin code (DISABLED for public signup security)
 export const validateAdminCode = (code: string): boolean => {
-  const codes = getAdminCodes();
-  return Object.values(codes).includes(code);
+  return false;
 };
 
 // Get admin level from code
@@ -68,4 +67,4 @@ export const getAdminLevel = (code: string): 'admin' | 'super_admin' | 'moderato
    - Use different codes for different environments
    - Rotate codes periodically
    - Keep a secure record of who has access to which codes
-*/ 
+*/  

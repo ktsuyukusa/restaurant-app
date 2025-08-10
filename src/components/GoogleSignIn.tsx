@@ -8,7 +8,7 @@ import TwoFactorAuthModal from './TwoFactorAuthModal';
 // GoogleSignIn component with internationalization support and ESLint fixes
 
 interface GoogleSignInProps {
-  userType: 'customer' | 'restaurant_owner' | 'admin';
+  userType: 'customer' | 'restaurant_owner';
   onSuccess?: (user: unknown) => void;
   onError?: (error: string) => void;
   locationConsent?: boolean;
@@ -284,4 +284,4 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
   );
 };
 
-export default GoogleSignIn; 
+export default GoogleSignIn;  
