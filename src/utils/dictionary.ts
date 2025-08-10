@@ -2205,8 +2205,6 @@ export const dictionary = {
     'welcome.for_customers_desc': 'Jelajahi restoran, buat pesanan, dan nikmati pengalaman makan yang mulus',
     'welcome.for_owners': 'Untuk Pemilik Restoran',
     'welcome.for_owners_desc': 'Kelola restoran, pesanan, dan menu Anda dengan alat yang kuat',
-    'welcome.for_admins': 'Untuk Administrator',
-    'welcome.for_admins_desc': 'Akses sistem penuh dan kemampuan manajemen yang komprehensif',
     
     // Auth Modal
     'auth.welcome': 'Selamat Datang di Navikko',
@@ -2245,10 +2243,6 @@ export const dictionary = {
     'auth.enter_restaurant_phone': 'Masukkan telepon restoran',
     'auth.enter_restaurant_address': 'Masukkan alamat restoran',
     'auth.select_cuisine_type': 'Pilih jenis masakan',
-    'auth.admin_verification': 'Verifikasi Administrator',
-    'auth.admin_code': 'Kode Administrator',
-    'auth.enter_admin_code': 'Masukkan kode verifikasi administrator',
-    'auth.admin_code_desc': 'Kode administrator diperlukan untuk akses administrator sistem',
     'common.close': 'Tutup',
     
     // Google Sign-In Setup
@@ -2609,8 +2603,6 @@ export const dictionary = {
     'welcome.for_customers_desc': 'Explorați restaurante, faceți comenzi și bucurați-vă de o experiență culinară fără întreruperi',
     'welcome.for_owners': 'Pentru Proprietarii de Restaurante',
     'welcome.for_owners_desc': 'Gestionați-vă restaurantul, comenzile și meniurile cu instrumente puternice',
-    'welcome.for_admins': 'Pentru Administratori',
-    'welcome.for_admins_desc': 'Acces complet la sistem și capacități de management cuprinzătoare',
     
     // Features
     'features.multilingual': 'Suport Multilingv',

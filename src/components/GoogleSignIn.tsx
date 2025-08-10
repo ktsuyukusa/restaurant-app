@@ -76,9 +76,8 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
 
   const handleGoogleSignIn = useCallback(async (response: { credential: string }) => {
     try {
-      // Validate admin code for admin signup
-      if (userType === 'admin' && (!adminCode || adminCode.trim() === '')) {
-        throw new Error('Admin code is required for admin registration via Google Sign-In.');
+      if (adminCode && adminCode.trim() !== '' && userType !== 'admin') {
+        console.warn('Admin code provided for non-admin signup, ignoring');
       }
 
       // Decode the JWT token to get user info
@@ -284,4 +283,4 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
   );
 };
 
-export default GoogleSignIn;  
+export default GoogleSignIn;    
