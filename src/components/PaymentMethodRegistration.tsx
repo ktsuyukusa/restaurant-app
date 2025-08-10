@@ -105,8 +105,8 @@ const PaymentMethodRegistration: React.FC<PaymentMethodRegistrationProps> = ({
       });
 
       onPaymentMethodAdded(paymentMethod);
-    } catch (err: any) {
-      setError(err.message || 'Failed to add payment method');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to add payment method');
     } finally {
       setIsLoading(false);
     }
@@ -125,8 +125,8 @@ const PaymentMethodRegistration: React.FC<PaymentMethodRegistrationProps> = ({
       });
 
       onPaymentMethodAdded(paymentMethod);
-    } catch (err: any) {
-      setError(err.message || 'Failed to add payment method');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to add payment method');
     } finally {
       setIsLoading(false);
     }
@@ -389,4 +389,4 @@ const PaymentMethodRegistration: React.FC<PaymentMethodRegistrationProps> = ({
   );
 };
 
-export default PaymentMethodRegistration; 
+export default PaymentMethodRegistration;  

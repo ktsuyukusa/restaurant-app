@@ -63,7 +63,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
                           selectedPriceRange !== 'All Prices' || 
                           selectedRating !== 'All Ratings';
 
-  const getDisplayText = (value: string, options: any[]) => {
+  const getDisplayText = (value: string, options: Array<{key: string, value: string, translationKey: string}>) => {
     const option = options.find(opt => opt.value === value);
     return option ? t(option.translationKey) : value;
   };

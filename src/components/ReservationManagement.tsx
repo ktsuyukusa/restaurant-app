@@ -34,11 +34,11 @@ interface Restaurant {
   id: string;
   name_ja: string;
   name_en: string;
-  name_json?: any;
+  name_json?: Record<string, string>;
 }
 
 // Fixed getLocalized helper function
-const getLocalized = (field: any, lang: string) => {
+const getLocalized = (field: Record<string, string> | null | undefined, lang: string) => {
   if (!field || typeof field !== 'object') return field;
   const fallbackLang = 'en';
   return field[lang] || field[fallbackLang] || Object.values(field)[0] || '';
@@ -57,8 +57,7 @@ const ReservationManagement: React.FC = () => {
     comment: ''
   });
 
-  useEffect(() => {
-    const fetchReservations = async () => {
+  const fetchReservations = async () => {
       try {
         const supabase = getSupabaseClient();
         const { data, error } = await supabase
@@ -79,8 +78,9 @@ const ReservationManagement: React.FC = () => {
       } catch (error) {
         console.error('Error fetching reservations:', error);
       }
-    };
+  };
 
+  useEffect(() => {
     fetchReservations();
   }, []);
 
@@ -163,13 +163,14 @@ const ReservationManagement: React.FC = () => {
     }
   };
 
-  const getRestaurantName = (restaurantId: string) => {
+  const getRestaurantName = (restaurantId: string): string => {
     const restaurant = restaurants.find(r => r.id === restaurantId);
     if (!restaurant) return '';
     
     // Try JSON field first (new format)
     if (restaurant.name_json) {
-      return getLocalized(restaurant.name_json, currentLanguage);
+      const localizedName = getLocalized(restaurant.name_json, currentLanguage);
+      return typeof localizedName === 'string' ? localizedName : '';
     }
     
     // Fallback to specific language fields

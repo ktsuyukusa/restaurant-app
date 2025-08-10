@@ -9,7 +9,11 @@ const OrderSuccess: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const [orderDetails, setOrderDetails] = useState<any>(null);
+  const [orderDetails, setOrderDetails] = useState<{
+    orderId: string;
+    status: string;
+    date: string;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const sessionId = searchParams.get('session_id');
@@ -167,4 +171,4 @@ const OrderSuccess: React.FC = () => {
   );
 };
 
-export default OrderSuccess; 
+export default OrderSuccess;  
