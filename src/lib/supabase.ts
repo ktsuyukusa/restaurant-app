@@ -2,8 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 
 // Use Vercel's automatically created environment variables
 // These are set by the Supabase integration
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qqcoooscyzhyzmrcvsxi.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://qqcoooscyzhyzmrcvsxi.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E';
 
 // Force clear any environment variables that might interfere
 if (typeof window !== 'undefined') {
@@ -48,15 +48,15 @@ export const mockSupabase = {
     select: () => Promise.resolve({ data: [], error: null }),
     insert: (data: unknown) => ({
       select: () => Promise.resolve({ data: data, error: null }),
-      then: (callback: unknown) => Promise.resolve({ data: data, error: null }).then(callback)
+      then: (callback: (value: { data: unknown; error: any }) => any) => Promise.resolve({ data: data, error: null }).then(callback)
     }),
     update: (data: unknown) => ({
       select: () => Promise.resolve({ data: data, error: null }),
-      then: (callback: unknown) => Promise.resolve({ data: data, error: null }).then(callback)
+      then: (callback: (value: { data: unknown; error: any }) => any) => Promise.resolve({ data: data, error: null }).then(callback)
     }),
     delete: () => ({
       select: () => Promise.resolve({ data: null, error: null }),
-      then: (callback: unknown) => Promise.resolve({ data: null, error: null }).then(callback)
+      then: (callback: (value: { data: any; error: any }) => any) => Promise.resolve({ data: null, error: null }).then(callback)
     }),
     rpc: (func: string, params: unknown) => Promise.resolve({ data: null, error: null })
   }),

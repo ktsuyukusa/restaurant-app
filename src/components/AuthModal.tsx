@@ -531,11 +531,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                               onCheckedChange={(checked: boolean) => updateSignupField('locationConsent', checked)}
                             />
                             <Label htmlFor="location-consent" className="text-sm">
-                              {t('auth.location_consent', 'Allow location access')}
+                              {t('auth.location_consent', 'Allow location access (optional)')}
                             </Label>
                           </div>
                           <p className="text-xs text-blue-600">
-                            {t('auth.location_consent_desc', 'This helps us show you nearby restaurants and provide location-based recommendations.')}
+                            {t('auth.location_consent_desc', 'This helps us show you nearby restaurants and provide location-based recommendations. You can enable this later in settings.')}
                           </p>
                         </div>
                       </div>
@@ -674,4 +674,4 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   );
 };
 
-export default AuthModal; 
+export default AuthModal;  
