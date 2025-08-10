@@ -307,8 +307,6 @@ export const dictionary: Dictionary = {
     "welcome.for_customers_desc": "レストランを閲覧し、注文して、シームレスなダイニング体験をお楽しみください",
     "welcome.for_owners": "レストランオーナー向け",
     "welcome.for_owners_desc": "強力なツールでレストラン、注文、メニューを管理",
-    "welcome.for_admins": "管理者向け",
-    "welcome.for_admins_desc": "完全なシステムアクセスと包括的な管理機能",
     
     // Features
     "features.multilingual": "多言語サポート",
