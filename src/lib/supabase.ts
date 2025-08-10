@@ -8,8 +8,8 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIU
 // Force clear any environment variables that might interfere
 if (typeof window !== 'undefined') {
   // Clear any cached environment variables in the browser
-  delete (window as any).__SUPABASE_URL__;
-  delete (window as any).__SUPABASE_ANON_KEY__;
+  delete (window as unknown as Record<string, unknown>).__SUPABASE_URL__;
+  delete (window as unknown as Record<string, unknown>).__SUPABASE_ANON_KEY__;
 }
 
 // Debug: Log the credentials being used (remove in production)
@@ -48,15 +48,15 @@ export const mockSupabase = {
     select: () => Promise.resolve({ data: [], error: null }),
     insert: (data: unknown) => ({
       select: () => Promise.resolve({ data: data, error: null }),
-      then: (callback: (value: { data: unknown; error: any }) => any) => Promise.resolve({ data: data, error: null }).then(callback)
+      then: (callback: (value: { data: unknown; error: unknown }) => unknown) => Promise.resolve({ data: data, error: null }).then(callback)
     }),
     update: (data: unknown) => ({
       select: () => Promise.resolve({ data: data, error: null }),
-      then: (callback: (value: { data: unknown; error: any }) => any) => Promise.resolve({ data: data, error: null }).then(callback)
+      then: (callback: (value: { data: unknown; error: unknown }) => unknown) => Promise.resolve({ data: data, error: null }).then(callback)
     }),
     delete: () => ({
       select: () => Promise.resolve({ data: null, error: null }),
-      then: (callback: (value: { data: any; error: any }) => any) => Promise.resolve({ data: null, error: null }).then(callback)
+      then: (callback: (value: { data: unknown; error: unknown }) => unknown) => Promise.resolve({ data: null, error: null }).then(callback)
     }),
     rpc: (func: string, params: unknown) => Promise.resolve({ data: null, error: null })
   }),
@@ -65,7 +65,7 @@ export const mockSupabase = {
     signInWithPassword: () => Promise.resolve({ data: { user: null }, error: null }),
     signOut: () => Promise.resolve({ error: null }),
     getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-    onAuthStateChange: (callback: unknown) => ({ data: { subscription: null } }),
+    onAuthStateChange: (callback: (event: string, session: unknown) => void) => ({ data: { subscription: null } }),
     resetPasswordForEmail: (email: string) => Promise.resolve({ 
       data: null, 
       error: { message: 'Mock client: Password reset not available. Please check Supabase configuration.' } 
