@@ -318,9 +318,10 @@ class AuthService {
     }
   }
 
-  // Check if user needs 2FA
+  // Check if user needs 2FA - admin signup disabled for security
   private requires2FA(userType: string): boolean {
-    return SECURITY_CONFIG.REQUIRE_2FA_FOR_ADMIN && userType === 'admin';
+    // Admin signup disabled for security - admin accounts should be created through secure backend processes
+    return false;
   }
 
   // Generate 2FA code using proper TOTP
@@ -1350,4 +1351,4 @@ class AuthService {
   }
 }
 
-export default AuthService.getInstance();          
+export default AuthService.getInstance();            
