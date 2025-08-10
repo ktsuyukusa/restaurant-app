@@ -7,8 +7,8 @@ Create a `.env` file in your project root with the following content:
 VITE_GOOGLE_CLIENT_ID=your-google-client-id-here
 
 # Supabase Configuration (if using Supabase)
-VITE_SUPABASE_URL=https://mzmvlahjtybrdboteyry.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16bXZsYWhqdHlicmRib3RleXJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI0NTY2ODEsImV4cCI6MjA2ODAzMjY4MX0.95zziILtcMnzvCwKz4HoWeeFSfqlQSbe_afdTl97VVmA
+VITE_SUPABASE_URL=https://qqcoooscyzhyzmrcvsxi.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFxY29vb3NjeXpoeXptcmN2c3hpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM0MjQ2MTMsImV4cCI6MjA2OTAwMDYxM30.8PIgWiNvwcUVKWyK6dH74eafBMgD-mfhaRZeanCzb6E
 
 # Payment Service Keys (Stripe)
 VITE_STRIPE_PUBLISHABLE_KEY=pk_live_51HEPeKHDciAfHF4XWMChPT07lSjGrbNhz2ZWhqKszcdG2BOwyZbRHRdYkMKg3OoAGAyIztd3yxY5BMHP7itw8FMd00BRBijcCL
@@ -85,4 +85,4 @@ Add these environment variables in your Vercel dashboard:
 2. Go to "Settings" > "Environment Variables"
 3. Add each variable from your `.env` file 
 
-Navikko 
+Navikko  

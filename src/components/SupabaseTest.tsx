@@ -18,7 +18,7 @@ const SupabaseTest = () => {
         const config = {
           hasUrl: true, // Hardcoded URL
           hasKey: true, // Hardcoded key
-          url: 'https://mzmvlahjtybrdboteyry.supabase.co', // Hardcoded
+          url: 'https://qqcoooscyzhyzmrcvsxi.supabase.co', // Hardcoded
           keyLength: 200 // Approximate length of hardcoded key
         };
         
@@ -95,4 +95,4 @@ const SupabaseTest = () => {
   );
 };
 
-export default SupabaseTest; 
+export default SupabaseTest;  
