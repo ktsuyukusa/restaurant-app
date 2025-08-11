@@ -8,7 +8,7 @@ import TwoFactorAuthModal from './TwoFactorAuthModal';
 // GoogleSignIn component with internationalization support and ESLint fixes
 
 interface GoogleSignInProps {
-  userType: 'customer' | 'restaurant_owner' | 'admin';
+  userType: 'customer' | 'restaurant_owner';
   onSuccess?: (user: unknown) => void;
   onError?: (error: string) => void;
   locationConsent?: boolean;
@@ -76,9 +76,8 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
 
   const handleGoogleSignIn = useCallback(async (response: { credential: string }) => {
     try {
-      // Validate admin code for admin signup
-      if (userType === 'admin' && (!adminCode || adminCode.trim() === '')) {
-        throw new Error('Admin code is required for admin registration via Google Sign-In.');
+      if (adminCode && adminCode.trim() !== '') {
+        console.warn('Admin code provided for signup, but admin signup is disabled for security');
       }
 
       // Decode the JWT token to get user info
@@ -284,4 +283,4 @@ const GoogleSignIn: React.FC<GoogleSignInProps> = ({
   );
 };
 
-export default GoogleSignIn; 
+export default GoogleSignIn;      

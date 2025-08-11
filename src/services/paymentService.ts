@@ -168,7 +168,7 @@ class PaymentService {
   }
 
   // Handle webhook notifications
-  async handleWebhook(payload: any, signature: string): Promise<boolean> {
+  async handleWebhook(payload: unknown, signature: string): Promise<boolean> {
     try {
       const baseUrl = window.location.origin || 'http://localhost:8080';
       const apiUrl = this.createSafeUrl(baseUrl, '/api/webhook');
@@ -193,7 +193,7 @@ class PaymentService {
   }
 
   // Get supported payment methods for a restaurant
-  getSupportedPaymentMethods(restaurant: any): ('stripe')[] {
+  getSupportedPaymentMethods(restaurant: {stripe_account_id?: string}): ('stripe')[] {
     const methods: ('stripe')[] = [];
     
     if (restaurant.stripe_account_id || this.stripePublishableKey) {
@@ -227,4 +227,4 @@ class PaymentService {
 }
 
 export const paymentService = new PaymentService();
-export default paymentService; 
+export default paymentService;  

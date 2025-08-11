@@ -288,8 +288,6 @@ export const dictionary = {
     'welcome.for_customers_desc': 'Browse restaurants, place orders, and enjoy seamless dining experiences',
     'welcome.for_owners': 'For Restaurant Owners',
     'welcome.for_owners_desc': 'Manage your restaurant, orders, and menus with powerful tools',
-    'welcome.for_admins': 'For Administrators',
-    'welcome.for_admins_desc': 'Full system access and comprehensive management capabilities',
     
     // Auth Modal
     'auth.welcome': 'Welcome to Navikko',
@@ -315,8 +313,6 @@ export const dictionary = {
     'auth.restaurant_owner_desc': 'Manage your restaurant and orders',
     'auth.owner': 'Restaurant Owner',
     'auth.owner_desc': 'Manage your restaurant and orders',
-    'auth.admin': 'Admin',
-    'auth.admin_desc': 'Full system access and management',
     'auth.selected': 'Selected',
     'auth.browse_restaurants': 'Browse restaurants',
     'auth.place_orders': 'Place orders',
@@ -341,10 +337,6 @@ export const dictionary = {
     'auth.enter_restaurant_phone': 'Enter restaurant phone',
     'auth.enter_restaurant_address': 'Enter restaurant address',
     'auth.select_cuisine_type': 'Select cuisine type',
-    'auth.admin_verification': 'Admin Verification',
-    'auth.admin_code': 'Admin Code',
-    'auth.enter_admin_code': 'Enter admin verification code',
-    'auth.admin_code_desc': 'Admin code required for system administrator access',
     'auth.privacy_policy': 'Privacy Policy',
     'auth.terms_of_service': 'Terms of Service',
     'auth.agree_to_terms': 'I agree to the Terms of Service and Privacy Policy',
@@ -590,8 +582,6 @@ export const dictionary = {
     'welcome.for_customers_desc': 'レストランを閲覧し、注文して、シームレスなダイニング体験をお楽しみください',
     'welcome.for_owners': 'レストランオーナー向け',
     'welcome.for_owners_desc': '強力なツールでレストラン、注文、メニューを管理',
-    'welcome.for_admins': '管理者向け',
-    'welcome.for_admins_desc': 'システム全体へのアクセスと包括的な管理機能',
     
     // Auth Modal
     'auth.welcome': 'Navikkoへようこそ',
@@ -614,8 +604,6 @@ export const dictionary = {
     'auth.restaurant_owner_desc': 'レストランと注文を管理',
     'auth.owner': 'レストランオーナー',
     'auth.owner_desc': 'レストランと注文を管理',
-    'auth.admin': '管理者',
-    'auth.admin_desc': 'システム全体へのアクセスと管理',
     'auth.selected': '選択済み',
     'auth.browse_restaurants': 'レストランを閲覧',
     'auth.place_orders': '注文する',
@@ -640,10 +628,6 @@ export const dictionary = {
     'auth.enter_restaurant_phone': 'レストラン電話番号を入力',
     'auth.enter_restaurant_address': 'レストラン住所を入力',
     'auth.select_cuisine_type': '料理の種類を選択',
-    'auth.admin_verification': '管理者認証',
-    'auth.admin_code': '管理者コード',
-    'auth.enter_admin_code': '管理者認証コードを入力',
-    'auth.admin_code_desc': 'システム管理者アクセスには管理者コードが必要です',
     'auth.privacy_policy': 'プライバシーポリシー',
     'auth.terms_of_service': '利用規約',
     'auth.agree_to_terms': '利用規約とプライバシーポリシーに同意します',
@@ -1014,8 +998,6 @@ export const dictionary = {
     'welcome.for_customers_desc': '浏览餐厅、下单并享受无缝的用餐体验',
     'welcome.for_owners': '餐厅老板专用',
     'welcome.for_owners_desc': '使用强大的工具管理您的餐厅、订单和菜单',
-    'welcome.for_admins': '管理员专用',
-    'welcome.for_admins_desc': '完整的系统访问和综合管理功能',
     
     // Auth Modal
     'auth.welcome': '欢迎使用Navikko',
@@ -1039,8 +1021,6 @@ export const dictionary = {
     'auth.customer_desc': '浏览餐厅并下单',
     'auth.owner': '餐厅老板',
     'auth.owner_desc': '管理您的餐厅和订单',
-    'auth.admin': '管理员',
-    'auth.admin_desc': '完整的系统访问和管理',
     'auth.selected': '已选择',
     'auth.browse_restaurants': '浏览餐厅',
     'auth.place_orders': '下单',
@@ -1065,10 +1045,6 @@ export const dictionary = {
     'auth.enter_restaurant_phone': '输入餐厅电话',
     'auth.enter_restaurant_address': '输入餐厅地址',
     'auth.select_cuisine_type': '选择菜系类型',
-    'auth.admin_verification': '管理员验证',
-    'auth.admin_code': '管理员代码',
-    'auth.enter_admin_code': '输入管理员验证代码',
-    'auth.admin_code_desc': '系统管理员访问需要管理员代码',
     'auth.privacy_policy': '隐私政策',
     'auth.terms_of_service': '服务条款',
     'auth.agree_to_terms': '我同意服务条款和隐私政策',
@@ -1335,8 +1311,6 @@ export const dictionary = {
     'welcome.for_customers_desc': '레스토랑을 둘러보고, 주문하고, 원활한 다이닝 경험을 즐기세요',
     'welcome.for_owners': '레스토랑 소유자용',
     'welcome.for_owners_desc': '강력한 도구로 레스토랑, 주문, 메뉴를 관리',
-    'welcome.for_admins': '관리자용',
-    'welcome.for_admins_desc': '전체 시스템 액세스 및 포괄적인 관리 기능',
     
     // Auth Modal
     'auth.welcome': 'Navikko에 오신 것을 환영합니다',
@@ -1360,8 +1334,6 @@ export const dictionary = {
     'auth.customer_desc': '레스토랑을 둘러보고 주문하기',
     'auth.owner': '레스토랑 소유자',
     'auth.owner_desc': '레스토랑과 주문 관리',
-    'auth.admin': '관리자',
-    'auth.admin_desc': '전체 시스템 액세스 및 관리',
     'auth.selected': '선택됨',
     'auth.browse_restaurants': '레스토랑 둘러보기',
     'auth.place_orders': '주문하기',
@@ -1386,10 +1358,6 @@ export const dictionary = {
     'auth.enter_restaurant_phone': '레스토랑 전화번호 입력',
     'auth.enter_restaurant_address': '레스토랑 주소 입력',
     'auth.select_cuisine_type': '요리 유형 선택',
-    'auth.admin_verification': '관리자 인증',
-    'auth.admin_code': '관리자 코드',
-    'auth.enter_admin_code': '관리자 인증 코드 입력',
-    'auth.admin_code_desc': '시스템 관리자 액세스에는 관리자 코드가 필요합니다',
     
     // Google Sign-In Setup
     'auth.google_setup_required': 'Google 로그인 설정 필요',
@@ -1651,8 +1619,6 @@ export const dictionary = {
     'welcome.for_customers_desc': 'Przeglądaj restauracje, składaj zamówienia i ciesz się płynnymi doświadczeniami gastronomicznymi',
     'welcome.for_owners': 'Dla właścicieli restauracji',
     'welcome.for_owners_desc': 'Zarządzaj swoją restauracją, zamówieniami i menu za pomocą potężnych narzędzi',
-    'welcome.for_admins': 'Dla administratorów',
-    'welcome.for_admins_desc': 'Pełny dostęp do systemu i kompleksowe możliwości zarządzania',
     
     // Auth Modal
     'auth.welcome': 'Witamy w Navikko',
@@ -1678,8 +1644,6 @@ export const dictionary = {
     'auth.restaurant_owner_desc': 'Zarządzaj swoją restauracją i zamówieniami',
     'auth.owner': 'Właściciel restauracji',
     'auth.owner_desc': 'Zarządzaj swoją restauracją i zamówieniami',
-    'auth.admin': 'Administrator',
-    'auth.admin_desc': 'Pełny dostęp do systemu i zarządzanie',
     'auth.selected': 'Wybrane',
     'auth.browse_restaurants': 'Przeglądaj restauracje',
     'auth.place_orders': 'Składaj zamówienia',
@@ -1704,10 +1668,6 @@ export const dictionary = {
     'auth.enter_restaurant_phone': 'Wprowadź telefon restauracji',
     'auth.enter_restaurant_address': 'Wprowadź adres restauracji',
     'auth.select_cuisine_type': 'Wybierz typ kuchni',
-    'auth.admin_verification': 'Weryfikacja administratora',
-    'auth.admin_code': 'Kod administratora',
-    'auth.enter_admin_code': 'Wprowadź kod weryfikacji administratora',
-    'auth.admin_code_desc': 'Kod administratora wymagany dla dostępu administratora systemu',
     
     // Google Sign-In Setup
     'auth.google_setup_required': 'Wymagana konfiguracja logowania Google',
@@ -1969,8 +1929,6 @@ export const dictionary = {
     'welcome.for_customers_desc': 'เรียกดูร้านอาหาร สั่งซื้อ และเพลิดเพลินกับประสบการณ์การรับประทานอาหารที่ราบรื่น',
     'welcome.for_owners': 'สำหรับเจ้าของร้านอาหาร',
     'welcome.for_owners_desc': 'จัดการร้านอาหาร การสั่งซื้อ และเมนูด้วยเครื่องมือที่ทรงพลัง',
-    'welcome.for_admins': 'สำหรับผู้ดูแลระบบ',
-    'welcome.for_admins_desc': 'การเข้าถึงระบบเต็มรูปแบบและความสามารถในการจัดการที่ครอบคลุม',
     
     // Auth Modal
     'auth.welcome': 'ยินดีต้อนรับสู่ Navikko',
@@ -1996,8 +1954,6 @@ export const dictionary = {
     'auth.restaurant_owner_desc': 'จัดการร้านอาหารและการสั่งซื้อของคุณ',
     'auth.owner': 'เจ้าของร้านอาหาร',
     'auth.owner_desc': 'จัดการร้านอาหารและการสั่งซื้อของคุณ',
-    'auth.admin': 'ผู้ดูแลระบบ',
-    'auth.admin_desc': 'การเข้าถึงระบบเต็มรูปแบบและการจัดการ',
     'auth.selected': 'เลือกแล้ว',
     'auth.browse_restaurants': 'เรียกดูร้านอาหาร',
     'auth.place_orders': 'สั่งซื้อ',
@@ -2022,10 +1978,6 @@ export const dictionary = {
     'auth.enter_restaurant_phone': 'ป้อนโทรศัพท์ร้านอาหาร',
     'auth.enter_restaurant_address': 'ป้อนที่อยู่ร้านอาหาร',
     'auth.select_cuisine_type': 'เลือกประเภทอาหาร',
-    'auth.admin_verification': 'การยืนยันผู้ดูแลระบบ',
-    'auth.admin_code': 'รหัสผู้ดูแลระบบ',
-    'auth.enter_admin_code': 'ป้อนรหัสยืนยันผู้ดูแลระบบ',
-    'auth.admin_code_desc': 'รหัสผู้ดูแลระบบที่จำเป็นสำหรับการเข้าถึงผู้ดูแลระบบระบบ',
     
     // Google Sign-In Setup
     'auth.google_setup_required': 'จำเป็นต้องตั้งค่า Google Sign-In',
@@ -2133,8 +2085,6 @@ export const dictionary = {
     'auth.restaurant_owner_desc': 'Urus restoran dan pesanan anda',
     'auth.owner': 'Pemilik Restoran',
     'auth.owner_desc': 'Urus restoran dan pesanan anda',
-    'auth.admin': 'Pentadbir',
-    'auth.admin_desc': 'Akses sistem penuh dan pengurusan',
     'auth.selected': 'Dipilih',
     'auth.customer_preferences': 'Keutamaan Pelanggan',
     'auth.location_consent': 'Kebenaran Perkhidmatan Lokasi',
@@ -2255,8 +2205,6 @@ export const dictionary = {
     'welcome.for_customers_desc': 'Jelajahi restoran, buat pesanan, dan nikmati pengalaman makan yang mulus',
     'welcome.for_owners': 'Untuk Pemilik Restoran',
     'welcome.for_owners_desc': 'Kelola restoran, pesanan, dan menu Anda dengan alat yang kuat',
-    'welcome.for_admins': 'Untuk Administrator',
-    'welcome.for_admins_desc': 'Akses sistem penuh dan kemampuan manajemen yang komprehensif',
     
     // Auth Modal
     'auth.welcome': 'Selamat Datang di Navikko',
@@ -2282,8 +2230,6 @@ export const dictionary = {
     'auth.restaurant_owner_desc': 'Kelola restoran dan pesanan Anda',
     'auth.owner': 'Pemilik Restoran',
     'auth.owner_desc': 'Kelola restoran dan pesanan Anda',
-    'auth.admin': 'Administrator',
-    'auth.admin_desc': 'Akses sistem penuh dan manajemen',
     'auth.selected': 'Dipilih',
     'auth.customer_preferences': 'Preferensi Pelanggan',
     'auth.location_consent': 'Persetujuan Layanan Lokasi',
@@ -2297,10 +2243,6 @@ export const dictionary = {
     'auth.enter_restaurant_phone': 'Masukkan telepon restoran',
     'auth.enter_restaurant_address': 'Masukkan alamat restoran',
     'auth.select_cuisine_type': 'Pilih jenis masakan',
-    'auth.admin_verification': 'Verifikasi Administrator',
-    'auth.admin_code': 'Kode Administrator',
-    'auth.enter_admin_code': 'Masukkan kode verifikasi administrator',
-    'auth.admin_code_desc': 'Kode administrator diperlukan untuk akses administrator sistem',
     'common.close': 'Tutup',
     
     // Google Sign-In Setup
@@ -2431,8 +2373,6 @@ export const dictionary = {
     'auth.restaurant_owner_desc': 'Gestiona tu restaurante y pedidos',
     'auth.owner': 'Propietario de Restaurante',
     'auth.owner_desc': 'Gestiona tu restaurante y pedidos',
-    'auth.admin': 'Administrador',
-    'auth.admin_desc': 'Acceso completo al sistema y gestión',
     'auth.selected': 'Seleccionado',
     'auth.customer_preferences': 'Preferencias del Cliente',
     'auth.location_consent': 'Consentimiento de Servicios de Ubicación',
@@ -2663,8 +2603,6 @@ export const dictionary = {
     'welcome.for_customers_desc': 'Explorați restaurante, faceți comenzi și bucurați-vă de o experiență culinară fără întreruperi',
     'welcome.for_owners': 'Pentru Proprietarii de Restaurante',
     'welcome.for_owners_desc': 'Gestionați-vă restaurantul, comenzile și meniurile cu instrumente puternice',
-    'welcome.for_admins': 'Pentru Administratori',
-    'welcome.for_admins_desc': 'Acces complet la sistem și capacități de management cuprinzătoare',
     
     // Features
     'features.multilingual': 'Suport Multilingv',

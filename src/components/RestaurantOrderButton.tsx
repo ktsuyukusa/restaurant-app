@@ -20,6 +20,7 @@ interface MenuItem {
   spicy?: boolean;
   vegetarian?: boolean;
   glutenFree?: boolean;
+  quantity?: number;
 }
 
 interface Restaurant {
@@ -49,7 +50,24 @@ const RestaurantOrderButton: React.FC<RestaurantOrderButtonProps> = ({
   const { t, currentLanguage } = useLanguage();
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
-  const [currentOrder, setCurrentOrder] = useState<any>(null);
+  const [currentOrder, setCurrentOrder] = useState<{
+    id: string;
+    created_at: string;
+    customer_name: string;
+    customer_email: string;
+    customer_phone: string;
+    pickup_time: string;
+    total_amount: number;
+    status: string;
+    payment_method: string;
+    restaurant_id: string;
+    notes: string;
+    items: Array<{
+      name: string;
+      quantity: number;
+      price: number;
+    }>;
+  } | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -159,10 +177,14 @@ const RestaurantOrderButton: React.FC<RestaurantOrderButtonProps> = ({
     setIsOrderDialogOpen(true);
   };
 
-  const handleOrderComplete = (orderId: string, orderData?: any) => {
-    if (orderData) {
+  const getTotalPrice = (): number => {
+    return selectedItems.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
+  };
+
+  const handleOrderComplete = (orderId: string, orderData?: unknown) => {
+    if (orderData && typeof orderData === 'object' && orderData !== null) {
       // Use the provided order data (for mock orders)
-      setCurrentOrder(orderData);
+      setCurrentOrder(orderData as typeof currentOrder);
     } else {
       // Fetch the completed order details from database
       fetchOrderDetails(orderId);
@@ -214,7 +236,7 @@ const RestaurantOrderButton: React.FC<RestaurantOrderButtonProps> = ({
       Pickup Time: ${currentOrder.pickup_time}
       
       Items:
-      ${currentOrder.items.map((item: any) => 
+      ${currentOrder.items.map((item) => 
         `${item.name} x${item.quantity} - ¥${(item.price * item.quantity).toLocaleString()}`
       ).join('\n')}
       
@@ -334,4 +356,4 @@ const RestaurantOrderButton: React.FC<RestaurantOrderButtonProps> = ({
   );
 };
 
-export default RestaurantOrderButton; 
+export default RestaurantOrderButton;    

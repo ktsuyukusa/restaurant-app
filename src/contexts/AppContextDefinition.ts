@@ -9,7 +9,7 @@ interface CartItem {
   restaurantId: string;
 }
 
-type UserRole = 'customer' | 'restaurant_owner' | 'admin' | null;
+type UserRole = 'customer' | 'restaurant_owner' | null;
 
 export interface AppContextType {
   sidebarOpen: boolean;
@@ -38,7 +38,7 @@ export interface AppContextType {
   updateUserAfter2FA: (user: User) => void;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
-  hasRole: (role: 'customer' | 'restaurant_owner' | 'admin') => boolean;
+  hasRole: (role: 'customer' | 'restaurant_owner') => boolean;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

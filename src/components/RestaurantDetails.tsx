@@ -17,7 +17,7 @@ interface RestaurantDetailsProps {
 }
 
 // Helper function to handle both string and object values
-const getLocalized = (field: any, lang: string) => {
+const getLocalized = (field: Record<string, string> | string | null | undefined, lang: string) => {
   if (!field || typeof field !== 'object') return field;
   return getLocalizedValue(field, lang);
 };
@@ -75,9 +75,9 @@ const RestaurantDetails: React.FC<RestaurantDetailsProps> = ({ restaurantId, onB
   }
 
   const lang = currentLanguage;
-  const name = getLocalized(restaurant.name, lang) || 'Restaurant';
-  const description = getLocalized(restaurant.description, lang) || '';
-  const address = getLocalized(restaurant.address, lang) || 'Address not available';
+  const name = String(getLocalized(restaurant.name, lang) || 'Restaurant');
+  const description = String(getLocalized(restaurant.description, lang) || '');
+  const address = String(getLocalized(restaurant.address, lang) || 'Address not available');
   const hours = restaurant.opening_hours || restaurant.openHours || '9:00 - 22:00';
   const phone = restaurant.phone_number || restaurant.phone || 'N/A';
 
@@ -85,12 +85,12 @@ const RestaurantDetails: React.FC<RestaurantDetailsProps> = ({ restaurantId, onB
     return restaurant.image_url || restaurant.image || '/AZ inside.jpg';
   };
 
-  const getItemName = (item: MenuItem) => {
-    return getLocalized(item.name, lang);
+  const getItemName = (item: MenuItem): string => {
+    return String(getLocalized(item.name, lang) || '');
   };
 
-  const getItemDescription = (item: MenuItem) => {
-    return getLocalized(item.description, lang);
+  const getItemDescription = (item: MenuItem): string => {
+    return String(getLocalized(item.description, lang) || '');
   };
 
   return (

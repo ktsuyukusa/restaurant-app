@@ -24,7 +24,7 @@ export interface SignupData {
   confirmPassword: string;
   name: string;
   phone: string;
-  userType: 'customer' | 'restaurant_owner' | 'admin';
+  userType: 'customer' | 'restaurant_owner';
   locationConsent?: boolean;
   restaurantName?: string;
   restaurantPhone?: string;
