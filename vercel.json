@@ -5,8 +5,8 @@
   "framework": "vite",
   "installCommand": "npm install",
   "functions": {
-    "api/**.js": {
-      "runtime": "nodejs20.x"
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
     }
   },
   "headers": [
