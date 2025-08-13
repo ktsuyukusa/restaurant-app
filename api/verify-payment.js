@@ -1,4 +1,5 @@
 const Stripe = require('stripe');
+export const config = { runtime: 'nodejs18.x' };
 
 module.exports = async function handler(req, res) {
   // Check if Stripe is configured

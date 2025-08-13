@@ -1,4 +1,5 @@
 const speakeasy = require('speakeasy');
+export const config = { runtime: 'nodejs18.x' };
 const { createClient } = require('@supabase/supabase-js');
 
 module.exports = async function handler(req, res) {
