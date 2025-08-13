@@ -1,21 +1,4 @@
-// Simple webhook test endpoint for development
-module.exports = async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  console.log('Webhook test received:', {
-    body: req.body,
-    headers: req.headers,
-    timestamp: new Date().toISOString()
-  });
-
-  // Simulate processing time
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  res.status(200).json({ 
-    received: true, 
-    message: 'Webhook test endpoint working',
-    timestamp: new Date().toISOString()
-  });
-} 
+// Disabled in production
+module.exports = async function handler(_req, res) {
+  return res.status(410).json({ error: 'Gone' });
+}

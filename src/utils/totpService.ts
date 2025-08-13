@@ -125,23 +125,8 @@ export const generateTOTPSecret = (): string => {
 };
 
 export const verifyTOTPCode = async (secret: string, token: string, window: number = 3): Promise<boolean> => {
-  console.log('🔍 TOTP Debug (speakeasy): Verifying token:', token, 'with secret:', secret);
-  console.log('🔍 TOTP Debug (speakeasy): Current time:', new Date().toISOString());
-  console.log('🔍 TOTP Debug (speakeasy): Unix timestamp:', Math.floor(Date.now() / 1000));
-  console.log('🔍 TOTP Debug (speakeasy): Window size:', window);
-  
   try {
-    // Generate current code for debugging
-    const currentCode = speakeasy.totp({
-      secret: secret,
-      encoding: 'base32',
-      digits: 6,
-      step: 30,
-      algorithm: 'sha1'
-    });
-    console.log(`🔍 TOTP Debug (speakeasy): Current code: ${currentCode}`);
-    
-    const result = speakeasy.totp.verify({
+    return speakeasy.totp.verify({
       secret: secret,
       encoding: 'base32',
       token: token,
@@ -150,19 +135,7 @@ export const verifyTOTPCode = async (secret: string, token: string, window: numb
       algorithm: 'sha1',
       window: window
     });
-    
-    console.log('🔍 TOTP Debug (speakeasy): Verification result:', result);
-    
-    // Calculate remaining time
-    const now = Math.floor(Date.now() / 1000);
-    const timeStep = Math.floor(now / 30);
-    const nextStep = (timeStep + 1) * 30;
-    const remainingTime = nextStep - now;
-    console.log('🔍 TOTP Debug (speakeasy): Time remaining:', remainingTime, 'seconds');
-    
-    return result;
-  } catch (error) {
-    console.error('🔍 TOTP Debug (speakeasy): Error during verification:', error);
+  } catch (_error) {
     return false;
   }
 };

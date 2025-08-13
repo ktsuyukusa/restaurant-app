@@ -17,8 +17,8 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
   const [remainingTime, setRemainingTime] = useState(30);
   const [isTesting, setIsTesting] = useState(false);
 
-  // Database secret from your SQL files - UPDATED VERSION 2.0
-  const DATABASE_SECRET = 'PKKHZPR2QBZC54PTPEA7SVZ6ZNGE3MHI';
+  // Enter the exact Base32 secret stored in your admin record to test
+  const [databaseSecret, setDatabaseSecret] = useState('');
 
   const addDebugInfo = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
     const timestamp = new Date().toLocaleTimeString();
@@ -27,12 +27,16 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
 
   const runDebugChecks = async () => {
     setDebugInfo([]);
-    addDebugInfo('=== Production 2FA Debug Started (v2.0) ===', 'info');
-    addDebugInfo(`🔑 Using database secret: ${DATABASE_SECRET}`, 'info');
+    addDebugInfo('=== Production 2FA Debug Started (v2.1) ===', 'info');
+    if (!databaseSecret) {
+      addDebugInfo('❌ No database secret provided. Paste your Base32 secret to test.', 'error');
+      return;
+    }
+    addDebugInfo(`🔑 Using database secret: [hidden]`, 'info');
 
     // Check 1: TOTP Implementation
     try {
-      const currentCode = await generateTOTPCode(DATABASE_SECRET);
+      const currentCode = await generateTOTPCode(databaseSecret);
       setGeneratedCode(currentCode);
       addDebugInfo(`✅ TOTP implementation working. Current code: ${currentCode}`, 'success');
     } catch (error) {
@@ -49,7 +53,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
     // Check 3: Base32 decoding
     try {
       // Test base32 decoding by generating a code
-      generateTOTPCode(DATABASE_SECRET);
+      generateTOTPCode(databaseSecret);
       addDebugInfo('✅ Base32 decoding working correctly', 'success');
     } catch (error) {
       addDebugInfo(`❌ Base32 decoding failed: ${error}`, 'error');
@@ -100,9 +104,13 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
 
     setIsTesting(true);
     addDebugInfo(`🧪 Testing code: ${testCode}`, 'info');
+    if (!databaseSecret) {
+      addDebugInfo('❌ No database secret provided. Paste your Base32 secret to test.', 'error');
+      return;
+    }
 
     try {
-      const totpService = new TOTPService({ secret: DATABASE_SECRET });
+      const totpService = new TOTPService({ secret: databaseSecret });
       const isValid = await totpService.verifyCode(testCode);
       
       if (isValid) {
@@ -124,7 +132,11 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
 
   const generateCurrentCode = async () => {
     try {
-      const totpService = new TOTPService({ secret: DATABASE_SECRET });
+      if (!databaseSecret) {
+        addDebugInfo('❌ No database secret provided. Paste your Base32 secret to generate a code.', 'error');
+        return;
+      }
+      const totpService = new TOTPService({ secret: databaseSecret });
       const code = await totpService.generateCode();
       const remaining = totpService.getRemainingTime();
       
@@ -140,7 +152,7 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
   useEffect(() => {
     if (isVisible) {
       const interval = setInterval(() => {
-        const totpService = new TOTPService({ secret: DATABASE_SECRET });
+         const totpService = new TOTPService({ secret: databaseSecret });
         setRemainingTime(totpService.getRemainingTime());
       }, 1000);
 
@@ -177,6 +189,18 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 className="font-semibold mb-2">Admin TOTP Secret (Base32)</h3>
+            <div className="space-y-2">
+              <Input
+                type="text"
+                placeholder="Paste the Base32 secret from your admin record"
+                value={databaseSecret}
+                onChange={(e) => setDatabaseSecret(e.target.value.trim().toUpperCase())}
+                className="font-mono"
+              />
+            </div>
+          </div>
           <div>
             <h3 className="font-semibold mb-2">Test Your Authenticator Code</h3>
             <div className="space-y-2">
@@ -232,10 +256,10 @@ export const Production2FADebug: React.FC<Production2FADebugProps> = ({ isVisibl
         </div>
 
         <div className="text-xs text-gray-500">
-          <p><strong>Database Secret:</strong> {DATABASE_SECRET}</p>
+          <p><strong>Database Secret:</strong> {databaseSecret ? '[hidden]' : '(not set)'}</p>
           <p><strong>Environment:</strong> {import.meta.env.MODE}</p>
           <p><strong>Deployment URL:</strong> {window.location.origin}</p>
-          <p><strong>Debug Version:</strong> 2.0 (Cache Bust)</p>
+          <p><strong>Debug Version:</strong> 2.1</p>
         </div>
       </CardContent>
     </Card>

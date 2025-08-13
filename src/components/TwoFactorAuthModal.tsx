@@ -132,13 +132,13 @@ export default function TwoFactorAuthModal({
   };
 
   const generateNewSecret = () => {
-    const newSecret = TOTP.generateSecret();
+    const newSecret = generateTOTPSecret();
     setSecret(newSecret);
-    
-    const totp = new TOTP(newSecret);
-    const qrUrl = `otpauth://totp/Navikko%20Admin:${userEmail || 'admin@navikko.com'}?secret=${newSecret}&issuer=Navikko%20Admin`;
+
+    const totpService = new TOTPService({ secret: newSecret });
+    const qrUrl = totpService.generateQRCodeURL(userEmail || 'admin@navikko.com', 'Navikko Admin');
     setQrCodeUrl(qrUrl);
-    
+
     setVerificationCode('');
     setError('');
     setSuccess('New secret generated!');

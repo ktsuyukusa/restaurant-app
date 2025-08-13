@@ -35,6 +35,39 @@ interface ExternalBookingProvider {
   supportsBooking: boolean;
 }
 
+interface ExistingReservation {
+  reservation_time: string;
+  party_size: number;
+}
+
+interface Reservation {
+  id: string;
+  restaurant_id: string;
+  customer_name: string;
+  customer_email?: string;
+  customer_phone?: string;
+  reservation_date: string;
+  reservation_time: string;
+  party_size: number;
+  notes?: string;
+  status: string;
+  user_id?: string;
+  created_at: string;
+  updated_at: string;
+  deposit_required?: boolean;
+  deposit_amount?: number;
+}
+
+interface UserReservation extends Reservation {
+  restaurants: {
+    name_ja: string;
+    name_en: string;
+    address_ja: string;
+    address_en: string;
+    phone: string;
+  };
+}
+
 class ReservationService {
   private externalProviders: Map<string, ExternalBookingProvider> = new Map();
 
@@ -160,7 +193,7 @@ class ReservationService {
   // Filter available timeslots based on existing reservations
   private filterAvailableTimeslots(
     timeslots: Timeslot[],
-    existingReservations: any[],
+    existingReservations: ExistingReservation[],
     partySize: number
   ): Timeslot[] {
     const restaurantCapacity = 50; // Default capacity, should come from restaurant settings
@@ -314,7 +347,7 @@ class ReservationService {
     restaurantId: string,
     date?: string,
     status?: string
-  ): Promise<any[]> {
+  ): Promise<Reservation[]> {
     try {
       const supabase = getSupabaseClient();
       
@@ -373,7 +406,7 @@ class ReservationService {
   }
 
   // Get user reservations
-  async getUserReservations(userId: string): Promise<any[]> {
+  async getUserReservations(userId: string): Promise<UserReservation[]> {
     try {
       const supabase = getSupabaseClient();
       

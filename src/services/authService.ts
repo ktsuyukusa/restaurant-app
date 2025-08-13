@@ -543,104 +543,9 @@ class AuthService {
 
   // Admin signup with admin code validation
   async signupAdmin(data: SignupData): Promise<User> {
-    if (data.userType !== 'admin') {
-      throw new Error('Invalid user type for admin signup');
-    }
-
-    // Validate required fields
-    if (!data.email || !data.password || !data.name || !data.phone || !data.adminCode) {
-      throw new Error('All fields including admin code are required');
-    }
-
-    // Validate admin code
-    const adminLevel = getAdminLevel(data.adminCode);
-    if (!adminLevel) {
-      throw new Error('Invalid admin code');
-    }
-
-    // Check IP restrictions for admin access
-    if (!this.isIPAllowedForAdmin()) {
-      throw new Error('Admin access is restricted from this IP address');
-    }
-
-    // Check if user already exists
-    const userExists = await this.checkUserExists(data.email);
-    if (userExists) {
-      throw new Error('User with this email already exists. Please login instead.');
-    }
-
-    try {
-      // Create user in Supabase
-      const supabase = getSupabaseClient();
-      console.log('Creating admin user with data:', {
-        email: data.email,
-        name: data.name,
-        phone: data.phone,
-        user_type: 'admin'
-      });
-      
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .insert({
-          email: data.email,
-          name: data.name,
-          phone: data.phone,
-          user_type: 'admin'
-        })
-        .select()
-        .single();
-
-      if (userError) {
-        console.error('Error creating admin user:', userError);
-        throw new Error(`Failed to create admin account: ${userError.message}`);
-      }
-
-      console.log('Admin user created successfully:', userData);
-
-      // Create admin access record
-      const adminAccessData = {
-          user_id: userData.id,
-          level: adminLevel,
-          permissions: this.getPermissionsForLevel(adminLevel),
-          access_code: data.adminCode
-      };
-      
-      console.log('Creating admin access with data:', adminAccessData);
-      
-      const { error: adminError } = await supabase
-        .from('admin_access')
-        .insert(adminAccessData);
-
-      if (adminError) {
-        console.error('Error creating admin access:', adminError);
-        // Clean up user if admin access creation fails
-        await supabase.from('users').delete().eq('id', userData.id);
-        throw new Error(`Failed to create admin access: ${adminError.message}`);
-      }
-
-      console.log('Admin access created successfully');
-
-      const user: User = {
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        phone: userData.phone,
-        userType: userData.user_type,
-        adminAccess: {
-          level: adminLevel,
-          permissions: this.getPermissionsForLevel(adminLevel),
-          accessCode: data.adminCode
-        },
-        createdAt: userData.created_at
-      };
-
-      this.currentUser = user;
-      this.saveUserToStorage(user);
-      return user;
-    } catch (error: unknown) {
-      console.error('Admin signup error:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to create admin account');
-    }
+    // For security, admin signup is disabled from the frontend.
+    // Admin accounts must be created via secure database scripts (see `setup-admin-user.sql`).
+    throw new Error('Admin signup is restricted. Use secure backend process to create admin users.');
   }
 
   // Unified signup method
@@ -774,21 +679,29 @@ class AuthService {
             throw new Error('2FA_REQUIRED');
           }
 
-          // Validate 2FA code using TOTP with secret from database
-          if (!user.adminAccess?.twoFactorSecret) {
-            throw new Error('2FA not set up. Please complete 2FA setup first.');
+          let isValid = false;
+          try {
+            // Verify 2FA via secure server endpoint (preferred)
+            const resp = await fetch('/api/verify-2fa', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: user.email, code: twoFactorCode })
+            });
+            const body = await resp.json().catch(() => ({}));
+            isValid = resp.ok && body?.success === true;
+            console.log('🔍 Login 2FA: server verification result:', isValid);
+          } catch (_e) {
+            // Network/404 → fall back to local verification for continuity
           }
 
-          console.log('🔍 Login 2FA Debug: Using secret from database:', user.adminAccess.twoFactorSecret);
-          console.log('🔍 Login 2FA Debug: Verifying code:', twoFactorCode);
-          
-          // Use browser-compatible TOTP verification with larger window for time drift
-          console.log('🔍 Login 2FA Debug: Current time:', new Date().toISOString());
-          console.log('🔍 Login 2FA Debug: Unix timestamp:', Math.floor(Date.now() / 1000));
-          console.log('🔍 Login 2FA Debug: Counter:', Math.floor(Date.now() / 1000 / 30));
-          const isValid = await verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode, 3); // Increased window to 3
-          
-          console.log('🔍 Login 2FA Debug: Verification result:', isValid);
+          if (!isValid) {
+            // Fallback: verify locally using the secret from DB (window 5 for drift)
+            if (!user.adminAccess?.twoFactorSecret) {
+              throw new Error('2FA not set up. Please complete 2FA setup first.');
+            }
+            isValid = await verifyTOTPCode(user.adminAccess.twoFactorSecret, twoFactorCode, 5);
+            console.log('🔍 Login 2FA: local fallback verification result:', isValid);
+          }
           
           if (!isValid) {
             this.trackLoginAttempt(data.email, false);

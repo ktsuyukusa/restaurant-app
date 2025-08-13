@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset 2FA QR Code - Navikko Admin</title>
-    <link rel="stylesheet" href="fresh-2fa-setup.css">
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <link rel="stylesheet" href="/fresh-2fa-setup.css">
 </head>
 <body>
     <div class="container">
@@ -25,13 +24,16 @@
             <div class="secret-section">
                 <h3>📱 New TOTP Secret</h3>
                 <div class="secret-code" id="secretDisplay"></div>
-                <p><strong>Account:</strong> admin@navikko.com</p>
+                <p><strong>Account:</strong> <span id="accountEmail">wasando.tsuyukusa@gmail.com</span></p>
                 <p><strong>Issuer:</strong> Navikko</p>
             </div>
 
             <div class="qr-section">
                 <h3>📱 QR Code for Google Authenticator</h3>
-                <div id="qrcode"></div>
+                <div id="qrcode">
+                    <img id="qrImg" alt="2FA QR" style="width:220px;height:220px;display:none;" />
+                </div>
+                <p><a id="qrLink" href="#" target="_blank" rel="noopener" style="display:none;">Open QR in a new tab</a></p>
                 <p>Scan this QR code with Google Authenticator</p>
             </div>
 
@@ -55,7 +57,7 @@
 
             <div class="success">
                 <h3>💾 Database Update SQL</h3>
-                <p>Run this SQL command to update the database with the new secret (replace [NEW_SECRET] with the secret shown above):</p>
+                <p>Run this SQL command to update the database with the new secret:</p>
                 <div class="secret-code" id="sqlCommand"></div>
                 <button onclick="copySQLCommand()">📋 Copy SQL Command</button>
             </div>
@@ -68,6 +70,12 @@
     </div>
 
     <script>
+        // Helper to read optional email from URL (?email=...)
+        function getParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
+
         // TOTP Service with corrected endianness handling
         class TOTPService {
             constructor(config = {}) {
@@ -189,25 +197,24 @@
             totpService = new TOTPService();
             
             const secret = totpService.getSecret();
-            const qrUrl = totpService.generateQRCodeURL('admin@navikko.com', 'Navikko');
+            const adminEmail = getParam('email') || 'wasando.tsuyukusa@gmail.com';
+            document.getElementById('accountEmail').textContent = adminEmail;
+            const qrUrl = totpService.generateQRCodeURL(adminEmail, 'Navikko');
             
             // Display secret
             document.getElementById('secretDisplay').textContent = secret;
             
-            // Generate QR code
-            const qrCodeElement = document.getElementById('qrcode');
-            qrCodeElement.innerHTML = '';
-            await QRCode.toCanvas(qrCodeElement, qrUrl, {
-                width: 256,
-                margin: 2,
-                color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
-                }
-            });
+            // Show QR via stable image endpoint
+            const qrData = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' + encodeURIComponent(qrUrl);
+            const img = document.getElementById('qrImg');
+            img.src = qrData;
+            img.style.display = 'block';
+            const link = document.getElementById('qrLink');
+            link.href = qrData;
+            link.style.display = 'inline';
             
-            // Generate SQL command with placeholder
-            const sqlCommand = `UPDATE admin_access SET two_factor_secret = '[NEW_SECRET]', two_factor_enabled = true WHERE user_id = (SELECT id FROM users WHERE email = 'admin@navikko.com');`;
+            // Generate SQL command with actual values
+            const sqlCommand = `UPDATE admin_access a\nSET two_factor_secret = '${secret}',\n    two_factor_enabled = true\nFROM users u\nWHERE a.user_id = u.id\n  AND u.email = '${adminEmail}';`;
             document.getElementById('sqlCommand').textContent = sqlCommand;
             // Note: Replace [NEW_SECRET] with the actual secret displayed above
             
