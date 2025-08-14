@@ -1,5 +1,5 @@
 const speakeasy = require('speakeasy');
-export const config = { runtime: 'nodejs18.x' };
+export const config = { runtime: 'nodejs' };
 const { createClient } = require('@supabase/supabase-js');
 
 module.exports = async function handler(req, res) {
@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Server is not configured for 2FA verification' });
     }
 
-    const { email, code } = req.body || {};
+    const { email, code } = await readJsonBody(req) || {};
     if (!email || !code || String(code).length !== 6) {
       return res.status(400).json({ error: 'Email and 6-digit code are required' });
     }
@@ -77,4 +77,18 @@ module.exports = async function handler(req, res) {
   }
 };
 
-
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+    req.on('end', () => {
+      try {
+        const raw = Buffer.concat(chunks).toString('utf8');
+        resolve(raw ? JSON.parse(raw) : {});
+      } catch (e) {
+        reject(e);
+      }
+    });
+    req.on('error', reject);
+  });
+}

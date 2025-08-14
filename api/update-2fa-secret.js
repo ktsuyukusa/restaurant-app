@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { email, secret } = req.body;
+    const { email, secret } = await readJsonBody(req);
 
     if (!email || !secret) {
       return res.status(400).json({ error: 'Email and secret are required' });
@@ -37,3 +37,19 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Internal server error' });
   }
 } 
+
+function readJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+    req.on('end', () => {
+      try {
+        const raw = Buffer.concat(chunks).toString('utf8');
+        resolve(raw ? JSON.parse(raw) : {});
+      } catch (e) {
+        reject(e);
+      }
+    });
+    req.on('error', reject);
+  });
+}

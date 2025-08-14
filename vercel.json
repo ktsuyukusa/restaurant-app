@@ -4,6 +4,11 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "installCommand": "npm install",
+  "functions": {
+    "api/**.js": {
+      "runtime": "nodejs"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)",
@@ -32,6 +37,13 @@
     }
   ],
   "rewrites": [
+    { "source": "/api/stripe/create-checkout-session", "destination": "/api/create-stripe-session" },
+    { "source": "/api/stripe/create-portal-session", "destination": "/api/create-portal-session" },
+    { "source": "/api/stripe/customers/(.*)", "destination": "/api/customers/$1" },
+    { "source": "/api/stripe/subscriptions/(.*)/cancel", "destination": "/api/subscriptions/$1/cancel" },
+    { "source": "/api/stripe/subscriptions/(.*)", "destination": "/api/subscriptions/$1" },
+    { "source": "/api/stripe/verify-payment", "destination": "/api/verify-payment" },
+    { "source": "/api/webhooks/stripe", "destination": "/api/webhook" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]

@@ -1,12 +1,13 @@
 const { createClient } = require('@supabase/supabase-js');
 const speakeasy = require('speakeasy');
-export const config = { runtime: 'nodejs18.x' };
+export const config = { runtime: 'nodejs' };
 
 module.exports = async function handler(req, res) {
   try {
     const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    const email = (req.query && req.query.email) || (req.body && req.body.email);
+    const parsed = await readMaybeJsonBody(req);
+    const email = (req.query && req.query.email) || (parsed && parsed.email);
 
     if (!supabaseUrl || !supabaseServiceKey) {
       return res.status(500).json({ error: 'Server env not set', details: { supabaseUrl: !!supabaseUrl, serviceKey: !!supabaseServiceKey } });
@@ -72,4 +73,20 @@ module.exports = async function handler(req, res) {
   }
 };
 
-
+function readMaybeJsonBody(req) {
+  return new Promise((resolve) => {
+    const method = (req.method || 'GET').toUpperCase();
+    if (method !== 'POST' && method !== 'PUT' && method !== 'PATCH') return resolve(null);
+    const chunks = [];
+    req.on('data', (c) => chunks.push(Buffer.from(c)));
+    req.on('end', () => {
+      try {
+        const raw = Buffer.concat(chunks).toString('utf8');
+        resolve(raw ? JSON.parse(raw) : null);
+      } catch {
+        resolve(null);
+      }
+    });
+    req.on('error', () => resolve(null));
+  });
+}

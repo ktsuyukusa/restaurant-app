@@ -2,29 +2,33 @@ const Stripe = require('stripe');
 export const config = { runtime: 'nodejs' };
 
 module.exports = async function handler(req, res) {
-  // Check if Stripe is configured
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   if (!process.env.STRIPE_SECRET_KEY) {
     console.error('STRIPE_SECRET_KEY is not configured');
     return res.status(500).json({ error: 'Payment service not configured' });
   }
 
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
   try {
-    const body = req.method === 'POST' ? await readJsonBody(req) : {};
-    const { session_id } = body || {};
-    
-    const session = await stripe.checkout.sessions.retrieve(session_id);
-    res.status(200).json({ verified: session.payment_status === 'paid' });
+    const { customerId, returnUrl } = await readJsonBody(req);
+    if (!customerId || !returnUrl) {
+      return res.status(400).json({ error: 'customerId and returnUrl are required' });
+    }
+
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl,
+    });
+
+    return res.status(200).json({ url: session.url });
   } catch (error) {
-    console.error('Payment verification error:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Portal session creation error:', error);
+    return res.status(500).json({ error: 'Failed to create portal session' });
   }
-} 
+}
 
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -41,3 +45,5 @@ function readJsonBody(req) {
     req.on('error', reject);
   });
 }
+
+
